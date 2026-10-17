@@ -844,3 +844,20 @@ body[data-theme="dark"] .inventory-confirm-box{background:#24392f}body[data-them
 .modern-card-scene.stage-declined .terminal-v2-screen b{font-size:15px!important;letter-spacing:1.5px}
 .modern-card-scene.stage-declined .payment-bankcard{opacity:.82;filter:saturate(.75)}
 @media(max-width:430px){#storeClock.rush-active{font-size:10px!important}.card-decline-actions button{font-size:11px;padding:10px 5px}}
+
+/* Developer-only sandbox test console. No admin permissions in client. */
+.dev-test-button[hidden]{display:none!important}
+.dev-test-button{display:flex;align-items:center;justify-content:center;gap:5px;background:#243f35!important;color:#e3ebcf!important;border:1px solid #547665!important;border-radius:12px!important;font-size:11px!important;font-weight:800;letter-spacing:.04em;min-height:40px}
+body.developer-mode .topbar{border-bottom-color:#aabcb0}
+.dev-panel .modal-kicker{color:#608669}
+.dev-panel h3{font-size:13px;letter-spacing:.02em;margin:20px 0 10px}
+.dev-note{background:#eef4e7;border:1px solid #bfd3b5;padding:13px 16px;border-radius:14px;color:#244334}
+.dev-note p{margin:3px 0 0;font-size:12px;line-height:1.5}
+.dev-scenario-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.dev-scenario-grid>button{display:flex;align-items:flex-start;flex-direction:column;gap:5px;text-align:left;border:1px solid #d4dfd2;border-radius:13px;background:#fffdf7;padding:12px;min-height:82px;font-size:17px;color:#204639;transition:background .14s,border-color .14s}
+.dev-scenario-grid>button:hover{border-color:#8bba8d;background:#f0f7eb}
+.dev-scenario-grid b{font-size:13px}.dev-scenario-grid small{color:#6e8076;font-size:11px}
+.dev-day-input{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px}
+.dev-day-input input{min-width:0;height:42px;border:1px solid #c8d8cc;border-radius:10px;padding:8px 10px;font-weight:bold}
+.dev-panel-footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;border-top:1px solid #e2e6dc;margin-top:17px;padding-top:15px}
+@media(max-width:760px){.dev-test-button{font-size:10px!important;min-width:0}.utility-bar{grid-template-columns:repeat(3,minmax(0,1fr))!important}.dev-day-input{grid-template-columns:1fr 1fr}.dev-day-input label{grid-column:1}.dev-day-input input{grid-column:2}.dev-day-input button{grid-column:1/-1}.dev-scenario-grid>button{min-height:76px;padding:10px}}
