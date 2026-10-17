@@ -1,6 +1,6 @@
-import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourPeriod} from './engine.mjs?v=2026-10-18-developer-test-v1';
+import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourPeriod} from './engine.mjs?v=2026-10-18-developer-setup-v2';
 import {productArt,moneyArt} from './art.mjs';
-import {createCloudSync} from './cloud.mjs?v=2026-10-18-developer-test-v1';
+import {createCloudSync} from './cloud.mjs?v=2026-10-18-developer-setup-v2';
 
 const $=id=>document.getElementById(id);
 const ICONS={basket:'M3 9h18l-2 11H5L3 9ZM8 9l4-7 4 7M8 13v3m4-3v3m4-3v3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5',shop:'M3 10V5h18v5M4 10v11h16V10M2 10a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0M9 21v-7h6v7',volume:'M11 4 6 8H2v8h4l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14',mute:'M11 4 6 8H2v8h4l5 4V4Zm5 5 6 6m0-6-6 6',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',pause:'M8 4v16m8-16v16',scan:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M6 12h12M7 9v6m3-6v6m4-6v6m3-6v6',scale:'M6 7h12l3 14H3L6 7Zm3 0V5a3 3 0 0 1 6 0v2m-3 4v5m-2-2h4',arrow:'M4 12h16m-6-6 6 6-6 6',heart:'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',flag:'M5 21V3m0 0c5-3 9 3 14 0v10c-5 3-9-3-14 0',receipt:'M5 3h14v19l-3-2-4 2-4-2-3 2V3Zm3 5h8m-8 4h8m-8 4h5',lock:'M6 10h12v11H6V10Zm3 0V6a3 3 0 0 1 6 0v4',card:'M2 5h20v14H2V5Zm0 5h20M6 15h4',qr:'M3 3h6v6H3V3Zm12 0h6v6h-6V3ZM3 15h6v6H3v-6Zm12 0h3v3h3v3h-6v-6Zm6-3v3M12 3v3m0 6v3M3 12h6m3 6v3',cash:'M2 5h20v14H2V5Zm10 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM5 8h1m12 8h1',check:'M5 12l4 4L19 6',close:'M6 6l12 12M6 18 18 6',play:'m8 4 12 8-12 8V4Z',snow:'M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4m13 9-4 1 1 4M4 14l4 1-1 4m13-9-4-1 1-4',spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z',undo:'M8 4 3 9l5 5M3 9h10a7 7 0 0 1 0 14',reset:'M4 8a9 9 0 1 1-1 8M4 3v5h5',help:'M9 8a3 3 0 1 1 5 2c-1 1-2 1-2 4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z'};
@@ -16,7 +16,7 @@ let paymentMinimized=false,musicUnlocked=false,musicLevel=0,musicTarget=-1,music
 let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=null,musicSource=null,chaChingBuffer=null,chaChingPromise=null,chaChingSource=null;
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-developer-test-v1';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-developer-setup-v2';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
@@ -193,12 +193,19 @@ function showSummary(){closeCalculator();ensureShift(session);settleShift(progre
 function setMobileView(view){const pay=view==='payment';document.body.classList.toggle('view-payment',pay);$('counterTab').classList.toggle('active',!pay);$('paymentTab').classList.toggle('active',pay);$('counterTab').setAttribute('aria-selected',String(!pay));$('paymentTab').setAttribute('aria-selected',String(pay))}
 Object.assign(ICONS,{user:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8',moon:'M20 15.5A8.7 8.7 0 0 1 8.5 4 9 9 0 1 0 20 15.5Z',calculator:'M5 2h14v20H5V2Zm3 3h8v4H8V5Zm0 8h1m3 0h1m3 0h1m-9 4h1m3 0h1m3 0h1',ticket:'M3 6h18v4a2 2 0 0 0 0 4v4H3v-4a2 2 0 0 0 0-4V6Zm12 0v12',clock:'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 4v6l4 2',settings:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2',book:'M3 4h7l2 2 2-2h7v16h-7l-2 2-2-2H3V4Zm9 2v16'});
 
-// Developer sandbox — only after a configured Firebase Authentication UID logs in.
-// This never writes to another player's cloud progress or the Developer's cloud save.
+// Developer sandbox — requires a configured Firebase Authentication UID.
+// ?dev=1 exposes an ACCESS SETUP entry, never grants sandbox access itself.
+const developerSetupRequested=new URLSearchParams(window.location.search).get('dev')==='1';
 let developerMode=false;
 function developerAccessChanged(enabled){
  developerMode=!!enabled;
- const button=$('developerPanelBtn');if(button)button.hidden=!developerMode;
+ const button=$('developerPanelBtn');
+ if(button){
+  button.hidden=!(developerMode||developerSetupRequested);
+  button.classList.toggle('dev-setup-locked',!developerMode);
+  button.innerHTML=developerMode?'🛠️ <span>DEV TEST</span>':'🔒 <span>DEV SETUP</span>';
+  button.setAttribute('aria-label',developerMode?'Buka panel ujian developer':'Semak dan aktifkan akses Developer dalam Akaun');
+ }
  document.body.classList.toggle('developer-mode',developerMode);
  if(developerMode)toast('Mod Developer aktif · semua ujian disimpan secara berasingan');
 }
@@ -288,6 +295,7 @@ function showDeveloperPanel(){
   await cloud.resetProgress(captureGame());render();showIntro();toast('Data ujian developer direset');
  };
 }
+developerAccessChanged(false);
 cloud=createCloudSync({
  capture:captureGame,
  hydrate:hydrateGame,
@@ -296,7 +304,7 @@ cloud=createCloudSync({
  onDeveloperChanged:developerAccessChanged
 });
 initIllustrations();icons();renderHeader();renderScene();renderProducts();renderPayment();showIntro();
-$('developerPanelBtn').onclick=showDeveloperPanel;
+$('developerPanelBtn').onclick=()=>{if(assertDeveloper())showDeveloperPanel();else cloud?.openAccount()};
 $('inventoryBtn').onclick=()=>showInventory();$('operationsBtn').onclick=()=>showInventory();$('calcBtn').onclick=showCalculator;$('missionBtn').onclick=showMissions;$('catalogueBtn').onclick=()=>showCodePad();$('settingsBtn').onclick=showSettings;$('bagZone').onclick=showBag;$('nightBtn').onclick=toggleDark;$('undoScanBtn').onclick=undoScan;
 $('counterTab').onclick=()=>setMobileView('counter');$('paymentTab').onclick=()=>setMobileView('payment');
 $('soundBtn').onclick=()=>{sound=!sound;if(!sound){stopScannerSound();stopChaChing();stopScaleSound();stopDrawerSound()}renderHeader();save()};$('pauseBtn').onclick=()=>{if($('modal').open){if(!['intro','summary'].includes(modalKind))closeModal()}else showPause()};$('shopBtn').onclick=()=>{if(modalKind==='intro')return;showShop()};$('fullBtn').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();else toast('Ajukan peranti secara melintang untuk ruang lebih luas.')}catch{toast('Skrin penuh tidak disokong di pelayar ini.')}};

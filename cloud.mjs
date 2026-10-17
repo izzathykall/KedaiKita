@@ -76,7 +76,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   let kickedForOtherDevice = false, kickingOut = false;
   let developerSandbox=false;
   const DEV_KEY=uid=>`kedai-kita-dev-sandbox-${uid}-v1`;
-  const authorizedDeveloper=uid=>!!uid&&Array.isArray(window.KEDAI_DEVELOPER_UIDS)&&window.KEDAI_DEVELOPER_UIDS.some(x=>typeof x==='string'&&x.length>12&&x===uid);
+  const authorizedDeveloper=uid=>!!uid&&Array.isArray(window.KEDAI_DEVELOPER_UIDS)&&window.KEDAI_DEVELOPER_UIDS.some(x=>typeof x==='string'&&x.trim().length>12&&x.trim()===uid);
   let bootWatchdog = null, bootSettled = false, bootStalled = false;
   const sessionPath = uid => api.ref(db, `activeSessions/${uid}`);
   const browserSessionKey = uid => `kk-active-session-${uid}`;
@@ -134,6 +134,15 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   const showOverview = () => {
     show();showRegion('overview');ui.title.textContent='Akaun Kedai Kita';ui.hint.textContent='Progres kerjaya disimpan mengikut akaun ini.';
     ui.current.textContent=user?.email||'Akaun pemain';message(syncError?errorMalay(syncError):'Data akaun anda telah dimuatkan.');
+    const setup=byId('developerSetupDetails'),access=byId('developerAccessStatus'),help=byId('developerAccessHelp'),uid=byId('developerUid'),copy=byId('copyDeveloperUid');
+    if(setup){
+      setup.open=developerSandbox||new URLSearchParams(window.location.search).get('dev')==='1';
+      if(access)access.textContent=developerSandbox?'Aktif · Sandbox':'Belum aktif';
+      if(access)access.classList.toggle('active',developerSandbox);
+      if(help)help.textContent=developerSandbox?'Akaun Developer disahkan. Tekan DEV TEST untuk menguji fungsi tanpa mengubah progres pemain.':'Akaun ini belum disenaraikan sebagai Developer. Ikut langkah di bawah untuk mengaktifkannya.';
+      if(uid)uid.value=user?.uid||'';
+      if(copy)copy.textContent='Salin UID';
+    }
   };
   const setMode = selected => {
     mode=selected; ui.login.classList.toggle('active',selected==='login');
@@ -378,6 +387,15 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     ui.close.onclick=hide;overlay.addEventListener('cancel',e=>{e.preventDefault()});
     ui.guest.onclick=()=>{if(user)return;guestMode=true;ready=true;hide();setStatus('Disimpan pada peranti · mod tetamu')};
     ui.logout.onclick=logOut;
+    const copyDevUid=byId('copyDeveloperUid');
+    if(copyDevUid)copyDevUid.onclick=async()=>{
+      const uid=user?.uid,field=byId('developerUid');if(!uid||!field)return;
+      let copied=false;
+      try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(uid);copied=true}}catch{}
+      if(!copied){try{field.focus();field.select();copied=document.execCommand('copy')}catch{}}
+      copyDevUid.textContent=copied?'✓ UID disalin':'Pilih UID dan salin';
+      if(!copied)field.select();
+    };
     ui.form.onsubmit=async e=>{
       e.preventDefault();if(!auth||busy)return;
       const email=trim(ui.email.value),password=ui.password.value;
