@@ -7,5 +7,5 @@
 // Nota keselamatan: konfigurasi JavaScript di browser hanyalah kawalan UI,
 // BUKAN peranan Firebase admin atau kawalan keselamatan data backend.
 window.KEDAI_DEVELOPER_UIDS = [
-  // "SALIN_UID_AKAUN_DEVELOPER_DI_SINI"
+  // "gfF5r3IVdjfIT6gt3B7XK4o4eJA3"
 ];
