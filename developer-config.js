@@ -3,5 +3,5 @@
 // then add the account's UID below. Never place passwords in this file.
 // This enables LOCAL SANDBOX testing only. It grants no database admin rights.
 window.KEDAI_DEVELOPER_UIDS = [
-  // "PASTE_DEVELOPER_AUTH_UID_HERE"
+  // "gfF5r3IVdjfIT6gt3B7XK4o4eJA3"
 ];
