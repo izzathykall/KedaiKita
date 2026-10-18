@@ -1,1 +1,5 @@
-{"version": "2026-10-18-qr-fit-v15", "label": "VIP badge dan bar pelanggan lebih kecil", "notes": "Developer sandbox moved to sibling path to satisfy Firebase validation"}
+{
+  "version": "2026-10-18-responsive-payment-v16",
+  "label": "Paparan responsif dan popup QR sepadan dengan kad",
+  "notes": "Developer sandbox moved to sibling path to satisfy Firebase validation"
+}
