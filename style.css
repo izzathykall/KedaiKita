@@ -1112,3 +1112,12 @@ body.store-rush-active .receipt-title,body.store-rush-active .receipt-total,body
 .store-scene .customer-info.vip{border-color:#e8c57c;box-shadow:0 4px 18px #ba9b5a25}
 @media(max-width:740px){.customer-vip-badge,.customer-vip-tip{font-size:8px;padding:3px 5px;margin-left:5px}.store-scene .customer-info{padding:5px 8px!important;min-height:44px!important}}
 @media(max-width:490px){.customer-vip-tip{display:none!important}.store-scene .customer-info .patience-wrap{gap:4px}.store-scene .customer-info .patience-track{width:42px}}
+
+/* v8 customer bar: compact overlay, torso stays visible */
+.store-scene .customer-info{bottom:5px!important;left:clamp(12px,3%,32px)!important;right:clamp(12px,3%,32px)!important;min-height:39px!important;padding:4px 10px!important;gap:7px!important;border-radius:12px!important;backdrop-filter:blur(5px)}
+.store-scene .customer-info .mini-avatar{width:27px;height:27px}
+.store-scene .customer-info #customerRole{display:none!important}
+.store-scene .customer-info strong{font-size:11px}
+.store-scene .customer-info .customer-vip-badge,.store-scene .customer-info .customer-vip-tip{font-size:8px;padding:3px 6px}
+.store-scene .customer{bottom:7px;max-height:260px}
+@media(max-width:740px){.store-scene .customer-info{min-height:36px!important;padding:3px 7px!important}.store-scene .customer-info .mini-avatar{width:24px;height:24px}}
