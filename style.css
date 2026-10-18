@@ -879,3 +879,18 @@ body.developer-mode .topbar{border-bottom-color:#aabcb0}
 .developer-access-body code{overflow-wrap:anywhere;font-size:11px}
 .developer-firebase-link{display:inline-flex;font-size:12px;font-weight:750;color:#276e4a;text-decoration:underline;text-underline-offset:3px}
 @media(max-width:420px){.developer-uid-row{flex-wrap:wrap}.developer-uid-row input{flex-basis:100%;width:100%}.developer-uid-row button{width:100%}}
+
+/* Rush Hour: one 60-second late-shift event, clearly timed on all screens. */
+.rush-hour-banner[hidden]{display:none!important}
+.rush-hour-banner{margin:8px clamp(12px,2.2vw,36px) 6px;padding:10px 14px 11px;background:linear-gradient(105deg,#3f3024,#6d4431);border:1px solid #a26f47;border-radius:14px;color:#fff4dd;box-shadow:0 7px 18px #4f302b29;animation:rushEntry .3s ease-out}
+.rush-hour-heading{display:flex;gap:12px;align-items:center;min-width:0;font-size:12px;letter-spacing:.01em}
+.rush-hour-heading>strong{font-weight:900;letter-spacing:.075em;white-space:nowrap;color:#ffdf9a}
+.rush-hour-heading>span{flex:1;min-width:0;text-align:center;font-size:11px}
+.rush-countdown{font-size:17px;font-variant-numeric:tabular-nums;color:#fff;line-height:1;white-space:nowrap}
+.rush-timer-track{height:5px;margin-top:9px;border-radius:20px;background:#ffffff3b;overflow:hidden}
+.rush-timer-track i{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#eebd73,#fff0be);transition:width .1s linear}
+.rush-upgrade-hint{background:#fff6e8;border:1px solid #ecd5b1;border-radius:12px;padding:10px 13px;line-height:1.6}
+.result-rush-bonus{display:block;margin-top:8px;border:1px solid #deb77a;background:#fff1dc;border-radius:8px;padding:6px 10px;color:#6d491e;font-weight:750}
+@keyframes rushEntry{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:550px){.rush-hour-banner{margin:7px 11px;padding:8px 10px}.rush-hour-heading{gap:5px;font-size:10px}.rush-hour-heading>span{font-size:9px}.rush-countdown{font-size:14px}}
+body[data-theme="dark"] .rush-upgrade-hint{background:#3e3528;color:#f5d9b2;border-color:#746047}

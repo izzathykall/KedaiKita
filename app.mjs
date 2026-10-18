@@ -1,4 +1,4 @@
-import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourPeriod} from './engine.mjs?v=2026-10-18-developer-setup-v2';
+import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-18-rush-hour-60s';
 import {productArt,moneyArt} from './art.mjs';
 import {createCloudSync} from './cloud.mjs?v=2026-10-18-developer-setup-v2';
 
@@ -16,7 +16,7 @@ let paymentMinimized=false,musicUnlocked=false,musicLevel=0,musicTarget=-1,music
 let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=null,musicSource=null,chaChingBuffer=null,chaChingPromise=null,chaChingSource=null;
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-developer-setup-v2';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-rush-hour-60s';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
@@ -61,7 +61,24 @@ function save(){
 
 function beep(type='scan'){if(!sound)return;if(type==='scan'){playScannerSound();return}prepareScannerAudio();try{audioCtx??=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();const notes=type==='success'?[523,659,784]:type==='error'?[196,155]:type==='coin'?[880]:type==='start'?[392,523]:[1100];notes.forEach((freq,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='sine';o.frequency.value=freq;const start=audioCtx.currentTime+i*.11;g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(.19*effectVolume(type),start+.01);g.gain.exponentialRampToValueAtTime(.001,start+.12);o.start(start);o.stop(start+.13)})}catch{}}
 function toast(msg,error=false){$('toast').textContent=msg;$('toast').className='toast show'+(error?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2600);if(error)beep('error')}
-function newSession(selectedMode='career'){mode=selectedMode;if(mode==='practice')practiceStore=null;session={dayStart:JSON.parse(JSON.stringify(progress)),day:progress.day,mode,served:0,lost:0,totalSales:0,tips:0,earned:0,mistakes:0,index:0,bestCombo:0,weighed:0,scans:0,perfectCash:0,claimedMissions:[],seenPeople:[]};ensureShift(session);combo=0;initIllustrations();newCustomer()}
+function applyRushPatience(c){
+ if(!c||c.paid||c.rushOriginalPatience!==undefined)return;
+ c.rushOriginalPatience=c.patience;
+ // Give a customer present when the event begins ten NEW seconds to act.
+ c.patience=c.elapsed+RUSH_PATIENCE_SECONDS;
+}
+function restoreRushPatience(){
+ if(customer?.rushOriginalPatience===undefined)return;
+ customer.patience=Math.max(customer.elapsed+5,customer.rushOriginalPatience);
+ delete customer.rushOriginalPatience;
+}
+function beginDailyRush(){
+ if(mode!=='career'||!startRushHour(session,progress.day))return false;
+ if(customer&&!customer.paid)applyRushPatience(customer);
+ toast('⚡ RUSH HOUR! 60 saat · Sabar 10 saat · Untung ×'+rushHourMultiplier(progress.upgrades).toFixed(1));
+ renderOperations();save();return true;
+}
+function newSession(selectedMode='career'){mode=selectedMode;if(mode==='practice')practiceStore=null;session={dayStart:JSON.parse(JSON.stringify(progress)),day:progress.day,mode,served:0,lost:0,totalSales:0,tips:0,earned:0,mistakes:0,index:0,bestCombo:0,weighed:0,scans:0,perfectCash:0,claimedMissions:[],seenPeople:[],rushStarted:false,rushCompleted:false,rushSecondsRemaining:0,rushBonus:0,rushSales:0};ensureShift(session);combo=0;initIllustrations();newCustomer()}
 function newCustomer(){
  ensureShift(session);
  if(mode!=='practice'&&!readyForCustomer()){enterSupplyWait();return}advancePending=false;paymentMinimized=false;scanToken++;busy=false;cashPicked=[];phase='scan';
@@ -69,21 +86,13 @@ function newCustomer(){
  const featuredNames=['person-izzat','person-sakinah','person-wawa'];
  const alreadyFeatured=session.seenPeople.some(id=>featuredNames.includes(id));
  const featuredId=mode==='career'&&!alreadyFeatured?featuredNames[(progress.day-1)%featuredNames.length]:null;
- const rush=mode==='career'&&rushHourActive(progress.day,session.clockMinutes);
+ const rush=mode==='career'&&rushHourActive(progress.day,session);
  const selected=makeCustomer(mode==='practice'?Math.max(2,progress.day):progress.day,session.index,Math.random,{seen:session.seenPeople,forcedPersonId:featuredId,paymentMethods:availablePaymentMethods(progress.upgrades,mode==='practice'),upgrades:progress.upgrades,challenges:mode==='career',unlocked:mode==='practice'?CATEGORIES.map(c=>c.id):progress.unlocked,stock:mode==='practice'?null:progress.inventory});
  if(!selected){session.practiceDay=(session.practiceDay||1)+1;session.seenPeople=[];toast('Syif latihan baharu bermula.');newCustomer();return}
  customer=selected;prepareReturnCustomer();session.seenPeople.push(customer.person.id);
- // Rush hour increases pressure but comfort upgrades still provide a safety margin.
- if(rush){
-   customer.patience=Math.max(45,Math.round(customer.patience*.78));
-   const period=rushHourPeriod(progress.day,session.clockMinutes);
-   session.rushNotified??=[];
-   if(!session.rushNotified.includes(period)){
-     session.rushNotified.push(period);
-     toast('⚡ RUSH HOUR! Pelanggan semakin ramai. Layan dengan pantas!');
-   }
- }
  customer.patience+=(progress.upgrades.comfort||0)*15;
+ // Even a level-5 comfort upgrade cannot override the 10-second Rush Hour challenge.
+ if(rush)applyRushPatience(customer);
  $('customerArt').className='customer arrive';
  const incomingCustomer=customer;
  setTimeout(()=>{if(customer===incomingCustomer){$('customerArt').classList.remove('arrive');requestAnimationFrame(positionCustomerDialogue)}},650);
@@ -160,16 +169,23 @@ function completePayment(transaction=customer){
  if(!ensurePaper())return;if(mode!=='practice'&&!stockForBasket(progress,transaction.items)){showInventory();toast('Stok tidak cukup. Tambah bekalan untuk selesaikan jualan.',true);return}
  ensureShift(session);const missedCoupon=transaction.hasCoupon&&!transaction.couponApplied,reason=missedCoupon?'Kupon diminta tetapi tidak digunakan.':'';
  const starLost=missedCoupon?loseStar(session,reason):0;transaction.paid=true;busy=false;phase='success';combo++;session.bestCombo=Math.max(session.bestCombo,combo);
- lastTip=missedCoupon?0:tipFor(customer,combo,progress.upgrades);const cost=transaction.items.reduce((n,p)=>n+stockCost(p,stockUnits(p),progress.day),0);lastEarned=amountDue(transaction)-cost+lastTip;
+ lastTip=missedCoupon?0:tipFor(customer,combo,progress.upgrades);
+ const cost=transaction.items.reduce((n,p)=>n+stockCost(p,stockUnits(p),progress.day),0);
+ const itemMargin=amountDue(transaction)-cost;
+ const rushBonus=mode==='career'?rushHourProfitBonus(itemMargin,progress.upgrades,rushHourActive(progress.day,session)):0;
+ transaction.rushBonus=rushBonus;
+ lastEarned=itemMargin+lastTip+rushBonus;
+ session.rushBonus=(session.rushBonus||0)+rushBonus;
+ if(rushBonus)session.rushSales=(session.rushSales||0)+1;
  session.served++;if(transaction.method==='cash'&&!transaction.cashMistakes&&!transaction.overpaid)session.perfectCash=(session.perfectCash||0)+1;session.totalSales+=amountDue(transaction);session.tips+=lastTip;session.earned+=lastEarned;session.overpaid+=transaction.overpaid||0;
- if(mode==='career'){takeStock(progress,transaction.items);progress.paper--;receiveStoreCash(progress,amountDue(transaction)+lastTip);progress.lifetime+=lastEarned;progress.bestCombo=Math.max(progress.bestCombo,combo);recordSale(transaction);if(transaction.method==='card'){progress.cardHealth=Math.max(0,progress.cardHealth-Math.max(4,24-4*Math.max(1,progress.upgrades.card||1)));progress.cardBroken=progress.cardHealth===0}}
+ if(mode==='career'){takeStock(progress,transaction.items);progress.paper--;receiveStoreCash(progress,amountDue(transaction)+lastTip);progress.wallet+=rushBonus;progress.lifetime+=lastEarned;progress.bestCombo=Math.max(progress.bestCombo,combo);recordSale(transaction);if(transaction.method==='card'){progress.cardHealth=Math.max(0,progress.cardHealth-Math.max(4,24-4*Math.max(1,progress.upgrades.card||1)));progress.cardBroken=progress.cardHealth===0}}
  session.clockMinutes=Math.min(1320,session.clockMinutes+90);render();save();if(transaction.method==='cash')playChaChing();else beep('success');floatingTip(lastTip);if(combo%3===0)confetti(24);
  showTransactionResult(lastTip,starLost,reason,transaction.overpaid||0);advance();
 }
 function advance(){
  if(advancePending||!['success','lost'].includes(phase))return;if(mode==='career'&&session.stars===0){showStarRecovery();return}advancePending=true;
- if(mode==='career'&&dayFinished(session,progress.day)){phase='end';save();renderPayment();showSummary();return}
- session.index++;const wait=mode==='practice'||rushHourActive(progress.day,session.clockMinutes)?0:arrivalWait(session.clockMinutes);if(wait){session.waitSeconds=wait;customer=null;phase='waiting';advancePending=false;resetStations();render();save()}else newCustomer();
+ if(mode==='career'){beginDailyRush();if(dayFinished(session,progress.day)){phase='end';save();renderPayment();showSummary();return}}
+ session.index++;const wait=mode==='practice'||rushHourActive(progress.day,session)?0:arrivalWait(session.clockMinutes);if(wait){session.waitSeconds=wait;customer=null;phase='waiting';advancePending=false;resetStations();render();save()}else newCustomer();
 }
 function loseCustomer(){if(!['scan','offer','change'].includes(phase))return;scanToken++;busy=false;cancelDrag();phase='lost';session.lost++;const starLost=loseStar(session,'Pelanggan menunggu terlalu lama.');showTransactionResult(0,starLost,'Pelanggan menunggu terlalu lama.');combo=0;resetStations();render();save();toast('Pelanggan hilang sabar. Cuba lagi!',true);advance()}
 function floatingTip(amount){if(!amount)return;const r=$('walletLabel').getBoundingClientRect(),el=document.createElement('div');el.className='floating-tip';el.textContent='+'+money(amount);el.style.left=r.left+'px';el.style.top=r.bottom+18+'px';$('fxLayer').append(el);setTimeout(()=>el.remove(),1850)}
@@ -183,12 +199,12 @@ function restoreCareer(){practiceStore=null;scanToken++;busy=false;advancePendin
 function showShop(returnTo='game'){
  if(mode==='practice'){toast('Semua kategori dibuka untuk latihan. Upgrade tersedia dalam kerjaya.');return}
  const destination=returnTo==='summary'||modalKind==='summary'?'summary':'game';
- openModal('shop',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">KEMBANGKAN PASAR MINI ANDA</div><h2>Upgrade & kategori.</h2></div><button class="icon-btn" id="closeShop" aria-label="Tutup">${icon('close')}</button></div><div class="shop-wallet"><small>Duit kedai anda</small><b>${money(progress.wallet)}</b></div><h3 class="shop-section-title">Buka kelas barangan</h3><p class="muted">Barang kategori baharu mula muncul pada pelanggan seterusnya. Pembelian kekal untuk hari-hari berikutnya.</p><div class="category-shop">${CATEGORIES.map(c=>{const owned=progress.unlocked.includes(c.id),count=PRODUCTS.filter(p=>p.category===c.id).length;return `<div class="category-card ${owned?'owned':''}"><div class="category-art">${productArt(c.art)}<span>${count} barang</span></div><div><h3>${c.name}</h3><p>Kelas ini mengandungi ${count} jenis barangan. ${owned?'Semua barangan sudah tersedia.':'Buka kelas untuk menjual barangan ini.'}</p></div><button data-category="${c.id}" class="secondary-btn" ${owned||progress.wallet<c.cost?'disabled':''}>${owned?'✓ Dibuka':money(c.cost)}</button><details class="category-products-preview"><summary>${owned?'Lihat senarai barangan':'Preview barangan terkunci'} (${count})</summary><div class="category-preview-items">${PRODUCTS.filter(p=>p.category===c.id).map(p=>`<div class="category-preview-item">${productArt(p.id)}<span><b>${p.name}</b><small>${money(p.price)}${p.weighted?'/kg':''}</small></span></div>`).join('')}</div></details></div>`}).join('')}</div>${paymentUpgradeCards()}<h3 class="shop-section-title">Peralatan kedai</h3><p class="shop-capacity-info">Had inventori: <b>${stockCapacity(progress)} unit / kg bagi setiap barang</b> · Tahap stor ${progress.upgrades.storage||0}/5 · Setiap tahap menambah 5.</p>${UPGRADES.filter(u=>u.type!=='payment').map(u=>{const level=progress.upgrades[u.id]||0,cost=u.cost*(level+1),maxed=level>=u.max;return `<div class="upgrade-row"><span class="upgrade-icon">${icon(u.icon)}</span><div class="upgrade-info"><b>${u.name}</b><span class="level-dots">${'●'.repeat(level)+'○'.repeat(u.max-level)}</span><small>${u.desc}${machineUpgradeInfo(u.id,level,u.max)}</small></div><button class="primary-btn" data-upgrade="${u.id}" ${maxed||progress.wallet<cost?'disabled':''}>${maxed?'Maksimum':money(cost)}</button></div>`}).join('')}<button class="secondary-btn" id="backFromShop" style="width:100%;margin-top:15px">${destination==='summary'?'Kembali ke laporan':'Kembali ke kaunter'}</button></div>`);
+ openModal('shop',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">KEMBANGKAN PASAR MINI ANDA</div><h2>Upgrade & kategori.</h2></div><button class="icon-btn" id="closeShop" aria-label="Tutup">${icon('close')}</button></div><div class="shop-wallet"><small>Duit kedai anda</small><b>${money(progress.wallet)}</b></div><h3 class="shop-section-title">Buka kelas barangan</h3><p class="muted">Barang kategori baharu mula muncul pada pelanggan seterusnya. Pembelian kekal untuk hari-hari berikutnya.</p><div class="category-shop">${CATEGORIES.map(c=>{const owned=progress.unlocked.includes(c.id),count=PRODUCTS.filter(p=>p.category===c.id).length;return `<div class="category-card ${owned?'owned':''}"><div class="category-art">${productArt(c.art)}<span>${count} barang</span></div><div><h3>${c.name}</h3><p>Kelas ini mengandungi ${count} jenis barangan. ${owned?'Semua barangan sudah tersedia.':'Buka kelas untuk menjual barangan ini.'}</p></div><button data-category="${c.id}" class="secondary-btn" ${owned||progress.wallet<c.cost?'disabled':''}>${owned?'✓ Dibuka':money(c.cost)}</button><details class="category-products-preview"><summary>${owned?'Lihat senarai barangan':'Preview barangan terkunci'} (${count})</summary><div class="category-preview-items">${PRODUCTS.filter(p=>p.category===c.id).map(p=>`<div class="category-preview-item">${productArt(p.id)}<span><b>${p.name}</b><small>${money(p.price)}${p.weighted?'/kg':''}</small></span></div>`).join('')}</div></details></div>`}).join('')}</div>${paymentUpgradeCards()}<h3 class="shop-section-title">Peralatan kedai & bonus Rush Hour</h3><p class="rush-upgrade-hint">⚡ Rush Hour sekali sehari selama 60 saat. Untung ×3 pada asasnya; beli empat upgrade mahal untuk capai ×5. Pelanggan tetap hanya bayar harga asal.</p><p class="shop-capacity-info">Had inventori: <b>${stockCapacity(progress)} unit / kg bagi setiap barang</b> · Tahap stor ${progress.upgrades.storage||0}/5 · Setiap tahap menambah 5.</p>${UPGRADES.filter(u=>u.type!=='payment').map(u=>{const level=progress.upgrades[u.id]||0,cost=u.cost*(level+1),maxed=level>=u.max;return `<div class="upgrade-row"><span class="upgrade-icon">${icon(u.icon)}</span><div class="upgrade-info"><b>${u.name}</b><span class="level-dots">${'●'.repeat(level)+'○'.repeat(u.max-level)}</span><small>${u.desc}${machineUpgradeInfo(u.id,level,u.max)}</small></div><button class="primary-btn" data-upgrade="${u.id}" ${maxed||progress.wallet<cost?'disabled':''}>${maxed?'Maksimum':money(cost)}</button></div>`}).join('')}<button class="secondary-btn" id="backFromShop" style="width:100%;margin-top:15px">${destination==='summary'?'Kembali ke laporan':'Kembali ke kaunter'}</button></div>`);
  const back=()=>destination==='summary'?showSummary():closeModal();$('closeShop').onclick=back;$('backFromShop').onclick=back;
  $('modalContent').querySelectorAll('[data-upgrade]').forEach(b=>b.onclick=()=>{{const previous=progress.upgrades[b.dataset.upgrade]||0;if(buyUpgrade(progress,b.dataset.upgrade)){if(b.dataset.upgrade==='comfort'&&customer)customer.patience+=15;save();renderHeader();beep('success');showShop(destination);if(['card','qr'].includes(b.dataset.upgrade))toast(previous===0?'Bayaran '+(b.dataset.upgrade==='card'?'kad':'QR')+' dibuka untuk pelanggan seterusnya!':'Peralatan pembayaran dinaik taraf ke tahap '+(previous+1));else if(b.dataset.upgrade==='storage')toast('Kapasiti stor kini '+stockCapacity(progress)+' unit / kg setiap produk.')}}});
  $('modalContent').querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>{if(unlockCategory(progress,b.dataset.category)){save();renderHeader();initIllustrations();showShop(destination);beep('success');confetti(18);toast('Kategori '+CATEGORIES.find(c=>c.id===b.dataset.category).name+' dibuka!')}});
 }
-function showSummary(){closeCalculator();ensureShift(session);settleShift(progress,session,mode==='career');phase='end';save();const stars=session.stars;openModal('summary',`<div class="modal-pad" style="text-align:center"><div class="modal-kicker" style="justify-content:center">SYIF HARI ${progress.day} SELESAI</div><div class="stars">${'★'.repeat(stars)+'☆'.repeat(3-stars)}</div><p class="last-tip-summary">Tip pelanggan terakhir: <b>${money(lastTip)}</b></p><h2>${stars===3?'Cashier kegemaran taman.':'Kerja yang bagus hari ini!'}</h2><p style="margin:auto">${session.served} pelanggan dilayan. Esok lebih ramai jiran akan singgah.</p><div class="day-summary"><div><small>JUMLAH JUALAN</small><b>${money(session.totalSales)}</b></div><div><small>UNTUNG BERSIH + TIP</small><b>${money(session.earned)}</b></div><div><small>COMBO TERBAIK</small><b>×${session.bestCombo}</b></div></div><p class="muted">Tip: ${money(session.tips)} · Baki terlebih: −${money(session.overpaid)}<br>Pulangan: ${session.returnCount} · Nilai bayaran balik: ${money(session.refunds)}<br>Kos resit/pembaikan: ${money(session.expenses)} · Hutang kedai: ${money(progress.supplierDebt)}<br>Terlepas: ${session.lost} · Silap baki: ${session.mistakes}<br>${session.served>=dayTarget(progress.day)&&session.stars===3?'Bonus syif sempurna <b>RM5.00</b> diterima pada hari seterusnya.':'Layan semua pelanggan dengan 3 bintang untuk bonus RM5.'}</p><button class="secondary-btn" id="summaryInventory" style="width:100%;margin-bottom:10px">Inventori & bekalan esok</button><button class="summary-missions secondary-btn" id="summaryMissions" style="width:100%;margin-bottom:12px">Semak & tuntut ganjaran misi</button><div class="summary-actions"><button class="secondary-btn" id="summaryShop">${icon('shop')} Naik taraf</button><button class="primary-btn" id="nextDay">Hari ${progress.day+1} ${icon('arrow')}</button></div></div>`);$('summaryInventory').onclick=()=>showInventory('summary');$('summaryMissions').onclick=()=>showMissions('summary');$('summaryShop').onclick=()=>showShop('summary');$('nextDay').onclick=()=>{const bonus=session.served>=dayTarget(progress.day)&&session.stars===3?500:0;progress.wallet+=bonus;progress.lifetime+=bonus;progress.served+=session.served;progress.history.push({day:progress.day,served:session.served,earned:session.earned+bonus,stars});progress.history=progress.history.slice(-20);progress.day++;explicitPause=false;newSession('career');$('modal').close();paused=false;modalKind=null;document.body.classList.remove('paused');save();beep('start');syncBackgroundMusic();toast((bonus?'Bonus RM5 diterima. ':'')+'Selamat datang ke hari '+progress.day+'!')};confetti(35)}
+function showSummary(){closeCalculator();ensureShift(session);settleShift(progress,session,mode==='career');phase='end';save();const stars=session.stars;openModal('summary',`<div class="modal-pad" style="text-align:center"><div class="modal-kicker" style="justify-content:center">SYIF HARI ${progress.day} SELESAI</div><div class="stars">${'★'.repeat(stars)+'☆'.repeat(3-stars)}</div><p class="last-tip-summary">Tip pelanggan terakhir: <b>${money(lastTip)}</b></p><h2>${stars===3?'Cashier kegemaran taman.':'Kerja yang bagus hari ini!'}</h2><p style="margin:auto">${session.served} pelanggan dilayan. Esok lebih ramai jiran akan singgah.</p><div class="day-summary"><div><small>JUMLAH JUALAN</small><b>${money(session.totalSales)}</b></div><div><small>UNTUNG BERSIH + TIP</small><b>${money(session.earned)}</b></div><div><small>COMBO TERBAIK</small><b>×${session.bestCombo}</b></div></div><p class="muted">Bonus Rush Hour: <b>${money(session.rushBonus||0)}</b> · ${session.rushSales||0} transaksi berganda<br>Tip: ${money(session.tips)} · Baki terlebih: −${money(session.overpaid)}<br>Pulangan: ${session.returnCount} · Nilai bayaran balik: ${money(session.refunds)}<br>Kos resit/pembaikan: ${money(session.expenses)} · Hutang kedai: ${money(progress.supplierDebt)}<br>Terlepas: ${session.lost} · Silap baki: ${session.mistakes}<br>${session.served>=dayTarget(progress.day)&&session.stars===3?'Bonus syif sempurna <b>RM5.00</b> diterima pada hari seterusnya.':'Layan semua pelanggan dengan 3 bintang untuk bonus RM5.'}</p><button class="secondary-btn" id="summaryInventory" style="width:100%;margin-bottom:10px">Inventori & bekalan esok</button><button class="summary-missions secondary-btn" id="summaryMissions" style="width:100%;margin-bottom:12px">Semak & tuntut ganjaran misi</button><div class="summary-actions"><button class="secondary-btn" id="summaryShop">${icon('shop')} Naik taraf</button><button class="primary-btn" id="nextDay">Hari ${progress.day+1} ${icon('arrow')}</button></div></div>`);$('summaryInventory').onclick=()=>showInventory('summary');$('summaryMissions').onclick=()=>showMissions('summary');$('summaryShop').onclick=()=>showShop('summary');$('nextDay').onclick=()=>{const bonus=session.served>=dayTarget(progress.day)&&session.stars===3?500:0;progress.wallet+=bonus;progress.lifetime+=bonus;progress.served+=session.served;progress.history.push({day:progress.day,served:session.served,earned:session.earned+bonus,stars});progress.history=progress.history.slice(-20);progress.day++;explicitPause=false;newSession('career');$('modal').close();paused=false;modalKind=null;document.body.classList.remove('paused');save();beep('start');syncBackgroundMusic();toast((bonus?'Bonus RM5 diterima. ':'')+'Selamat datang ke hari '+progress.day+'!')};confetti(35)}
 
 function setMobileView(view){const pay=view==='payment';document.body.classList.toggle('view-payment',pay);$('counterTab').classList.toggle('active',!pay);$('paymentTab').classList.toggle('active',pay);$('counterTab').setAttribute('aria-selected',String(!pay));$('paymentTab').setAttribute('aria-selected',String(pay))}
 Object.assign(ICONS,{user:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8',moon:'M20 15.5A8.7 8.7 0 0 1 8.5 4 9 9 0 1 0 20 15.5Z',calculator:'M5 2h14v20H5V2Zm3 3h8v4H8V5Zm0 8h1m3 0h1m3 0h1m-9 4h1m3 0h1m3 0h1',ticket:'M3 6h18v4a2 2 0 0 0 0 4v4H3v-4a2 2 0 0 0 0-4V6Zm12 0v12',clock:'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 4v6l4 2',settings:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2',book:'M3 4h7l2 2 2-2h7v16h-7l-2 2-2-2H3V4Zm9 2v16'});
@@ -232,7 +248,7 @@ function runDeveloperScenario(key,requestedDay=7){
  }
  newSession('career');
  if(key==='rush'){
-  session.index=1;session.clockMinutes=750;session.seenPeople=[];newCustomer();
+  session.index=1;session.clockMinutes=750;session.seenPeople=[];session.rushStarted=true;session.rushCompleted=false;session.rushSecondsRemaining=RUSH_DURATION_SECONDS;newCustomer();
  }
  if(key==='barcode'){
   const item=customer.items.find(i=>!i.weighted);
@@ -279,7 +295,7 @@ function showDeveloperPanel(){
  <button data-dev-scenario="decline">🚫 <b>Kad ditolak</b><small>Baki tidak cukup</small></button>
  <button data-dev-scenario="qr">📱 <b>Imbas QR</b><small>Bayaran e-wallet</small></button>
  <button data-dev-scenario="barcode">▥ <b>Barcode rosak</b><small>Masukkan kod manual</small></button>
- <button data-dev-scenario="rush">⚡ <b>Rush Hour</b><small>Hari 7 · kesabaran turun</small></button>
+ <button data-dev-scenario="rush">⚡ <b>Rush Hour</b><small>60s · 10s sabar · untung ×3</small></button>
  <button data-dev-scenario="refundValid">↩ <b>Refund sah</b><small>Resit sepadan</small></button>
  <button data-dev-scenario="refundInvalid">⚠ <b>Refund salah</b><small>Resit tidak sepadan</small></button>
  <button data-dev-scenario="vip">★ <b>Pelanggan VIP</b><small>Cabaran tip</small></button>
@@ -314,6 +330,15 @@ document.addEventListener('keydown',e=>{if(handleCalculatorKey(e)||handlePayment
 document.addEventListener('visibilitychange',()=>{if(document.hidden){save();if(!paused)showPause()}syncBackgroundMusic()});window.addEventListener('pagehide',()=>{save();musicUnlocked=false;musicFade=null;musicTarget=0;writeMusicLevel(0);$('backgroundMusic').pause();stopScannerSound();stopChaChing();stopScaleSound();stopDrawerSound()});window.addEventListener('pageshow',()=>{if(session&&modalKind!=='intro'){musicUnlocked=true;syncBackgroundMusic()}});
 let lastTick=performance.now(),sinceSave=0;function loop(now){const dt=Math.min((now-lastTick)/1000,.1);lastTick=now;if(!paused&&!document.hidden&&session&&phase!=='end'){
  if(mode!=='practice'){session.clockMinutes=Math.min(1320,(session.clockMinutes||480)+dt*.35);renderOperations();sinceSave+=dt;if(sinceSave>5){save();sinceSave=0}}
+ if(mode==='career'&&tickRushHour(session,dt)){
+   restoreRushPatience();
+   toast('⚡ Rush Hour tamat! Bonus direkodkan dalam laporan syif.');
+   renderOperations();save();
+   if(['waiting','supply'].includes(phase)&&dayFinished(session,progress.day)){
+     phase='end';showSummary();requestAnimationFrame(loop);return;
+   }
+ }
+ if(mode==='career'&&!session.rushStarted)beginDailyRush();
  if(phase==='waiting'){session.waitSeconds=Math.max(0,session.waitSeconds-dt);renderWaiting();if(session.waitSeconds<=0)newCustomer()}
  else if(phase==='supply'&&readyForCustomer())newCustomer();
  else if(customer&&mode!=='practice'&&['scan','offer','change'].includes(phase)){customer.elapsed+=dt;renderPatience();if(customer.elapsed>=customer.patience)loseCustomer()}
@@ -566,6 +591,7 @@ function applyMachineSpeeds(){
  $('scaleZone').setAttribute('title','Penimbang · '+speed.weighMs/1000+' saat');
 }
 function machineUpgradeInfo(id,level,max){
+ if(id==='rushBoost')return `<span class="machine-speed">Bonus Rush Hour: ×${rushHourMultiplier(progress.upgrades).toFixed(1)} → ×${rushHourMultiplier({...progress.upgrades,rushBoost:Math.min(max,level+1)}).toFixed(1)} · ${level>=max?'Maksimum':'Tambah +0.5 setiap tahap'}</span>`;
  if(id==='storage')return `<span class="machine-speed">Had stok: ${stockCapacity(progress)} → ${level<max?stockCapacity({upgrades:{storage:level+1}}):stockCapacity(progress)} unit/kg</span>`;
  if(!['scanner','scale','conveyor'].includes(id))return '';
  const current=machineTimings(progress.upgrades),next=machineTimings({...progress.upgrades,[id]:Math.min(max,level+1)});
@@ -718,8 +744,9 @@ function readyForCustomer(){return progress.paper>0&&availableProducts(progress.
 function enterSupplyWait(){customer=null;phase='supply';busy=false;advancePending=false;session.waitSeconds=0;resetStations();render();save()}
 function ensurePaper(){if(mode==='practice'||progress.paper>0)return true;showInventory();toast('Kertas resit habis. Beli satu pek sebelum melayan pelanggan.',true);return false}
 function renderOperations(){
- const s=operatingStore(),rush=mode==='career'&&!!session&&rushHourActive(progress.day,session.clockMinutes);
+ const s=operatingStore(),rush=mode==='career'&&!!session&&rushHourActive(progress.day,session);
  $('storeClock').textContent=clockText(session?.clockMinutes||480)+(rush?' · ⚡ RUSH HOUR':session?.clockMinutes>=1020?' · Waktu lewat':' · Waktu kedai');
+ const banner=$('rushHourBanner');if(banner){banner.hidden=!rush;if(rush){$('rushClock').textContent=String(Math.ceil(session.rushSecondsRemaining)).padStart(2,'0')+'s';$('rushMultiplier').textContent='×'+rushHourMultiplier(progress.upgrades).toFixed(1);$('rushBar').style.width=(session.rushSecondsRemaining/RUSH_DURATION_SECONDS*100).toFixed(2)+'%';}}
  $('storeClock').classList.toggle('rush-active',rush);
  const stars=session?.stars??3;$('storeStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);$('storeStars').setAttribute('aria-label',stars+' daripada 3 bintang servis');
  $('supplyStatus').textContent='Resit '+s.paper+' · Kad '+(s.cardBroken?'ROSAK':s.cardHealth+'%');$('operationsBtn').classList.toggle('needs-supply',s.paper<=3||s.cardBroken);
@@ -905,7 +932,7 @@ function completeReturn(){
 }
 document.addEventListener('pointerdown',()=>{const result=$('transactionResult');if(result&&!result.hidden){clearTimeout(resultTimer);result.hidden=true}},true);
 function showTransactionResult(tip,starLost=0,reason='',overpaid=0){
- const el=$('transactionResult');clearTimeout(resultTimer);el.hidden=false;el.innerHTML=`<div class="result-check">${icon('check')}</div><small>${phase==='lost'?'PELANGGAN TELAH PERGI':customer?.kind==='return'?(phase==='offer'?'SEMAKAN PEMULANGAN':'URUSAN PULANGAN SELESAI'):'PAYMENT APPROVED'}</small><strong>${tip>0?'Tip +'+money(tip):starLost?'Servis perlu diperbaiki':'Terima kasih!'}</strong>${starLost?`<div class="result-stars">${'★'.repeat(session.stars)+'☆'.repeat(3-session.stars)}</div>`:''}<p>${starLost?'−'+starLost+' bintang · ':''}${reason||customerLine(customer||{},tip>0?'thanks':'thanksNoTip')}</p>${overpaid?`<span>Baki terlebih ${money(overpaid)} · ditolak pada akhir hari</span>`:''}`;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');resultTimer=setTimeout(()=>{el.hidden=true},1450);
+ const el=$('transactionResult');clearTimeout(resultTimer);el.hidden=false;el.innerHTML=`<div class="result-check">${icon('check')}</div><small>${phase==='lost'?'PELANGGAN TELAH PERGI':customer?.kind==='return'?(phase==='offer'?'SEMAKAN PEMULANGAN':'URUSAN PULANGAN SELESAI'):'PAYMENT APPROVED'}</small><strong>${tip>0?'Tip +'+money(tip):starLost?'Servis perlu diperbaiki':'Terima kasih!'}</strong>${starLost?`<div class="result-stars">${'★'.repeat(session.stars)+'☆'.repeat(3-session.stars)}</div>`:''}<p>${starLost?'−'+starLost+' bintang · ':''}${reason||customerLine(customer||{},tip>0?'thanks':'thanksNoTip')}</p>${overpaid?`<span>Baki terlebih ${money(overpaid)} · ditolak pada akhir hari</span>`:''}${customer?.rushBonus>0?`<span class="result-rush-bonus">⚡ Bonus Rush Hour +${money(customer.rushBonus)} · ×${rushHourMultiplier(progress.upgrades).toFixed(1)} untung</span>`:''}`;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');resultTimer=setTimeout(()=>{el.hidden=true},1450);
 }
 
 function ensureStyle(){

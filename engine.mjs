@@ -548,6 +548,7 @@ export const CATEGORIES = [
 export const UPGRADES = [
   {id:'card',name:'Terminal kad',icon:'card',cost:3500,max:5,type:'payment',desc:'Tahap 1 membuka kad; tahap lanjut mengurangkan kehausan dan risiko kerosakan.'},
   {id:'qr',name:'Scanner QR',icon:'qr',cost:2500,max:5,type:'payment',desc:'Tahap 1 membuka QR; tahap lanjut mempercepat pengesahan bayaran.'},
+  {id:'rushBoost',name:'Pengganda Rush Hour',icon:'spark',cost:50000,max:4,desc:'Untung Rush Hour bermula ×3; setiap tahap +0.5 hingga ×5. Kos naik taraf tinggi.'},
   {id:'storage',name:'Kapasiti stor',icon:'basket',cost:2600,max:5,desc:'Tambah had stok 5 unit/kg setiap naik taraf. Bermula dengan 20.'},
   {id:'conveyor',name:'Motor conveyor',icon:'arrow',cost:1500,max:5,desc:'Barang maju dan tali sawat bergerak lebih pantas.'},
   {id:'scale',name:'Penimbang pantas',icon:'scale',cost:1800,max:5,desc:'Bacaan berat stabil lebih cepat.'},
@@ -563,16 +564,41 @@ export function netTotal(customer){return Math.max(0,customer.total-(customer.di
 export function amountDue(customer){const total=netTotal(customer);return customer.method==='cash'&&customer.kind!=='return'?Math.round(total/5)*5:total}
 export function tenderFor(total){return [500,1000,2000,5000,10000,20000].find(v=>v>=total)||Math.ceil(total/10000)*10000}
 export function changeParts(cents){const parts=[];for(const value of DENOMS){const count=Math.floor(cents/value);if(count)parts.push({value,count});cents%=value}return {parts,remainder:cents}}
-// Day 7+: short busy periods, based on game-clock minutes (not real time).
-export function rushHourActive(day,clockMinutes){
- const d=Number(day)||1,t=Number(clockMinutes)||0;
- return d>=7&&((t>=660&&t<870)||(t>=1020&&t<1140));
+// One 60-second Rush Hour per career shift, measured in active REAL seconds.
+// Pause and backgrounding do not consume the countdown; state is persisted in session.
+export const RUSH_DURATION_SECONDS=60;
+export const RUSH_PATIENCE_SECONDS=10;
+export function rushHourActive(day,session){
+ return Number(day)>=1&&!!session&&!!session.rushStarted&&!session.rushCompleted&&Number(session.rushSecondsRemaining)>0;
 }
-export function rushHourPeriod(day,clockMinutes){
- return !rushHourActive(day,clockMinutes)?0:clockMinutes<870?1:2;
+export function rushHourPeriod(day,session){return rushHourActive(day,session)?1:0}
+export function rushHourMultiplier(upgrades={}){
+ const level=Math.max(0,Math.min(4,Math.floor(Number(upgrades?.rushBoost)||0)));
+ return 3+level*.5;
+}
+export function rushHourProfitBonus(marginCents,upgrades={},active=false){
+ // Extra profit is a game reward funded by the game, not an additional customer charge.
+ // Never multiply a loss or a refund. Tip and total charged remain unchanged.
+ return active?Math.round(Math.max(0,marginCents)*(rushHourMultiplier(upgrades)-1)):0;
+}
+export function shouldStartRushHour(session,day){
+ return !!session&&Number(day)>=1&&!session.rushStarted&&!session.rushCompleted&&
+   (((session.served||0)+(session.lost||0))>=Math.min(5,Math.max(1,Math.ceil(dayTarget(day)*.55)))||Number(session.clockMinutes)>=900);
+}
+export function startRushHour(session,day){
+ if(!shouldStartRushHour(session,day))return false;
+ session.rushStarted=true;session.rushCompleted=false;session.rushSecondsRemaining=RUSH_DURATION_SECONDS;
+ return true;
+}
+export function tickRushHour(session,seconds){
+ if(!session?.rushStarted||session.rushCompleted||!Number.isFinite(seconds)||seconds<=0)return false;
+ session.rushSecondsRemaining=Math.max(0,(session.rushSecondsRemaining||0)-seconds);
+ if(session.rushSecondsRemaining<.001)session.rushSecondsRemaining=0;
+ if(session.rushSecondsRemaining>0)return false;
+ session.rushCompleted=true;return true;
 }
 export function dayTarget(day){return Math.min(12,4+day)}
-export function createProgress(){return {version:1,day:1,wallet:0,lifetime:0,served:0,bestCombo:0,upgrades:{scanner:0,scale:0,conveyor:0,comfort:0,tips:0,storage:0,card:0,qr:0},history:[],unlocked:['essentials'],settings:{motion:true,theme:'mint',volume:.6,music:true,musicVolume:.2}}}
+export function createProgress(){return {version:1,day:1,wallet:0,lifetime:0,served:0,bestCombo:0,upgrades:{scanner:0,scale:0,conveyor:0,comfort:0,tips:0,storage:0,card:0,qr:0,rushBoost:0},history:[],unlocked:['essentials'],settings:{motion:true,theme:'mint',volume:.6,music:true,musicVolume:.2}}}
 export function restoreProgress(raw){try{const p=JSON.parse(raw);if(p?.version!==1||!Number.isInteger(p.day)||p.day<1||!Number.isFinite(p.wallet))return createProgress();return {...createProgress(),...p,upgrades:{...createProgress().upgrades,...p.upgrades},history:Array.isArray(p.history)?p.history.slice(-20):[],settings:{...createProgress().settings,...p.settings},unlocked:Array.isArray(p.unlocked)?[...new Set(['essentials',...p.unlocked.filter(id=>CATEGORIES.some(c=>c.id===id))])]:['essentials']}}catch{return createProgress()}}
 export function randomManualCode(rng=Math.random){return String(1000+Math.floor(rng()*9000))}
 export function availableProducts(unlocked=['essentials']){return PRODUCTS.filter(p=>unlocked.includes(p.category))}
@@ -617,7 +643,7 @@ export function unlockCategory(progress,id){
  }
  return true;
 }
-export function dayFinished(session,day){return (session.served||0)+(session.lost||0)>=dayTarget(day)}
+export function dayFinished(session,day){return (session.served||0)+(session.lost||0)>=dayTarget(day)&&(!session.rushStarted||session.rushCompleted)}
 export function tipFor(customer,combo,upgrades){if(customer.willTip===false)return 0;const fraction=Math.max(0,1-customer.elapsed/customer.patience);return Math.round((60+fraction*170+Math.min(combo,10)*20)*(1+(upgrades.tips||0)*.25)*(customer.kind==='vip'?1.5:1)/5)*5}
 export function buyUpgrade(progress,id){const u=UPGRADES.find(u=>u.id===id);if(!u)return false;const level=progress.upgrades[id]||0,cost=u.cost*(level+1);if(level>=u.max||progress.wallet<cost)return false;progress.wallet-=cost;progress.upgrades[id]=level+1;return true}
 
@@ -711,7 +737,12 @@ export function buyStock(p,quote,credit=false){
 export function stockForBasket(p,items){const needed={};for(const x of items)needed[x.id]=(needed[x.id]||0)+stockUnits(x);return Object.entries(needed).every(([id,n])=>(p.inventory[id]||0)>=n)}
 export function takeStock(p,items){if(!stockForBasket(p,items))return false;for(const x of items)p.inventory[x.id]-=stockUnits(x);return true}
 export function receiveStoreCash(p,cents){const repayment=Math.min(p.supplierDebt||0,Math.max(0,Math.floor(cents*.3)));p.supplierDebt-=repayment;p.wallet+=cents-repayment;return repayment}
-export function ensureShift(s){if(!s)return;s.stars=Number.isInteger(s.stars)?Math.max(0,Math.min(3,s.stars)):3;s.clockMinutes=Number.isFinite(s.clockMinutes)?s.clockMinutes:480;s.overpaid=Math.max(0,s.overpaid||0);s.expenses=s.expenses||0;s.refunds=s.refunds||0;s.returnCount=s.returnCount||0;s.waitSeconds=Math.max(0,s.waitSeconds||0)}
+export function ensureShift(s){if(!s)return;s.stars=Number.isInteger(s.stars)?Math.max(0,Math.min(3,s.stars)):3;s.clockMinutes=Number.isFinite(s.clockMinutes)?s.clockMinutes:480;s.overpaid=Math.max(0,s.overpaid||0);s.expenses=s.expenses||0;s.refunds=s.refunds||0;s.returnCount=s.returnCount||0;s.waitSeconds=Math.max(0,s.waitSeconds||0);
+ s.rushStarted=!!s.rushStarted;s.rushCompleted=!!s.rushCompleted;
+ s.rushSecondsRemaining=s.rushCompleted?0:Math.max(0,Math.min(RUSH_DURATION_SECONDS,Number(s.rushSecondsRemaining)||0));
+ if(s.rushStarted&&s.rushSecondsRemaining<=0)s.rushCompleted=true;
+ s.rushBonus=Math.max(0,Math.floor(Number(s.rushBonus)||0));s.rushSales=Math.max(0,Math.floor(Number(s.rushSales)||0));
+}
 export function loseStar(s,reason){ensureShift(s);const before=s.stars;s.stars=Math.max(0,s.stars-1);s.lastStarReason=reason;return before-s.stars}
 export function settleShift(p,s,career=true){ensureShift(s);if(s.settled)return 0;s.settled=true;const loss=s.overpaid;s.earned-=loss;if(career){const paid=Math.min(Math.max(0,p.wallet),loss);p.wallet-=paid;p.supplierDebt+=loss-paid;p.lifetime-=loss}return loss}
 export function arrivalWait(minutes,rng=Math.random){return minutes<1020?0:minutes<1140?3+Math.floor(rng()*3):6+Math.floor(rng()*4)}
