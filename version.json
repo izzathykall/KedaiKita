@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-19-v24-revert-text-layout",
+  "version": "2026-10-19-v25-layout-account",
   "label": "Laporan penutupan syif profesional",
-  "notes": "Kekalkan jam sahaja; pulihkan CSS sebelum perubahan teks terpotong dan kabur v22"
+  "notes": "Navigation bar + account popups redesign; receipt aligned with bottom stations"
 }

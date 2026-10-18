@@ -1191,3 +1191,51 @@ body.store-night .atmosphere-label{background:#25395ddf;color:#ffebba}
  body.store-evening .store-atmosphere .sunbeam,
  body.store-night .store-atmosphere .sunbeam{animation:none}
 }
+
+/* v25 — POS dashboard reference layout */
+@media (min-width: 761px){
+ .app{padding-left:clamp(20px,2.2vw,34px);padding-right:clamp(20px,2.2vw,34px)}
+ .utility-bar{display:flex!important;align-items:center!important;gap:clamp(8px,1.6vw,26px)!important;
+   width:100%;min-height:57px;height:auto!important;margin:0 0 12px!important;
+   padding:8px 17px!important;border:1px solid #e1e5dc;border-radius:17px;
+   background:#fffefa;box-shadow:0 5px 16px #193d2a09;overflow:visible!important}
+ .utility-heading{display:inline-flex;align-items:center;white-space:nowrap;font-weight:800;font-size:10px;
+   letter-spacing:2px;margin-right:6px}
+ .utility-bar>button:not(.dev-test-button){border:0!important;background:transparent!important;
+   box-shadow:none!important;border-radius:10px!important;padding:9px 7px!important;
+   height:39px!important;min-height:39px!important;white-space:nowrap}
+ .utility-bar>button:hover{background:#eef3e9!important}
+ .utility-bar>#settingsBtn{margin-left:auto!important}
+ .utility-bar>#developerPanelBtn:not([hidden]){margin-left:0!important}
+ .game-grid{align-items:stretch}
+ .pos-panel{height:100%;max-height:100%;align-self:stretch;border-radius:19px;
+   border:1px solid #dfe5d9;box-shadow:0 7px 22px #1d3b2910}
+ .pos-top{min-height:51px}
+ .stations{padding-bottom:12px}
+}
+@media (max-width:760px){.utility-heading{display:none!important}}
+/* Refined, fully functional account/login modal */
+.account-overlay::backdrop{background:rgba(12,42,32,.77);backdrop-filter:blur(9px)}
+.account-panel{width:min(100%,460px);max-height:calc(100dvh - 30px);overflow-y:auto;
+ background:#fffefa;border:1px solid #e1e9df;border-radius:27px;
+ padding:clamp(21px,3.2vw,34px);box-shadow:0 24px 80px #071d1540}
+.account-store-art{width:100%;height:155px;position:relative;display:flex;justify-content:center;
+ align-items:flex-end;margin:0 auto 20px;overflow:hidden;background:radial-gradient(ellipse at 50% 95%,#edf5e9,transparent 66%)}
+.account-store-building{width:166px;height:91px;position:relative;background:#d9e9d9;
+ border-radius:3px 3px 8px 8px;box-shadow:0 6px 0 #a7c3a938}
+.account-store-roof{position:absolute;z-index:2;bottom:90px;width:188px;height:30px;border-radius:5px 5px 13px 13px;
+ background:repeating-linear-gradient(90deg,#28755a 0 24px,#fff5d8 24px 48px);box-shadow:0 6px 0 #b4c9a8}
+.account-store-window{position:absolute;top:14px;left:15px;width:102px;height:58px;border:6px solid #f8f2d7;
+ background:#c1ded0;display:grid;place-items:center;color:#2a6954;font:800 32px var(--display)}
+.account-store-door{position:absolute;right:12px;bottom:0;width:30px;height:71px;background:#b8d8c9;border:5px solid #f6edd3}
+.account-store-door:after{content:'';position:absolute;right:3px;top:32px;width:4px;height:7px;border-radius:4px;background:#dfab64}
+.account-store-plant{position:absolute;bottom:0;left:calc(50% - 123px);width:27px;height:32px;background:#ca9369;border-radius:3px 3px 7px 7px}
+.account-store-plant i,.account-store-plant b{position:absolute;bottom:25px;width:14px;height:32px;background:#79a76a;border-radius:90% 0 90% 0;transform:rotate(-30deg)}
+.account-store-plant b{left:14px;transform:rotate(35deg)}
+.account-store-sparkle{position:absolute;color:#d8a251;font-size:17px}.sparkle-a{top:22px;left:20%}.sparkle-b{top:53px;right:19%}
+.account-logo{margin-bottom:20px}.account-panel h2{font-size:clamp(26px,3.2vw,32px);margin:10px 0 12px}
+.account-tabs{margin:20px 0 20px}.account-form input{min-height:49px}
+.account-current{background:#edf4eb}.account-fineprint{margin-top:22px}
+@media(max-height:800px){.account-store-art{height:104px;margin-bottom:9px;transform:scale(.88);transform-origin:center bottom}
+ .account-panel{padding:20px 25px}.account-logo{margin-bottom:8px}.account-panel h2{margin:8px 0}}
+@media(max-width:520px){.account-store-art{height:115px}.account-panel{border-radius:21px;padding:19px}}

@@ -15,7 +15,7 @@
     <div class="top-stats"><span><small>DUIT KEDAI</small><b id="walletLabel">RM 0.00</b></span><span class="combo-stat"><small>COMBO</small><b id="comboLabel">×0 <span>✦</span></b></span></div>
     <nav class="tools" id="gameTools" aria-label="Kawalan game"><button id="shopBtn" class="icon-btn" title="Naik taraf kedai" aria-label="Naik taraf kedai" data-icon="shop"></button><button id="accountBtn" class="account-nav-btn" title="Log masuk / akaun" aria-label="Akaun dan simpanan permainan"><span data-icon="user"></span><span id="accountBtnText">Akaun</span></button><button id="soundBtn" class="icon-btn" title="Bunyi" aria-label="Bunyi" data-icon="volume"></button><button id="fullBtn" class="icon-btn" title="Skrin penuh" aria-label="Skrin penuh" data-icon="expand"></button><button id="pauseBtn" class="icon-btn" title="Jeda dan bantuan" aria-label="Jeda dan bantuan" data-icon="pause"></button></nav>
   </header>
-  <nav class="utility-bar" aria-label="Fungsi kedai">
+  <nav class="utility-bar" aria-label="Fungsi kedai"><span class="utility-heading">URUS KEDAI</span>
     <button id="missionBtn"><span data-icon="flag"></span><span>Misi</span><i></i></button>
     <button id="calcBtn"><span data-icon="calculator"></span><span>Kalkulator</span></button>
     <button id="inventoryBtn"><span data-icon="basket"></span><span>Inventori</span></button><button id="catalogueBtn"><span data-icon="book"></span><span>Katalog</span></button>
@@ -79,6 +79,12 @@
 <dialog id="modal"><div id="modalContent"></div></dialog>
 <dialog id="accountOverlay" class="account-overlay" aria-labelledby="accountTitle" aria-modal="true">
   <div class="account-panel">
+    <div class="account-store-art" aria-hidden="true">
+      <span class="account-store-sparkle sparkle-a">✦</span><span class="account-store-sparkle sparkle-b">✦</span>
+      <div class="account-store-roof"></div>
+      <div class="account-store-building"><div class="account-store-window">kita.</div><div class="account-store-door"></div></div>
+      <div class="account-store-plant"><i></i><b></b></div>
+    </div>
     <div class="account-logo">✦ <b>Kedai<span>Kita.</span></b> <small>SIMPAN PROGRES</small></div>
     <h2 id="accountTitle">Selamat kembali!</h2>
     <p id="accountHint">Daftar atau log masuk untuk simpan progres permainan.</p>
