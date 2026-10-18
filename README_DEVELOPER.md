@@ -1,29 +1,11 @@
-# Kedai Kita — Mod Developer (Setup Diperjelas V2)
+# Panduan Developer Mode — Kedai Kita
 
-**Punca butang DEV TEST tiada:** `developer-config.js` asal sengaja mempunyai `window.KEDAI_DEVELOPER_UIDS = []`. Tiada akaun dibenarkan secara automatik.
+1. Tiada lagi butang pendaftaran atau DEV SETUP dalam game. Akses Developer hanya untuk UID yang dibenarkan. Pastikan `developer-config.js` mengandungi Firebase Authentication UID anda **tanpa simbol komen `//`** dan anda log masuk menggunakan akaun dengan UID itu.
+2. Tekan **DEV TEST** untuk membuka panel. Label **Duit Kedai** adalah nilai yang sama seperti Duit Kedai di bahagian atas game.
+3. Isi amaun RM dan tekan **+ Tambah** / **− Tolak**. Tunggu pengesahan Firebase sebelum meneruskan.
+4. **Reset duit** (bahagian tersendiri) menetapkan duit kepada **RM0.00**, tetapi mengekalkan hari, stok dan upgrade. Pengesahan diperlukan.
+5. **Reset data ujian** (zon berasingan, di bawah panel) memerlukan jawapan soalan darab diikuti persetujuan akhir sebelum mengembalikan sandbox ke Hari 1. Akaun log masuk dan progres biasa tidak dipadam.
+6. Ketika Firebase gagal atau offline, reset tidak menukar data semasa dalam memori. Mesej kesilapan akan muncul supaya pemain boleh cuba semula. Periksa Realtime Database Rules jika gagal disimpan.
+7. Simpanan ujian menggunakan `users/<UID>/games/kedai-kita/developerSandbox`, bukan progres biasa pada `users/<UID>/games/kedai-kita/state`. Akses satu sesi menggunakan `activeSessions/<UID>`.
 
-## Langkah mudah
-
-1. Upload **keenam-enam fail** ZIP kemas kini ini ke root GitHub Pages dan commit (app.mjs, cloud.mjs, developer-config.js, index.html, style.css, version.json).
-2. Buka URL game sedia ada, tambah `?dev=1` di hujung (jika URL sudah ada `?`, gunakan `&dev=1`). Butang **DEV SETUP** muncul walaupun akaun belum diberi akses.
-3. Klik **DEV SETUP**, log masuk menggunakan akaun ujian Firebase Authentication. Jika belum ada akaun, buat dahulu menggunakan Firebase Console → Authentication → Users → Add user.
-4. Dalam **Akaun → Akses Developer**, salin **UID Firebase** (bukan e-mel, bukan kata laluan).
-5. Edit `developer-config.js` pada GitHub:
-
-```js
-window.KEDAI_DEVELOPER_UIDS = [
-  "PASTE_UID_SEBENAR_DI_SINI"
-];
-```
-
-6. Commit fail konfigurasi itu, tunggu GitHub Pages selesai deploy, refresh laman dan log masuk akaun yang sama. Butang bertukar kepada **DEV TEST**; sandbox hanya disimpan pada peranti, bukan di Realtime Database.
-
-## Jika masih tidak muncul
-
-- Pastikan UID di dalam `developer-config.js` **sama tepat** dengan UID yang tertera pada skrin akaun; ia bukan alamat e-mel.
-- Pastikan semua fail di root repository, bukan dalam folder tambahan.
-- Pastikan `developer-config.js` yang baru terbit pada URL `.../developer-config.js`.
-- Refresh selepas GitHub Pages deployment, atau buka game dengan `?dev=1&check=2`.
-- Pastikan masih log masuk dengan akaun Developer yang dibenarkan.
-
-**Perhatian:** Ini bukan akses admin untuk Firebase Database. JavaScript klien yang boleh diubah pengguna tidak sesuai untuk melindungi data rahsia; Firebase Security Rules masih diperlukan bagi melindungi data pemain. Jangan letak kata laluan atau token dalam fail ini.
+> UID Developer dalam fail JS hanyalah kawalan UI; ia bukan akses pentadbir Firebase. Jangan jadikan Realtime Database boleh dibaca atau ditulis oleh umum.

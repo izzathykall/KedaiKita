@@ -1,18 +1,25 @@
-# Kedai Kita — GitHub Pages (pembaikan bunyi)
+# Kedai Kita — Golden Rush V5 (18 Oktober 2026)
 
-Semua fail kini berada pada folder utama. Tiada folder assets diperlukan.
+## Perubahan
+- Pemulangan barang (refund) tidak muncul ketika Rush Hour sedang aktif.
+- Jika pelanggan refund sedang dilayan tepat ketika Rush Hour sepatutnya bermula, acara menunggu sehingga urusan selesai, kemudian memaparkan popup permulaan.
+- Selepas Rush Hour, pelanggan refund berfungsi seperti biasa.
+- Latar kedai lebih meriah dengan efek Golden Rush: sinaran emas bergerak, bintang bercahaya, kilauan kaunter, glow scanner & penimbang dan pelanggan latar hiasan.
+- Animasi tidak menghalang klik/touch; mod kurangkan animasi atau reduced motion dipatuhi.
+- Popup permulaan/tamat Rush Hour, sasaran pelanggan harian, sistem keuntungan, UID Developer dan Firebase kekal.
 
-## Untuk repository sedia ada
-1. Ekstrak ZIP ini.
-2. Upload semua fail ke root repository KedaiKita dan gantikan fail lama dengan nama sama. Fail index.html dan app.mjs mesti diganti.
-3. Commit changes dan tunggu deployment GitHub Pages selesai.
-4. Muat semula halaman game dan tekan mula/teruskan untuk membolehkan pelayar memainkan audio.
-5. Semak ikon bunyi serta volume muzik dan efek dalam Tetapan jika perlu.
+## Kemas kini GitHub Pages
 
-Fail audio: gameplay-music.mp3, scanner-beep.wav, cha-ching.wav, scale-place.mp3.
-Kesemua fail ini mesti berada sebaris dengan index.html dan app.mjs.
+Gantikan tepat empat fail daripada ZIP perubahan:
+1. `app.mjs`
+2. `style.css`
+3. `index.html`
+4. `version.json`
 
-Kod ini membetulkan rujukan audio untuk susunan rata seperti repository anda. Ia tidak memadam simpanan game. Gunakan alamat GitHub Pages yang sama dan pelayar yang sama untuk meneruskan simpanan sedia ada.
+Jangan ubah `developer-config.js` yang sedia ada. Selepas Commit, tunggu GitHub Pages selesai deploy dan refresh halaman.
 
-Untuk repository baharu: Settings > Pages > Deploy from a branch > main > /(root) > Save.
-Game ini tiada keperluan build atau API key. Jangan muat naik ZIP sahaja; ekstrak dahulu.
+## Ujian
+- Sintaks JavaScript: lulus.
+- Simulasi logik: ketika Rush Hour refund disekat; di luar Rush Hour refund masih muncul; refund sedia ada selesai dahulu: lulus.
+- Semakan lapisan visual CSS di Chromium saiz 390, 768 dan 1474 px: lulus.
+- Belum diuji terhadap Firebase dan Safari sebenar selepas deploy.
