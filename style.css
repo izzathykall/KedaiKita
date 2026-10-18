@@ -1134,3 +1134,11 @@ body.store-rush-active .payment-sheet::before{content:"";position:absolute;inset
 body.store-rush-active .payment-sheet::after{content:"✦";position:absolute;right:16px;top:76px;color:#e5a83c;text-shadow:0 0 12px #ffd878;font-size:22px;pointer-events:none;animation:rushPanelSparkles 4s ease-in-out infinite}
 body.store-rush-active .payment-sheet>*{position:relative;z-index:1}
 @media(prefers-reduced-motion:reduce){body.store-rush-active .payment-sheet::before,body.store-rush-active .payment-sheet::after{animation:none}}
+
+/* v11: show customer PIN prominently above the card terminal. */
+#paymentArea:has(.card-pin-guide){display:flex;flex-direction:column}
+#paymentArea:has(.card-pin-guide) .card-pin-guide{order:-1;display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 12px;padding:10px 16px;border:1px solid #d4b77c;border-radius:12px;background:#fff4d8;box-shadow:0 4px 16px rgba(116,85,39,.10)}
+#paymentArea:has(.card-pin-guide) .card-pin-guide small{font-size:12px;font-weight:700;color:#6c583b}
+#paymentArea:has(.card-pin-guide) .card-pin-guide strong{font-size:23px;letter-spacing:5px;color:#4a3a27}
+#paymentArea:has(.card-pin-guide) .card-pin-guide .code-error{font-size:11px}
+#paymentArea:has(.card-pin-guide) .payment-scene{width:100%;flex-shrink:0}
