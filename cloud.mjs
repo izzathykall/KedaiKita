@@ -152,7 +152,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   const snapshotRef = uid => api.ref(db,`users/${uid}/games/kedai-kita`);
   // Developer wallet and testing progress use a distinct Firebase branch under
   // the same account-owned game path, never the regular career `state`.
-  const developerSnapshotRef = uid => api.ref(db,`users/${uid}/games/kedai-kita/developerSandbox`);
+  const developerSnapshotRef = uid => api.ref(db,`users/${uid}/games/developerSandbox`);
   const currentSnapshotRef = uid => developerSandbox?developerSnapshotRef(uid):snapshotRef(uid);
   async function sessionReplaced(uid){
     if(kickingOut||!user||user.uid!==uid)return;
