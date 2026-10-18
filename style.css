@@ -1126,3 +1126,11 @@ body.store-rush-active .receipt-title,body.store-rush-active .receipt-total,body
 .store-scene .customer-info .customer-occupation{display:inline-flex;vertical-align:middle;align-items:center;max-width:clamp(70px,15vw,180px);padding:3px 7px;margin-left:7px;border-radius:20px;border:1px solid #d5e1d4;background:#eaf2e6;color:#466c59;font-size:9px;font-weight:650;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .store-scene .customer-info .customer-occupation[hidden]{display:none!important}
 @media(max-width:600px){.store-scene .customer-info .customer-occupation{font-size:8px;max-width:95px;padding:2px 5px;margin-left:4px}}
+
+/* v10: gold highlights on receipt and payment dialog during Rush Hour */
+body.store-rush-active .pos-panel{box-shadow:0 0 22px rgba(255,198,75,.32),inset 0 0 0 2px rgba(255,207,94,.3)}
+body.store-rush-active .payment-sheet{position:relative;isolation:isolate;box-shadow:0 0 0 2px rgba(255,209,105,.75),0 0 38px rgba(255,180,53,.55),0 18px 60px rgba(29,48,39,.24)}
+body.store-rush-active .payment-sheet::before{content:"";position:absolute;inset:0;z-index:0;border-radius:inherit;pointer-events:none;background:radial-gradient(circle at 8% 15%,rgba(255,235,156,.23),transparent 28%),radial-gradient(circle at 93% 78%,rgba(255,194,73,.2),transparent 30%);animation:rushPanelShine 3.5s ease-in-out infinite}
+body.store-rush-active .payment-sheet::after{content:"✦";position:absolute;right:16px;top:76px;color:#e5a83c;text-shadow:0 0 12px #ffd878;font-size:22px;pointer-events:none;animation:rushPanelSparkles 4s ease-in-out infinite}
+body.store-rush-active .payment-sheet>*{position:relative;z-index:1}
+@media(prefers-reduced-motion:reduce){body.store-rush-active .payment-sheet::before,body.store-rush-active .payment-sheet::after{animation:none}}

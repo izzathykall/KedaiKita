@@ -489,9 +489,9 @@ export const PEOPLE = [
     "hairStyle": "short",
     "glasses": true
   },
-  {"id":"person-izzat","name":"Izzat","role":"Pelanggan tetap","community":"Jiran","skin":"#bc8b6b","hair":"#2d2927","shirt":"#649a90","line":"Singgah beli beberapa barang.","hairStyle":"short"},
-  {"id":"person-sakinah","name":"Sakinah","role":"Pelanggan tetap","community":"Jiran","skin":"#ce9d7e","hair":"#302b2b","shirt":"#b78c9c","line":"Saya mahu beli barang dapur.","scarf":true,"scarfColor":"#94768e"},
-  {"id":"person-wawa","name":"Wawa","role":"Pelanggan tetap","community":"Jiran","skin":"#cd9b7a","hair":"#322e30","shirt":"#88a5a1","line":"Saya singgah sebelum balik.","hairStyle":"long"}
+  {"id":"person-izzat","name":"Izzat","role":"Jurutera Profesional","community":"Jiran","skin":"#bc8b6b","hair":"#2d2927","shirt":"#649a90","line":"Singgah beli beberapa barang.","hairStyle":"short"},
+  {"id":"person-sakinah","name":"Sakinah","role":"Pengarah Program","community":"Jiran","skin":"#ce9d7e","hair":"#302b2b","shirt":"#b78c9c","line":"Saya mahu beli barang dapur.","scarf":true,"scarfColor":"#94768e"},
+  {"id":"person-wawa","name":"Wawa","role":"Pengurus Perniagaan","community":"Jiran","skin":"#cd9b7a","hair":"#322e30","shirt":"#88a5a1","line":"Saya singgah sebelum balik.","hairStyle":"long"}
 ];
 export const CATEGORIES = [
   {
