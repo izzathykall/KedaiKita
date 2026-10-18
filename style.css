@@ -894,3 +894,17 @@ body.developer-mode .topbar{border-bottom-color:#aabcb0}
 @keyframes rushEntry{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:550px){.rush-hour-banner{margin:7px 11px;padding:8px 10px}.rush-hour-heading{gap:5px;font-size:10px}.rush-hour-heading>span{font-size:9px}.rush-countdown{font-size:14px}}
 body[data-theme="dark"] .rush-upgrade-hint{background:#3e3528;color:#f5d9b2;border-color:#746047}
+
+/* Developer wallet: accessible on mobile without squashing buttons. */
+.dev-wallet{margin-top:14px;border:1px solid #cddccf;border-radius:14px;background:#f6faf3;padding:14px 15px}
+.dev-wallet-top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;border-bottom:1px solid #d9e5d6;padding-bottom:10px;margin-bottom:13px}
+.dev-wallet-top span{font-size:10px;font-weight:800;letter-spacing:.09em;color:#66806d}
+.dev-wallet-top strong{font-size:22px;color:#215b40;font-variant-numeric:tabular-nums}
+.dev-wallet label{display:block;font-size:12px;font-weight:700;margin-bottom:8px;color:#375a4b}
+.dev-wallet-form{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+.dev-wallet-form input{flex:1 1 150px;min-width:0;min-height:42px;background:white;border:1px solid #bbcdbb;border-radius:10px;padding:9px 12px;font-size:15px}
+.dev-wallet-form button{flex:1 1 112px;min-height:42px;font-size:12px;white-space:nowrap;padding:8px!important}
+.dev-wallet>small{display:block;margin-top:11px;color:#667f70;line-height:1.5}
+@media(max-width:450px){.dev-wallet-form input{flex-basis:100%}.dev-wallet-form button{flex-basis:calc(50% - 4px)}}
+
+.inventory-rush-note{padding:12px 14px;border:1px solid #dac690;background:#fff7e2;border-radius:11px;color:#72501d;font-weight:700;font-size:12px;line-height:1.5}

@@ -548,7 +548,7 @@ export const CATEGORIES = [
 export const UPGRADES = [
   {id:'card',name:'Terminal kad',icon:'card',cost:3500,max:5,type:'payment',desc:'Tahap 1 membuka kad; tahap lanjut mengurangkan kehausan dan risiko kerosakan.'},
   {id:'qr',name:'Scanner QR',icon:'qr',cost:2500,max:5,type:'payment',desc:'Tahap 1 membuka QR; tahap lanjut mempercepat pengesahan bayaran.'},
-  {id:'rushBoost',name:'Pengganda Rush Hour',icon:'spark',cost:50000,max:4,desc:'Untung Rush Hour bermula ×3; setiap tahap +0.5 hingga ×5. Kos naik taraf tinggi.'},
+  {id:'rushBoost',name:'Pengganda Rush Hour',icon:'spark',cost:100000,max:5,desc:'Untung Rush Hour bermula ×2; setiap tahap +0.3 sehingga ×3.5. Kos upgrade tinggi.'},
   {id:'storage',name:'Kapasiti stor',icon:'basket',cost:2600,max:5,desc:'Tambah had stok 5 unit/kg setiap naik taraf. Bermula dengan 20.'},
   {id:'conveyor',name:'Motor conveyor',icon:'arrow',cost:1500,max:5,desc:'Barang maju dan tali sawat bergerak lebih pantas.'},
   {id:'scale',name:'Penimbang pantas',icon:'scale',cost:1800,max:5,desc:'Bacaan berat stabil lebih cepat.'},
@@ -573,8 +573,8 @@ export function rushHourActive(day,session){
 }
 export function rushHourPeriod(day,session){return rushHourActive(day,session)?1:0}
 export function rushHourMultiplier(upgrades={}){
- const level=Math.max(0,Math.min(4,Math.floor(Number(upgrades?.rushBoost)||0)));
- return 3+level*.5;
+ const level=Math.max(0,Math.min(5,Math.floor(Number(upgrades?.rushBoost)||0)));
+ return 2+level*.3;
 }
 export function rushHourProfitBonus(marginCents,upgrades={},active=false){
  // Extra profit is a game reward funded by the game, not an additional customer charge.

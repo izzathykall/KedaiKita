@@ -1,6 +1,6 @@
-import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-18-rush-hour-60s';
+import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-18-rush-wallet-session-v2';
 import {productArt,moneyArt} from './art.mjs';
-import {createCloudSync} from './cloud.mjs?v=2026-10-18-developer-setup-v2';
+import {createCloudSync} from './cloud.mjs?v=2026-10-18-rush-wallet-session-v2';
 
 const $=id=>document.getElementById(id);
 const ICONS={basket:'M3 9h18l-2 11H5L3 9ZM8 9l4-7 4 7M8 13v3m4-3v3m4-3v3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5',shop:'M3 10V5h18v5M4 10v11h16V10M2 10a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0M9 21v-7h6v7',volume:'M11 4 6 8H2v8h4l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14',mute:'M11 4 6 8H2v8h4l5 4V4Zm5 5 6 6m0-6-6 6',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',pause:'M8 4v16m8-16v16',scan:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M6 12h12M7 9v6m3-6v6m4-6v6m3-6v6',scale:'M6 7h12l3 14H3L6 7Zm3 0V5a3 3 0 0 1 6 0v2m-3 4v5m-2-2h4',arrow:'M4 12h16m-6-6 6 6-6 6',heart:'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',flag:'M5 21V3m0 0c5-3 9 3 14 0v10c-5 3-9-3-14 0',receipt:'M5 3h14v19l-3-2-4 2-4-2-3 2V3Zm3 5h8m-8 4h8m-8 4h5',lock:'M6 10h12v11H6V10Zm3 0V6a3 3 0 0 1 6 0v4',card:'M2 5h20v14H2V5Zm0 5h20M6 15h4',qr:'M3 3h6v6H3V3Zm12 0h6v6h-6V3ZM3 15h6v6H3v-6Zm12 0h3v3h3v3h-6v-6Zm6-3v3M12 3v3m0 6v3M3 12h6m3 6v3',cash:'M2 5h20v14H2V5Zm10 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM5 8h1m12 8h1',check:'M5 12l4 4L19 6',close:'M6 6l12 12M6 18 18 6',play:'m8 4 12 8-12 8V4Z',snow:'M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4m13 9-4 1 1 4M4 14l4 1-1 4m13-9-4-1 1-4',spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z',undo:'M8 4 3 9l5 5M3 9h10a7 7 0 0 1 0 14',reset:'M4 8a9 9 0 1 1-1 8M4 3v5h5',help:'M9 8a3 3 0 1 1 5 2c-1 1-2 1-2 4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z'};
@@ -16,7 +16,7 @@ let paymentMinimized=false,musicUnlocked=false,musicLevel=0,musicTarget=-1,music
 let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=null,musicSource=null,chaChingBuffer=null,chaChingPromise=null,chaChingSource=null;
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-rush-hour-60s';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-rush-wallet-session-v2';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
@@ -75,6 +75,7 @@ function restoreRushPatience(){
 function beginDailyRush(){
  if(mode!=='career'||!startRushHour(session,progress.day))return false;
  if(customer&&!customer.paid)applyRushPatience(customer);
+ if(customer&&!customer.paid)customer.rushUnlimited=true;
  toast('⚡ RUSH HOUR! 60 saat · Sabar 10 saat · Untung ×'+rushHourMultiplier(progress.upgrades).toFixed(1));
  renderOperations();save();return true;
 }
@@ -87,9 +88,9 @@ function newCustomer(){
  const alreadyFeatured=session.seenPeople.some(id=>featuredNames.includes(id));
  const featuredId=mode==='career'&&!alreadyFeatured?featuredNames[(progress.day-1)%featuredNames.length]:null;
  const rush=mode==='career'&&rushHourActive(progress.day,session);
- const selected=makeCustomer(mode==='practice'?Math.max(2,progress.day):progress.day,session.index,Math.random,{seen:session.seenPeople,forcedPersonId:featuredId,paymentMethods:availablePaymentMethods(progress.upgrades,mode==='practice'),upgrades:progress.upgrades,challenges:mode==='career',unlocked:mode==='practice'?CATEGORIES.map(c=>c.id):progress.unlocked,stock:mode==='practice'?null:progress.inventory});
+ const selected=makeCustomer(mode==='practice'?Math.max(2,progress.day):progress.day,session.index,Math.random,{seen:session.seenPeople,forcedPersonId:featuredId,paymentMethods:availablePaymentMethods(progress.upgrades,mode==='practice'),upgrades:progress.upgrades,challenges:mode==='career',unlocked:mode==='practice'?CATEGORIES.map(c=>c.id):progress.unlocked,stock:mode==='practice'||rush?null:progress.inventory});
  if(!selected){session.practiceDay=(session.practiceDay||1)+1;session.seenPeople=[];toast('Syif latihan baharu bermula.');newCustomer();return}
- customer=selected;prepareReturnCustomer();session.seenPeople.push(customer.person.id);
+ customer=selected;if(rush)customer.rushUnlimited=true;prepareReturnCustomer();session.seenPeople.push(customer.person.id);
  customer.patience+=(progress.upgrades.comfort||0)*15;
  // Even a level-5 comfort upgrade cannot override the 10-second Rush Hour challenge.
  if(rush)applyRushPatience(customer);
@@ -143,7 +144,7 @@ function renderPayment(){if(customer)$('paymentArea').dataset.waitKey='';syncPay
  if(phase==='end')area.innerHTML=`<button class="primary-btn" id="reportBtn">Lihat laporan hari ini ${icon('arrow')}</button>`;if($('reportBtn'))$('reportBtn').onclick=showSummary;
 }
 function qrArt(){return `<svg class="qr-art" viewBox="0 0 70 70" aria-hidden="true"><rect width="70" height="70" fill="white"/><g fill="#173f37"><path fill-rule="evenodd" d="M2 2h22v22H2Zm4 4v14h14V6Zm40-4h22v22H46Zm4 4v14h14V6ZM2 46h22v22H2Zm4 4v14h14V50Z"/><path d="M9 9h8v8H9Zm44 0h8v8h-8ZM9 53h8v8H9ZM28 2h6v6h-6Zm8 8h5v14h-5Zm-8 8h5v11h-5ZM2 29h10v5H2Zm16 0h6v11h-6Zm10 6h13v7H28Zm18-8h6v12h-6Zm12 4h10v6H58ZM2 38h10v5H2Zm26 9h6v21h-6Zm12 0h11v6H40Zm0 11h6v10h-6Zm12-14h6v12h-6Zm10 0h6v7h-6Zm-11 18h17v6H51Zm11-7h6v7h-6Z"/></g></svg>`}
-function renderPatience(){if(!customer)return;const fraction=mode==='practice'?1:Math.max(0,1-customer.elapsed/customer.patience);$('patienceBar').style.width=fraction*100+'%';$('patienceBar').style.background=fraction<.25?'#cc8d62':fraction<.5?'#c5b270':'#75a283';$('customerArt').classList.toggle('impatient',fraction<.25&&phase!=='success');$('patienceText').textContent=mode==='practice'?'Santai':fraction<.25?'Cepat!':fraction<.5?'Menunggu':'Sabar'}
+function renderPatience(){if(!customer)return;const fraction=mode==='practice'?1:Math.max(0,1-customer.elapsed/customer.patience);$('patienceBar').style.width=fraction*100+'%';$('patienceBar').style.background=fraction<.25?'#cc8d62':fraction<.5?'#c5b270':'#75a283';$('customerArt').classList.toggle('impatient',fraction<.25&&phase!=='success');$('patienceText').textContent=mode==='practice'?'Santai':phase==='offer'||phase==='change'?'Bayaran · berhenti':fraction<.25?'Cepat!':fraction<.5?'Menunggu':'Sabar'}
 function onItemDown(e){if(e.button!==0||paused||busy||phase!=='scan')return;const el=e.currentTarget,p=customer.items.find(i=>i.uid===el.dataset.uid);if(!p||p.scanned)return;drag={p,el,x:e.clientX,y:e.clientY,moved:false,id:e.pointerId};el.setPointerCapture(e.pointerId);el.addEventListener('pointermove',onItemMove);el.addEventListener('pointerup',onItemUp,{once:true});el.addEventListener('pointercancel',cancelDrag,{once:true});e.preventDefault()}
 function onItemMove(e){if(!drag)return;const d=drag;if(!d.moved&&Math.hypot(e.clientX-d.x,e.clientY-d.y)>7){d.moved=true;d.ghost=document.createElement('div');d.ghost.className='drag-ghost';d.ghost.innerHTML=productArt(d.p.id);document.body.append(d.ghost);d.el.style.opacity='.25'}if(d.ghost){d.ghost.style.left=e.clientX+'px';d.ghost.style.top=e.clientY+'px';for(const id of ['scannerZone','scaleZone'])$(id).classList.toggle('highlight',inside(e,$(id).getBoundingClientRect()))}}
 function inside(e,r){return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom}
@@ -166,19 +167,19 @@ function delayActive(ms,token,onProgress){return new Promise(resolve=>{let elaps
 function fly(productId,from,to){if(!from)return;const a=from.getBoundingClientRect(),b=to.getBoundingClientRect(),el=document.createElement('div');el.className='fly-item';el.innerHTML=productArt(productId);el.style.left=a.left+a.width/2-23+'px';el.style.top=a.top+a.height/2-23+'px';$('fxLayer').append(el);void el.offsetWidth;requestAnimationFrame(()=>{el.style.transform=`translate(${b.left+b.width/2-a.left-a.width/2}px,${b.top+b.height/2-a.top-a.height/2}px) scale(.75)`;el.style.opacity='0'});setTimeout(()=>el.remove(),420)}
 function completePayment(transaction=customer){
  if(!transaction||transaction!==customer||transaction.paid||!['scan','offer','change'].includes(phase)||!transaction.items.every(i=>i.scanned))return;
- if(!ensurePaper())return;if(mode!=='practice'&&!stockForBasket(progress,transaction.items)){showInventory();toast('Stok tidak cukup. Tambah bekalan untuk selesaikan jualan.',true);return}
+ if(!ensurePaper())return;if(mode!=='practice'&&!rushUnlimited(transaction)&&!stockForBasket(progress,transaction.items)){showInventory();toast('Stok tidak cukup. Tambah bekalan untuk selesaikan jualan.',true);return}
  ensureShift(session);const missedCoupon=transaction.hasCoupon&&!transaction.couponApplied,reason=missedCoupon?'Kupon diminta tetapi tidak digunakan.':'';
  const starLost=missedCoupon?loseStar(session,reason):0;transaction.paid=true;busy=false;phase='success';combo++;session.bestCombo=Math.max(session.bestCombo,combo);
  lastTip=missedCoupon?0:tipFor(customer,combo,progress.upgrades);
  const cost=transaction.items.reduce((n,p)=>n+stockCost(p,stockUnits(p),progress.day),0);
  const itemMargin=amountDue(transaction)-cost;
- const rushBonus=mode==='career'?rushHourProfitBonus(itemMargin,progress.upgrades,rushHourActive(progress.day,session)):0;
+ const rushBonus=mode==='career'?rushHourProfitBonus(itemMargin,progress.upgrades,rushUnlimited(transaction)||rushHourActive(progress.day,session)):0;
  transaction.rushBonus=rushBonus;
  lastEarned=itemMargin+lastTip+rushBonus;
  session.rushBonus=(session.rushBonus||0)+rushBonus;
  if(rushBonus)session.rushSales=(session.rushSales||0)+1;
  session.served++;if(transaction.method==='cash'&&!transaction.cashMistakes&&!transaction.overpaid)session.perfectCash=(session.perfectCash||0)+1;session.totalSales+=amountDue(transaction);session.tips+=lastTip;session.earned+=lastEarned;session.overpaid+=transaction.overpaid||0;
- if(mode==='career'){takeStock(progress,transaction.items);progress.paper--;receiveStoreCash(progress,amountDue(transaction)+lastTip);progress.wallet+=rushBonus;progress.lifetime+=lastEarned;progress.bestCombo=Math.max(progress.bestCombo,combo);recordSale(transaction);if(transaction.method==='card'){progress.cardHealth=Math.max(0,progress.cardHealth-Math.max(4,24-4*Math.max(1,progress.upgrades.card||1)));progress.cardBroken=progress.cardHealth===0}}
+ if(mode==='career'){if(!rushUnlimited(transaction)){takeStock(progress,transaction.items);progress.paper--;}receiveStoreCash(progress,amountDue(transaction)+lastTip);progress.wallet+=rushBonus;progress.lifetime+=lastEarned;progress.bestCombo=Math.max(progress.bestCombo,combo);recordSale(transaction);if(transaction.method==='card'){progress.cardHealth=Math.max(0,progress.cardHealth-Math.max(4,24-4*Math.max(1,progress.upgrades.card||1)));progress.cardBroken=progress.cardHealth===0}}
  session.clockMinutes=Math.min(1320,session.clockMinutes+90);render();save();if(transaction.method==='cash')playChaChing();else beep('success');floatingTip(lastTip);if(combo%3===0)confetti(24);
  showTransactionResult(lastTip,starLost,reason,transaction.overpaid||0);advance();
 }
@@ -199,7 +200,7 @@ function restoreCareer(){practiceStore=null;scanToken++;busy=false;advancePendin
 function showShop(returnTo='game'){
  if(mode==='practice'){toast('Semua kategori dibuka untuk latihan. Upgrade tersedia dalam kerjaya.');return}
  const destination=returnTo==='summary'||modalKind==='summary'?'summary':'game';
- openModal('shop',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">KEMBANGKAN PASAR MINI ANDA</div><h2>Upgrade & kategori.</h2></div><button class="icon-btn" id="closeShop" aria-label="Tutup">${icon('close')}</button></div><div class="shop-wallet"><small>Duit kedai anda</small><b>${money(progress.wallet)}</b></div><h3 class="shop-section-title">Buka kelas barangan</h3><p class="muted">Barang kategori baharu mula muncul pada pelanggan seterusnya. Pembelian kekal untuk hari-hari berikutnya.</p><div class="category-shop">${CATEGORIES.map(c=>{const owned=progress.unlocked.includes(c.id),count=PRODUCTS.filter(p=>p.category===c.id).length;return `<div class="category-card ${owned?'owned':''}"><div class="category-art">${productArt(c.art)}<span>${count} barang</span></div><div><h3>${c.name}</h3><p>Kelas ini mengandungi ${count} jenis barangan. ${owned?'Semua barangan sudah tersedia.':'Buka kelas untuk menjual barangan ini.'}</p></div><button data-category="${c.id}" class="secondary-btn" ${owned||progress.wallet<c.cost?'disabled':''}>${owned?'✓ Dibuka':money(c.cost)}</button><details class="category-products-preview"><summary>${owned?'Lihat senarai barangan':'Preview barangan terkunci'} (${count})</summary><div class="category-preview-items">${PRODUCTS.filter(p=>p.category===c.id).map(p=>`<div class="category-preview-item">${productArt(p.id)}<span><b>${p.name}</b><small>${money(p.price)}${p.weighted?'/kg':''}</small></span></div>`).join('')}</div></details></div>`}).join('')}</div>${paymentUpgradeCards()}<h3 class="shop-section-title">Peralatan kedai & bonus Rush Hour</h3><p class="rush-upgrade-hint">⚡ Rush Hour sekali sehari selama 60 saat. Untung ×3 pada asasnya; beli empat upgrade mahal untuk capai ×5. Pelanggan tetap hanya bayar harga asal.</p><p class="shop-capacity-info">Had inventori: <b>${stockCapacity(progress)} unit / kg bagi setiap barang</b> · Tahap stor ${progress.upgrades.storage||0}/5 · Setiap tahap menambah 5.</p>${UPGRADES.filter(u=>u.type!=='payment').map(u=>{const level=progress.upgrades[u.id]||0,cost=u.cost*(level+1),maxed=level>=u.max;return `<div class="upgrade-row"><span class="upgrade-icon">${icon(u.icon)}</span><div class="upgrade-info"><b>${u.name}</b><span class="level-dots">${'●'.repeat(level)+'○'.repeat(u.max-level)}</span><small>${u.desc}${machineUpgradeInfo(u.id,level,u.max)}</small></div><button class="primary-btn" data-upgrade="${u.id}" ${maxed||progress.wallet<cost?'disabled':''}>${maxed?'Maksimum':money(cost)}</button></div>`}).join('')}<button class="secondary-btn" id="backFromShop" style="width:100%;margin-top:15px">${destination==='summary'?'Kembali ke laporan':'Kembali ke kaunter'}</button></div>`);
+ openModal('shop',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">KEMBANGKAN PASAR MINI ANDA</div><h2>Upgrade & kategori.</h2></div><button class="icon-btn" id="closeShop" aria-label="Tutup">${icon('close')}</button></div><div class="shop-wallet"><small>Duit kedai anda</small><b>${money(progress.wallet)}</b></div><h3 class="shop-section-title">Buka kelas barangan</h3><p class="muted">Barang kategori baharu mula muncul pada pelanggan seterusnya. Pembelian kekal untuk hari-hari berikutnya.</p><div class="category-shop">${CATEGORIES.map(c=>{const owned=progress.unlocked.includes(c.id),count=PRODUCTS.filter(p=>p.category===c.id).length;return `<div class="category-card ${owned?'owned':''}"><div class="category-art">${productArt(c.art)}<span>${count} barang</span></div><div><h3>${c.name}</h3><p>Kelas ini mengandungi ${count} jenis barangan. ${owned?'Semua barangan sudah tersedia.':'Buka kelas untuk menjual barangan ini.'}</p></div><button data-category="${c.id}" class="secondary-btn" ${owned||progress.wallet<c.cost?'disabled':''}>${owned?'✓ Dibuka':money(c.cost)}</button><details class="category-products-preview"><summary>${owned?'Lihat senarai barangan':'Preview barangan terkunci'} (${count})</summary><div class="category-preview-items">${PRODUCTS.filter(p=>p.category===c.id).map(p=>`<div class="category-preview-item">${productArt(p.id)}<span><b>${p.name}</b><small>${money(p.price)}${p.weighted?'/kg':''}</small></span></div>`).join('')}</div></details></div>`}).join('')}</div>${paymentUpgradeCards()}<h3 class="shop-section-title">Peralatan kedai & bonus Rush Hour</h3><p class="rush-upgrade-hint">⚡ Rush Hour sekali sehari selama 60 saat. Untung bermula ×2; beli lima upgrade mahal (+0.3 setiap tahap) untuk mencapai ×3.5. Pelanggan tetap hanya bayar harga asal.</p><p class="shop-capacity-info">Had inventori: <b>${stockCapacity(progress)} unit / kg bagi setiap barang</b> · Tahap stor ${progress.upgrades.storage||0}/5 · Setiap tahap menambah 5.</p>${UPGRADES.filter(u=>u.type!=='payment').map(u=>{const level=progress.upgrades[u.id]||0,cost=u.cost*(level+1),maxed=level>=u.max;return `<div class="upgrade-row"><span class="upgrade-icon">${icon(u.icon)}</span><div class="upgrade-info"><b>${u.name}</b><span class="level-dots">${'●'.repeat(level)+'○'.repeat(u.max-level)}</span><small>${u.desc}${machineUpgradeInfo(u.id,level,u.max)}</small></div><button class="primary-btn" data-upgrade="${u.id}" ${maxed||progress.wallet<cost?'disabled':''}>${maxed?'Maksimum':money(cost)}</button></div>`}).join('')}<button class="secondary-btn" id="backFromShop" style="width:100%;margin-top:15px">${destination==='summary'?'Kembali ke laporan':'Kembali ke kaunter'}</button></div>`);
  const back=()=>destination==='summary'?showSummary():closeModal();$('closeShop').onclick=back;$('backFromShop').onclick=back;
  $('modalContent').querySelectorAll('[data-upgrade]').forEach(b=>b.onclick=()=>{{const previous=progress.upgrades[b.dataset.upgrade]||0;if(buyUpgrade(progress,b.dataset.upgrade)){if(b.dataset.upgrade==='comfort'&&customer)customer.patience+=15;save();renderHeader();beep('success');showShop(destination);if(['card','qr'].includes(b.dataset.upgrade))toast(previous===0?'Bayaran '+(b.dataset.upgrade==='card'?'kad':'QR')+' dibuka untuk pelanggan seterusnya!':'Peralatan pembayaran dinaik taraf ke tahap '+(previous+1));else if(b.dataset.upgrade==='storage')toast('Kapasiti stor kini '+stockCapacity(progress)+' unit / kg setiap produk.')}}});
  $('modalContent').querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>{if(unlockCategory(progress,b.dataset.category)){save();renderHeader();initIllustrations();showShop(destination);beep('success');confetti(18);toast('Kategori '+CATEGORIES.find(c=>c.id===b.dataset.category).name+' dibuka!')}});
@@ -227,10 +228,10 @@ function developerAccessChanged(enabled){
 }
 function assertDeveloper(){return developerMode&&cloud?.isDeveloper?.()===true}
 function prepareDeveloperProfile(day=7){
- const preservedSettings={...progress.settings};
+ const preservedSettings={...progress.settings},preservedWallet=progress.wallet;
  progress=createProgress();progress.settings=preservedSettings;
  progress.day=Math.max(1,Math.min(60,Math.floor(Number(day)||1)));
- progress.wallet=200000; // RM 2,000 sandbox funds
+ progress.wallet=Math.max(0,Math.round(Number(preservedWallet)||0)); // preserve Developer wallet across scenarios
  progress.unlocked=CATEGORIES.map(c=>c.id);
  progress.upgrades.card=1;progress.upgrades.qr=1;
  ensureOperations(progress);
@@ -289,26 +290,45 @@ function runDeveloperScenario(key,requestedDay=7){
 }
 function showDeveloperPanel(){
  if(!assertDeveloper())return;
- openModal('developer',`<div class="modal-pad dev-panel"><div class="modal-heading"><div><div class="modal-kicker">DEVELOPER · SANDBOX</div><h2>Uji fungsi Kedai Kita.</h2></div><button id="closeDeveloperPanel" class="icon-btn" aria-label="Tutup">${icon('close')}</button></div><div class="dev-note"><b>Data ujian berasingan</b><p>Panel ini hanya tersedia untuk UID Developer yang dibenarkan. Transaksi ujian tidak dihantar ke simpanan permainan sebenar.</p></div><h3>Ujian segera</h3><div class="dev-scenario-grid">
+ openModal('developer',`<div class="modal-pad dev-panel"><div class="modal-heading"><div><div class="modal-kicker">DEVELOPER · SANDBOX</div><h2>Uji fungsi Kedai Kita.</h2></div><button id="closeDeveloperPanel" class="icon-btn" aria-label="Tutup">${icon('close')}</button></div><div class="dev-note"><b>Sandbox Firebase · satu sesi aktif</b><p>Data ujian disimpan dalam ruang Developer berasingan di Firebase. Log masuk pada peranti lain akan menamatkan sesi di sini.</p></div><section class="dev-wallet" aria-label="Ubah duit Developer"><div class="dev-wallet-top"><span>DUIT UJIAN SEMASA</span><strong id="devWalletBalance">${money(progress.wallet)}</strong></div><label for="devWalletAmount">Jumlah yang hendak diubah (RM)</label><div class="dev-wallet-form"><input id="devWalletAmount" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" placeholder="Contoh: 500.00"><button type="button" id="devAddMoney" class="primary-btn">+ Tambah</button><button type="button" id="devSubtractMoney" class="secondary-btn">− Tolak</button></div><small id="devWalletHint">Perubahan disimpan ke Firebase untuk akaun Developer ini.</small></section><h3>Ujian segera</h3><div class="dev-scenario-grid">
  <button data-dev-scenario="cash">💵 <b>Bayar tunai</b><small>Kira baki sendiri</small></button>
  <button data-dev-scenario="pin">💳 <b>Kad + PIN</b><small>Masukkan PIN</small></button>
  <button data-dev-scenario="decline">🚫 <b>Kad ditolak</b><small>Baki tidak cukup</small></button>
  <button data-dev-scenario="qr">📱 <b>Imbas QR</b><small>Bayaran e-wallet</small></button>
  <button data-dev-scenario="barcode">▥ <b>Barcode rosak</b><small>Masukkan kod manual</small></button>
- <button data-dev-scenario="rush">⚡ <b>Rush Hour</b><small>60s · 10s sabar · untung ×3</small></button>
+ <button data-dev-scenario="rush">⚡ <b>Rush Hour</b><small>60s · 10s sabar · untung ×2</small></button>
  <button data-dev-scenario="refundValid">↩ <b>Refund sah</b><small>Resit sepadan</small></button>
  <button data-dev-scenario="refundInvalid">⚠ <b>Refund salah</b><small>Resit tidak sepadan</small></button>
  <button data-dev-scenario="vip">★ <b>Pelanggan VIP</b><small>Cabaran tip</small></button>
  <button data-dev-scenario="full">🧰 <b>Semua upgrade</b><small>Inventori & peralatan penuh</small></button>
  </div><h3>Ujian hari permainan</h3><div class="dev-day-input"><label for="developerDay">Hari (1–60)</label><input id="developerDay" type="number" min="1" max="60" value="${progress.day}"><button id="devRunDay" class="primary-btn">Buka hari</button></div><div class="dev-panel-footer"><button class="secondary-btn" id="devClearSandbox">Reset data ujian sahaja</button><button class="primary-btn" id="devBack">Kembali</button></div></div>`);
  $('closeDeveloperPanel').onclick=closeModal;$('devBack').onclick=closeModal;
+ for(const [buttonId,sign] of [['devAddMoney',1],['devSubtractMoney',-1]]){
+  $(buttonId).onclick=async()=>{
+   if(!assertDeveloper())return;
+   const raw=$('devWalletAmount').value.trim();
+   if(!/^(?:\d{1,7})(?:\.\d{1,2})?$/.test(raw)){toast('Masukkan amaun RM0.01 hingga RM1,000,000.00 (maksimum dua perpuluhan).',true);return}
+   const cents=Math.round(Number(raw)*100);
+   if(cents<1||cents>100000000){toast('Amaun mestilah RM0.01 hingga RM1,000,000.00.',true);return}
+   if(sign<0&&progress.wallet<cents){toast('Duit Developer tidak cukup untuk ditolak.',true);return}
+   for(const button of [$('devAddMoney'),$('devSubtractMoney')])button.disabled=true;
+   progress.wallet+=sign*cents;renderHeader();save();
+   $('devWalletBalance').textContent=money(progress.wallet);
+   $('devWalletHint').textContent='Menyegerakkan perubahan dengan Firebase…';
+   await cloud.flush();
+   const synced=cloud.isSavedRemotely?.()===true;
+   $('devWalletHint').textContent=synced?'✓ Duit berjaya disimpan dalam Firebase':'⚠ Data masih menunggu sync. Jangan log keluar sebelum selesai.';
+   for(const button of [$('devAddMoney'),$('devSubtractMoney')])button.disabled=false;
+   toast((sign>0?'Tambah ':'Tolak ')+money(cents)+(synced?' · disimpan dalam Firebase':' · belum disegerakkan'),!synced);
+  };
+ }
  $('modalContent').querySelectorAll('[data-dev-scenario]').forEach(btn=>btn.onclick=()=>runDeveloperScenario(btn.dataset.devScenario));
  $('devRunDay').onclick=()=>runDeveloperScenario('day',Number($('developerDay').value));
  $('devClearSandbox').onclick=async()=>{
-  if(!assertDeveloper()||!window.confirm('Reset data UJIAN pada peranti ini sahaja? Data pemain sebenar tidak terjejas.'))return;
+  if(!assertDeveloper()||!window.confirm('Reset semua data UJIAN dalam Firebase untuk akaun Developer ini? Progres pemain biasa tidak terjejas.'))return;
   scanToken++;busy=false;session=null;customer=null;phase='scan';mode='career';progress=createProgress();ensureOperations(progress);
   renderedSceneCustomer=undefined;renderedBasket=null;lastTip=0;lastEarned=0;cashPicked=[];
-  await cloud.resetProgress(captureGame());render();showIntro();toast('Data ujian developer direset');
+  await cloud.resetProgress(captureGame());render();showIntro();toast('Data ujian Developer direset dan disimpan');
  };
 }
 developerAccessChanged(false);
@@ -341,7 +361,8 @@ let lastTick=performance.now(),sinceSave=0;function loop(now){const dt=Math.min(
  if(mode==='career'&&!session.rushStarted)beginDailyRush();
  if(phase==='waiting'){session.waitSeconds=Math.max(0,session.waitSeconds-dt);renderWaiting();if(session.waitSeconds<=0)newCustomer()}
  else if(phase==='supply'&&readyForCustomer())newCustomer();
- else if(customer&&mode!=='practice'&&['scan','offer','change'].includes(phase)){customer.elapsed+=dt;renderPatience();if(customer.elapsed>=customer.patience)loseCustomer()}
+ else if(customer&&mode!=='practice'&&phase==='scan'){customer.elapsed+=dt;renderPatience();if(customer.elapsed>=customer.patience)loseCustomer()}
+  // After checkout begins, countdown and impatience stay frozen until payment finishes.
  }requestAnimationFrame(loop)}requestAnimationFrame(loop);
 
 function initIllustrations(){
@@ -591,7 +612,7 @@ function applyMachineSpeeds(){
  $('scaleZone').setAttribute('title','Penimbang · '+speed.weighMs/1000+' saat');
 }
 function machineUpgradeInfo(id,level,max){
- if(id==='rushBoost')return `<span class="machine-speed">Bonus Rush Hour: ×${rushHourMultiplier(progress.upgrades).toFixed(1)} → ×${rushHourMultiplier({...progress.upgrades,rushBoost:Math.min(max,level+1)}).toFixed(1)} · ${level>=max?'Maksimum':'Tambah +0.5 setiap tahap'}</span>`;
+ if(id==='rushBoost')return `<span class="machine-speed">Bonus Rush Hour: ×${rushHourMultiplier(progress.upgrades).toFixed(1)} → ×${rushHourMultiplier({...progress.upgrades,rushBoost:Math.min(max,level+1)}).toFixed(1)} · ${level>=max?'Maksimum':'Tambah +0.3 setiap tahap'}</span>`;
  if(id==='storage')return `<span class="machine-speed">Had stok: ${stockCapacity(progress)} → ${level<max?stockCapacity({upgrades:{storage:level+1}}):stockCapacity(progress)} unit/kg</span>`;
  if(!['scanner','scale','conveyor'].includes(id))return '';
  const current=machineTimings(progress.upgrades),next=machineTimings({...progress.upgrades,[id]:Math.min(max,level+1)});
@@ -740,16 +761,17 @@ function operatingStore(){
  if(!practiceStore){practiceStore=createProgress();practiceStore.wallet=1000000;practiceStore.unlocked=CATEGORIES.map(c=>c.id);ensureOperations(practiceStore);practiceStore.paper=999}
  return practiceStore;
 }
-function readyForCustomer(){return progress.paper>0&&availableProducts(progress.unlocked).some(p=>progress.inventory[p.id]>=(p.weighted?100:1))}
+function rushUnlimited(c=customer){return mode==='career'&&!!c?.rushUnlimited}
+function readyForCustomer(){return (mode==='career'&&rushHourActive(progress.day,session))||(progress.paper>0&&availableProducts(progress.unlocked).some(p=>progress.inventory[p.id]>=(p.weighted?100:1)))}
 function enterSupplyWait(){customer=null;phase='supply';busy=false;advancePending=false;session.waitSeconds=0;resetStations();render();save()}
-function ensurePaper(){if(mode==='practice'||progress.paper>0)return true;showInventory();toast('Kertas resit habis. Beli satu pek sebelum melayan pelanggan.',true);return false}
+function ensurePaper(){if(mode==='practice'||rushUnlimited()||(mode==='career'&&rushHourActive(progress.day,session))||progress.paper>0)return true;showInventory();toast('Kertas resit habis. Beli satu pek sebelum melayan pelanggan.',true);return false}
 function renderOperations(){
  const s=operatingStore(),rush=mode==='career'&&!!session&&rushHourActive(progress.day,session);
  $('storeClock').textContent=clockText(session?.clockMinutes||480)+(rush?' · ⚡ RUSH HOUR':session?.clockMinutes>=1020?' · Waktu lewat':' · Waktu kedai');
  const banner=$('rushHourBanner');if(banner){banner.hidden=!rush;if(rush){$('rushClock').textContent=String(Math.ceil(session.rushSecondsRemaining)).padStart(2,'0')+'s';$('rushMultiplier').textContent='×'+rushHourMultiplier(progress.upgrades).toFixed(1);$('rushBar').style.width=(session.rushSecondsRemaining/RUSH_DURATION_SECONDS*100).toFixed(2)+'%';}}
  $('storeClock').classList.toggle('rush-active',rush);
  const stars=session?.stars??3;$('storeStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);$('storeStars').setAttribute('aria-label',stars+' daripada 3 bintang servis');
- $('supplyStatus').textContent='Resit '+s.paper+' · Kad '+(s.cardBroken?'ROSAK':s.cardHealth+'%');$('operationsBtn').classList.toggle('needs-supply',s.paper<=3||s.cardBroken);
+ $('supplyStatus').textContent=((rush||rushUnlimited())?'⚡ Stok & resit ∞':'Resit '+s.paper)+' · Kad '+(s.cardBroken?'ROSAK':s.cardHealth+'%');$('operationsBtn').classList.toggle('needs-supply',(!rush&&!rushUnlimited()&&s.paper<=3)||s.cardBroken);
 }
 function renderWaiting(){
  const area=$('paymentArea'),key=phase+(progress.paper===0?'paper':'stock');if(area.dataset.waitKey!==key){area.dataset.waitKey=key;area.innerHTML=`<div class="waiting-counter">${icon(phase==='supply'?'basket':'clock')}<h3>${phase==='supply'?(progress.paper===0?'Kertas resit habis':'Stok kedai habis'):'Kaunter lapang seketika'}</h3><p>${phase==='supply'?'Tambah bekalan sebelum pelanggan seterusnya boleh dilayan.':'Dah lewat. Pelanggan datang lebih perlahan.'}</p><button class="secondary-btn" id="waitingInventory">Buka inventori</button></div>`;$('waitingInventory').onclick=()=>showInventory()}
@@ -793,7 +815,7 @@ function showInventory(returnTo='game'){
  inventoryDestination=returnTo==='summary'||modalKind==='summary'?'summary':'game';
  const destination=inventoryDestination;
  const back=()=>{if(destination==='summary'){showSummary();return}closeModal();if(phase==='supply'&&readyForCustomer())newCustomer()};
- openModal('inventory',`<div class="modal-pad inventory-panel"><div class="modal-heading"><div><div class="modal-kicker">STOK & PENYELENGGARAAN</div><h2>Inventori kedai.</h2></div><button class="icon-btn" id="closeInventory" aria-label="Tutup">${icon('close')}</button></div><div class="inventory-money"><span>Duit kedai <b id="inventoryWallet">${money(store.wallet)}</b></span><span>Hutang pembekal <b id="inventoryDebt">${money(store.supplierDebt)}</b></span></div><p class="muted">Kapasiti stor: ${stockCapacity(store)} unit/kg bagi setiap produk. Pembelian maksimum 20 unit/kg sekali gus.  Harga borong berubah mengikut hari permainan dan kekal sepanjang hari tersebut.</p><button class="primary-btn" id="restockAll" ${!quote.lines.length||mode==='practice'?'disabled':''}>Tambah semua stok · ${money(quote.total)}</button><p class="inventory-credit">Jika duit tidak cukup, anda boleh sahkan pembelian secara hutang. 30% kutipan jualan seterusnya digunakan untuk membayarnya.</p><div class="supply-cards"><div><b>Kertas resit</b><strong id="inventoryPaper">${store.paper} helai</strong><small>Satu helai bagi setiap jualan atau pulangan.</small><button class="secondary-btn" id="buyPaper">Beli ${PAPER_PACK} helai · ${money(PAPER_COST)}</button></div><div><b>Terminal kad</b><strong id="inventoryTerminal">${store.cardBroken?'Rosak':store.cardHealth+'% keadaan'}</strong><small>Rosak selepas haus atau gangguan rawak. Bayaran kad disekat sehingga dibaiki.</small><button class="secondary-btn" id="repairTerminal" ${!cardRepairCost(store)?'disabled':''}>Baiki · ${money(cardRepairCost(store))}</button></div></div><div class="inventory-toolbar"><input id="inventorySearch" type="search" placeholder="Cari nama barang…" aria-label="Cari inventori"><label for="inventoryStateFilter">Tapis stok</label><select id="inventoryStateFilter" aria-label="Tapis stok mengikut tahap"><option value="all">Semua stok</option><option value="empty">Stok habis (0)</option><option value="low">Stok rendah (1–4)</option><option value="good">Stok mencukupi (5+)</option></select><button class="secondary-btn" id="foldStock">Lipat semua</button></div><div class="inventory-list" id="inventoryGroups">${inventoryGroupsHTML(store)}</div><button class="secondary-btn" id="backInventory">${destination==='summary'?'Kembali ke laporan':'Kembali ke kaunter'}</button></div><div class="inventory-confirm-layer" id="inventoryConfirmLayer" hidden></div>`);
+ openModal('inventory',`<div class="modal-pad inventory-panel"><div class="modal-heading"><div><div class="modal-kicker">STOK & PENYELENGGARAAN</div><h2>Inventori kedai.</h2></div><button class="icon-btn" id="closeInventory" aria-label="Tutup">${icon('close')}</button></div><div class="inventory-money"><span>Duit kedai <b id="inventoryWallet">${money(store.wallet)}</b></span><span>Hutang pembekal <b id="inventoryDebt">${money(store.supplierDebt)}</b></span></div>${mode==='career'&&(rushHourActive(progress.day,session)||rushUnlimited())?'<p class="inventory-rush-note">⚡ Rush Hour: stok dan kertas resit tanpa had buat sementara. Stok asal tidak berkurang sepanjang transaksi ini.</p>':''}<p class="muted">Kapasiti stor: ${stockCapacity(store)} unit/kg bagi setiap produk. Pembelian maksimum 20 unit/kg sekali gus.  Harga borong berubah mengikut hari permainan dan kekal sepanjang hari tersebut.</p><button class="primary-btn" id="restockAll" ${!quote.lines.length||mode==='practice'?'disabled':''}>Tambah semua stok · ${money(quote.total)}</button><p class="inventory-credit">Jika duit tidak cukup, anda boleh sahkan pembelian secara hutang. 30% kutipan jualan seterusnya digunakan untuk membayarnya.</p><div class="supply-cards"><div><b>Kertas resit</b><strong id="inventoryPaper">${store.paper} helai</strong><small>Satu helai bagi setiap jualan atau pulangan.</small><button class="secondary-btn" id="buyPaper">Beli ${PAPER_PACK} helai · ${money(PAPER_COST)}</button></div><div><b>Terminal kad</b><strong id="inventoryTerminal">${store.cardBroken?'Rosak':store.cardHealth+'% keadaan'}</strong><small>Rosak selepas haus atau gangguan rawak. Bayaran kad disekat sehingga dibaiki.</small><button class="secondary-btn" id="repairTerminal" ${!cardRepairCost(store)?'disabled':''}>Baiki · ${money(cardRepairCost(store))}</button></div></div><div class="inventory-toolbar"><input id="inventorySearch" type="search" placeholder="Cari nama barang…" aria-label="Cari inventori"><label for="inventoryStateFilter">Tapis stok</label><select id="inventoryStateFilter" aria-label="Tapis stok mengikut tahap"><option value="all">Semua stok</option><option value="empty">Stok habis (0)</option><option value="low">Stok rendah (1–4)</option><option value="good">Stok mencukupi (5+)</option></select><button class="secondary-btn" id="foldStock">Lipat semua</button></div><div class="inventory-list" id="inventoryGroups">${inventoryGroupsHTML(store)}</div><button class="secondary-btn" id="backInventory">${destination==='summary'?'Kembali ke laporan':'Kembali ke kaunter'}</button></div><div class="inventory-confirm-layer" id="inventoryConfirmLayer" hidden></div>`);
  $('inventorySearch').oninput=filterInventory;
  $('inventoryStateFilter').onchange=filterInventory;
  $('foldStock').onclick=()=>{$('modalContent').querySelectorAll('[data-stock-category]').forEach(el=>el.open=false)};
@@ -919,7 +941,7 @@ function completeReturn(){
   record.returned=true;
   if(restock)store.inventory[record.productId]+=1;
  }
- store.paper--;
+ if(!rushUnlimited(customer))store.paper--;
  session.returnCount++;
  session.refunds+=refund;
  // Refund sebenar ialah wang yang keluar dari kedai. Kos barang yang boleh
