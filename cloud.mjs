@@ -243,8 +243,12 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     const fresh=clone(state);
     if(user){
       if(!api||!activeSessionToken)throw new Error('Sesi akaun telah tamat. Log masuk semula.');
-      if(writesPending){try{await writesPending}catch{/* remote save below is authoritative */}}
-      if(writing){await new Promise(resolve=>setTimeout(resolve,0));}
+      // Never leave the developer reset spinner hanging on an old network write.
+      // Do not mutate local game data until the authoritative reset completes.
+      if(writesPending){try{await withTimeout(writesPending,DATA_TIMEOUT_MS,'menunggu simpanan terdahulu')}catch(err){if(writing)throw err}}
+      if(writing){
+        await withTimeout(new Promise(resolve=>{const check=()=>writing?setTimeout(check,40):resolve();check()}),DATA_TIMEOUT_MS,'menyelesaikan simpanan terdahulu');
+      }
       if(timer){clearTimeout(timer);timer=null}
       const pendingBefore=queued;queued=null;
       try{

@@ -908,3 +908,30 @@ body[data-theme="dark"] .rush-upgrade-hint{background:#3e3528;color:#f5d9b2;bord
 @media(max-width:450px){.dev-wallet-form input{flex-basis:100%}.dev-wallet-form button{flex-basis:calc(50% - 4px)}}
 
 .inventory-rush-note{padding:12px 14px;border:1px solid #dac690;background:#fff7e2;border-radius:11px;color:#72501d;font-weight:700;font-size:12px;line-height:1.5}
+
+/* GOLDEN HOUR: in-game 16:00–18:00, warm sunlight across the shop, no obstruction. */
+.store-scene{isolation:isolate}
+.store-atmosphere{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3;opacity:0;transition:opacity 2s ease}
+.store-atmosphere .sunbeam{position:absolute;top:-55%;width:23%;height:180%;transform:rotate(32deg);background:linear-gradient(90deg,transparent,rgba(255,209,110,.22),rgba(255,240,170,.12),transparent);filter:blur(8px);transform-origin:top center;animation:goldenShimmer 9s ease-in-out infinite alternate}
+.store-atmosphere .beam-one{left:32%}.store-atmosphere .beam-two{left:70%;width:12%;animation-delay:-4s;opacity:.8}
+.store-atmosphere .dust{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffdfa0;box-shadow:0 0 9px #ffdb8e80;animation:dustFloat 8s linear infinite}
+.store-atmosphere .mote-one{top:72%;left:18%}.store-atmosphere .mote-two{top:36%;left:73%;animation-delay:-3s}.store-atmosphere .mote-three{top:64%;left:49%;animation-delay:-6s}
+body.store-golden-hour:not([data-theme="dark"]) .store-atmosphere{opacity:1}
+body.store-golden-hour:not([data-theme="dark"]) .store-scene{box-shadow:inset 0 0 55px #ffdb8733,0 10px 35px #b67b3924;background-color:#f0e2be}
+body.store-evening:not([data-theme="dark"]) .store-scene{filter:saturate(.91);box-shadow:inset 0 0 55px #4d537328}
+.atmosphere-label{position:absolute;top:11px;right:13px;padding:4px 8px;border-radius:30px;background:#593e28d9;color:#ffeac8;font-size:8px;font-weight:800;letter-spacing:.09em;z-index:12;pointer-events:none}
+.atmosphere-label[hidden]{display:none!important}
+@keyframes goldenShimmer{from{opacity:.48;filter:blur(10px)}to{opacity:1;filter:blur(5px)}}
+@keyframes dustFloat{0%{transform:translateY(15px) translateX(-5px);opacity:0}25%{opacity:.95}85%{opacity:.75}100%{transform:translateY(-55px) translateX(25px);opacity:0}}
+/* Rush Hour gives effective LEVEL 5 conveyor, scanner and scale (not purchased levels). */
+body.rush-machine-max .scanner,body.rush-machine-max .retail-scale,body.rush-machine-max .scale{box-shadow:inset 0 0 0 1px #e1bd63,0 0 16px #ffcd5836}
+body.rush-machine-max .scanner .station-label::after,body.rush-machine-max .scale .station-label::after{content:' MAX';font-size:8px;letter-spacing:.02em;font-weight:900;color:#ac751b}
+/* Separate destructive actions and clean small-screen developer wallet UX. */
+.dev-money-reset,.dev-data-reset{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:15px;border:1px solid #dbd9cd;border-radius:14px;background:#fbfaf4;margin-top:13px}
+.dev-money-reset b,.dev-data-reset b{display:block;font-size:13px;color:#274e3f;margin-bottom:5px}
+.dev-money-reset small,.dev-data-reset small{display:block;color:#748179;font-size:11px;line-height:1.6;max-width:360px}
+.dev-money-reset button,.dev-data-reset button{white-space:nowrap;flex:none;border-color:#c99982;color:#a54c3b;font-size:11px}
+.dev-data-reset{margin:18px 0;background:#fff5ed;border-color:#e6bead}
+.dev-reset-error{color:#aa483c;font-size:11px;line-height:1.6;min-height:0}
+@media(max-width:540px){.dev-money-reset,.dev-data-reset{flex-direction:column;align-items:stretch}.dev-money-reset button,.dev-data-reset button{width:100%}.atmosphere-label{font-size:7px;top:8px;right:8px}}
+body.reduced-motion .store-atmosphere *,body.reduced-motion .store-atmosphere{animation:none!important;transition:none!important}

@@ -1,6 +1,6 @@
-import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-18-rush-wallet-session-v2';
+import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-18-rush-golden-dev-reset-v3';
 import {productArt,moneyArt} from './art.mjs';
-import {createCloudSync} from './cloud.mjs?v=2026-10-18-rush-wallet-session-v2';
+import {createCloudSync} from './cloud.mjs?v=2026-10-18-rush-golden-dev-reset-v3';
 
 const $=id=>document.getElementById(id);
 const ICONS={basket:'M3 9h18l-2 11H5L3 9ZM8 9l4-7 4 7M8 13v3m4-3v3m4-3v3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5',shop:'M3 10V5h18v5M4 10v11h16V10M2 10a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0M9 21v-7h6v7',volume:'M11 4 6 8H2v8h4l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14',mute:'M11 4 6 8H2v8h4l5 4V4Zm5 5 6 6m0-6-6 6',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',pause:'M8 4v16m8-16v16',scan:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M6 12h12M7 9v6m3-6v6m4-6v6m3-6v6',scale:'M6 7h12l3 14H3L6 7Zm3 0V5a3 3 0 0 1 6 0v2m-3 4v5m-2-2h4',arrow:'M4 12h16m-6-6 6 6-6 6',heart:'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',flag:'M5 21V3m0 0c5-3 9 3 14 0v10c-5 3-9-3-14 0',receipt:'M5 3h14v19l-3-2-4 2-4-2-3 2V3Zm3 5h8m-8 4h8m-8 4h5',lock:'M6 10h12v11H6V10Zm3 0V6a3 3 0 0 1 6 0v4',card:'M2 5h20v14H2V5Zm0 5h20M6 15h4',qr:'M3 3h6v6H3V3Zm12 0h6v6h-6V3ZM3 15h6v6H3v-6Zm12 0h3v3h3v3h-6v-6Zm6-3v3M12 3v3m0 6v3M3 12h6m3 6v3',cash:'M2 5h20v14H2V5Zm10 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM5 8h1m12 8h1',check:'M5 12l4 4L19 6',close:'M6 6l12 12M6 18 18 6',play:'m8 4 12 8-12 8V4Z',snow:'M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4m13 9-4 1 1 4M4 14l4 1-1 4m13-9-4-1 1-4',spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z',undo:'M8 4 3 9l5 5M3 9h10a7 7 0 0 1 0 14',reset:'M4 8a9 9 0 1 1-1 8M4 3v5h5',help:'M9 8a3 3 0 1 1 5 2c-1 1-2 1-2 4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z'};
@@ -16,7 +16,7 @@ let paymentMinimized=false,musicUnlocked=false,musicLevel=0,musicTarget=-1,music
 let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=null,musicSource=null,chaChingBuffer=null,chaChingPromise=null,chaChingSource=null;
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-rush-wallet-session-v2';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-rush-golden-dev-reset-v3';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
@@ -77,7 +77,7 @@ function beginDailyRush(){
  if(customer&&!customer.paid)applyRushPatience(customer);
  if(customer&&!customer.paid)customer.rushUnlimited=true;
  toast('⚡ RUSH HOUR! 60 saat · Sabar 10 saat · Untung ×'+rushHourMultiplier(progress.upgrades).toFixed(1));
- renderOperations();save();return true;
+ applyMachineSpeeds();renderOperations();save();return true;
 }
 function newSession(selectedMode='career'){mode=selectedMode;if(mode==='practice')practiceStore=null;session={dayStart:JSON.parse(JSON.stringify(progress)),day:progress.day,mode,served:0,lost:0,totalSales:0,tips:0,earned:0,mistakes:0,index:0,bestCombo:0,weighed:0,scans:0,perfectCash:0,claimedMissions:[],seenPeople:[],rushStarted:false,rushCompleted:false,rushSecondsRemaining:0,rushBonus:0,rushSales:0};ensureShift(session);combo=0;initIllustrations();newCustomer()}
 function newCustomer(){
@@ -88,9 +88,9 @@ function newCustomer(){
  const alreadyFeatured=session.seenPeople.some(id=>featuredNames.includes(id));
  const featuredId=mode==='career'&&!alreadyFeatured?featuredNames[(progress.day-1)%featuredNames.length]:null;
  const rush=mode==='career'&&rushHourActive(progress.day,session);
- const selected=makeCustomer(mode==='practice'?Math.max(2,progress.day):progress.day,session.index,Math.random,{seen:session.seenPeople,forcedPersonId:featuredId,paymentMethods:availablePaymentMethods(progress.upgrades,mode==='practice'),upgrades:progress.upgrades,challenges:mode==='career',unlocked:mode==='practice'?CATEGORIES.map(c=>c.id):progress.unlocked,stock:mode==='practice'||rush?null:progress.inventory});
+ const selected=makeCustomer(mode==='practice'?Math.max(2,progress.day):progress.day,session.index,Math.random,{seen:session.seenPeople,forcedPersonId:featuredId,paymentMethods:availablePaymentMethods(progress.upgrades,mode==='practice'),upgrades:effectiveRushMachineUpgrades(progress.upgrades,rush),challenges:mode==='career',unlocked:mode==='practice'?CATEGORIES.map(c=>c.id):progress.unlocked,stock:mode==='practice'||rush?null:progress.inventory});
  if(!selected){session.practiceDay=(session.practiceDay||1)+1;session.seenPeople=[];toast('Syif latihan baharu bermula.');newCustomer();return}
- customer=selected;if(rush)customer.rushUnlimited=true;prepareReturnCustomer();session.seenPeople.push(customer.person.id);
+ customer=selected;if(rush)customer.rushUnlimited=true;applyMachineSpeeds();prepareReturnCustomer();session.seenPeople.push(customer.person.id);
  customer.patience+=(progress.upgrades.comfort||0)*15;
  // Even a level-5 comfort upgrade cannot override the 10-second Rush Hour challenge.
  if(rush)applyRushPatience(customer);
@@ -99,7 +99,21 @@ function newCustomer(){
  setTimeout(()=>{if(customer===incomingCustomer){$('customerArt').classList.remove('arrive');requestAnimationFrame(positionCustomerDialogue)}},650);
  setMobileView('counter');resetStations();render();save();
 }
-function resetStations(){$('scaleItem').innerHTML='';$('scaleItem').dataset.uid='';setScaleReading(null);$('scaleState').textContent='SEDIA';$('scaleZone').classList.remove('stable');$('weightProgress').style.width='0';$('scaleCaption').textContent='Hasil segar · '+(machineTimings(progress.upgrades).weighMs/1000)+' saat';$('scaleZone').classList.remove('weighing','highlight');$('scannerZone').classList.remove('scanning','highlight');$('scannerStatus').textContent='Sedia untuk scan'}
+function rushMachinesActive(){
+ return mode==='career'&&!!session&&(rushHourActive(progress.day,session)||rushUnlimited());
+}
+function gameplayMachineUpgrades(){return effectiveRushMachineUpgrades(progress.upgrades,rushMachinesActive())}
+function syncSceneAtmosphere(){
+ const minutes=Number(session?.clockMinutes)||480;
+ const golden=minutes>=960&&minutes<1080&&mode==='career'; // 16:00–18:00 game time
+ const evening=minutes>=1080&&mode==='career';
+ document.body.classList.toggle('store-golden-hour',golden);
+ document.body.classList.toggle('store-evening',evening);
+ document.body.classList.toggle('rush-machine-max',rushMachinesActive());
+ const label=$('atmosphereLabel');if(label)label.textContent=golden?'✦ GOLDEN HOUR':evening?'✦ SENJA':'';
+ if(label)label.hidden=!(golden||evening);
+}
+function resetStations(){$('scaleItem').innerHTML='';$('scaleItem').dataset.uid='';setScaleReading(null);$('scaleState').textContent='SEDIA';$('scaleZone').classList.remove('stable');$('weightProgress').style.width='0';$('scaleCaption').textContent='Hasil segar · '+(machineTimings(gameplayMachineUpgrades()).weighMs/1000)+' saat';$('scaleZone').classList.remove('weighing','highlight');$('scannerZone').classList.remove('scanning','highlight');$('scannerStatus').textContent='Sedia untuk scan'}
 function render(){refreshCalculatorPresets();renderHeader();renderScene();renderProducts();renderReceipt();renderPayment();icons();renderPatience();renderActivity()}
 function renderHeader(){renderOperations();renderPaymentAvailability();$('dayLabel').textContent=mode==='practice'?'Latihan':'Hari '+String(progress.day).padStart(2,'0');$('walletLabel').textContent=money(progress.wallet);$('comboLabel').innerHTML='×'+combo+' <span>✦</span>';$('missionText').textContent=mode==='practice'?'Belajar ikut rentak sendiri':dayTarget(progress.day)+' pelanggan unik hari ini';$('servedLabel').textContent=mode==='practice'?String(session?.served||0)+' siap':((session?.served||0)+(session?.lost||0))+' / '+dayTarget(progress.day);$('missionProgress').style.width=(mode==='practice'?0:Math.min(100,((session?.served||0)+(session?.lost||0))/dayTarget(progress.day)*100))+'%';$('dayMood').textContent=['Pagi yang ceria','Petang yang sibuk','Jiran datang lagi'][Math.min(2,Math.floor((session?.served||0)/3))];$('soundBtn').innerHTML=icon(sound?'volume':'mute');$('soundBtn').classList.toggle('off',!sound);$('soundBtn').setAttribute('aria-label',sound?'Matikan bunyi':'Hidupkan bunyi');$('shopBtn').disabled=mode==='practice';$('missionBtn').classList.toggle('reward-ready',!!session&&dailyMissions(session).some(m=>m.value>=m.target&&!(session.claimedMissions||[]).includes(m.id)));applySettings();syncBackgroundMusic()}
 function renderScene(){
@@ -154,7 +168,7 @@ async function processItem(uid,target=null,manual=false){if(paused||busy||phase!
  if(p.damaged&&!p.repaired&&!manual){
    busy=true;const attempt=scanToken;
    $('scannerZone').classList.add('scanning');$('scannerStatus').textContent='Membaca barcode…';
-   const ok=await delayActive(Math.min(500,machineTimings(progress.upgrades).scanMs+200),attempt);
+   const ok=await delayActive(Math.min(500,machineTimings(gameplayMachineUpgrades()).scanMs+200),attempt);
    if(!ok)return;
    busy=false;$('scannerZone').classList.remove('scanning');
    p.barcodeFailTriggered=true;$('scannerStatus').textContent='✕ Barcode tidak dapat dibaca';
@@ -162,7 +176,7 @@ async function processItem(uid,target=null,manual=false){if(paused||busy||phase!
    toast('Barcode rosak! Masukkan kod manual untuk scan.');
    showCodePad(uid);return;
  }
- busy=true;const token=scanToken;const el=$('products').querySelector(`[data-uid="${uid}"]`);el?.classList.add('busy');fly(p.id,el,$(correct==='scale'?'scaleZone':'scannerZone'));if(p.weighted){prepareScaleSound();$('scaleZone').classList.remove('stable');$('scaleZone').classList.add('weighing');setScaleReading(p,0);$('scaleItem').innerHTML=productArt(p.id);$('scaleItem').dataset.uid=p.uid;$('scaleState').textContent='MENIMBANG';$('scaleCaption').textContent='Menstabilkan bacaan berat…';const valid=await delayActive(machineTimings(progress.upgrades).weighMs,token,frac=>{setScaleReading(p,Math.max(0,frac<.95?frac+Math.sin(frac*42)*.05:1));$('weightProgress').style.width=frac*100+'%'});if(!valid)return;$('scaleZone').classList.remove('weighing');setScaleReading(p);$('scaleZone').classList.add('stable');$('scaleState').textContent='STABIL';$('scaleCaption').textContent=money(itemPrice(p))+' · Masuk resit secara automatik';playScaleSound()}else{$('scannerZone').classList.add('scanning');$('scannerStatus').textContent='Membaca barcode…';const valid=await delayActive(machineTimings(progress.upgrades).scanMs,token);if(!valid)return;$('scannerZone').classList.remove('scanning');$('scannerStatus').textContent='✓ '+p.name+' · '+money(itemPrice(p));beep('scan')}p.scanned=true;p.scanOrder=(customer.scanSequence||0)+1;customer.scanSequence=p.scanOrder;session.scans=(session.scans||0)+1;if(p.weighted)session.weighed=(session.weighed||0)+1;busy=false;fly(p.id,$(p.weighted?'scaleZone':'scannerZone'),$('bagZone'));if(p.weighted)setTimeout(()=>{if(token===scanToken&&$('scaleItem').dataset.uid===p.uid){$('scaleItem').innerHTML='';$('scaleItem').dataset.uid=''}},420);renderProducts();renderActivity();renderHeader();renderReceipt();renderPayment();const bag=document.querySelector('.bag-zone');bag.classList.remove('pop');void bag.offsetWidth;bag.classList.add('pop');if(customer.items.every(i=>i.scanned)){customer.elapsed=Math.max(0,customer.elapsed-2);$('speech').textContent=customer.kind==='return'?customer.returnReason:'Dah siap semua! '+({cash:'Saya bayar tunai ya.',card:'Saya nak guna kad.',qr:'Saya guna QR.'}[customer.method]);toast(customer.kind==='return'?'Barang siap discan. Bandingkan resit pemulangan.':'Semua barang siap. Masa untuk bayaran!');setMobileView('payment')}save()}
+ busy=true;const token=scanToken;const el=$('products').querySelector(`[data-uid="${uid}"]`);el?.classList.add('busy');fly(p.id,el,$(correct==='scale'?'scaleZone':'scannerZone'));if(p.weighted){prepareScaleSound();$('scaleZone').classList.remove('stable');$('scaleZone').classList.add('weighing');setScaleReading(p,0);$('scaleItem').innerHTML=productArt(p.id);$('scaleItem').dataset.uid=p.uid;$('scaleState').textContent='MENIMBANG';$('scaleCaption').textContent='Menstabilkan bacaan berat…';const valid=await delayActive(machineTimings(gameplayMachineUpgrades()).weighMs,token,frac=>{setScaleReading(p,Math.max(0,frac<.95?frac+Math.sin(frac*42)*.05:1));$('weightProgress').style.width=frac*100+'%'});if(!valid)return;$('scaleZone').classList.remove('weighing');setScaleReading(p);$('scaleZone').classList.add('stable');$('scaleState').textContent='STABIL';$('scaleCaption').textContent=money(itemPrice(p))+' · Masuk resit secara automatik';playScaleSound()}else{$('scannerZone').classList.add('scanning');$('scannerStatus').textContent='Membaca barcode…';const valid=await delayActive(machineTimings(gameplayMachineUpgrades()).scanMs,token);if(!valid)return;$('scannerZone').classList.remove('scanning');$('scannerStatus').textContent='✓ '+p.name+' · '+money(itemPrice(p));beep('scan')}p.scanned=true;p.scanOrder=(customer.scanSequence||0)+1;customer.scanSequence=p.scanOrder;session.scans=(session.scans||0)+1;if(p.weighted)session.weighed=(session.weighed||0)+1;busy=false;fly(p.id,$(p.weighted?'scaleZone':'scannerZone'),$('bagZone'));if(p.weighted)setTimeout(()=>{if(token===scanToken&&$('scaleItem').dataset.uid===p.uid){$('scaleItem').innerHTML='';$('scaleItem').dataset.uid=''}},420);renderProducts();renderActivity();renderHeader();renderReceipt();renderPayment();const bag=document.querySelector('.bag-zone');bag.classList.remove('pop');void bag.offsetWidth;bag.classList.add('pop');if(customer.items.every(i=>i.scanned)){customer.elapsed=Math.max(0,customer.elapsed-2);$('speech').textContent=customer.kind==='return'?customer.returnReason:'Dah siap semua! '+({cash:'Saya bayar tunai ya.',card:'Saya nak guna kad.',qr:'Saya guna QR.'}[customer.method]);toast(customer.kind==='return'?'Barang siap discan. Bandingkan resit pemulangan.':'Semua barang siap. Masa untuk bayaran!');setMobileView('payment')}save()}
 function delayActive(ms,token,onProgress){return new Promise(resolve=>{let elapsed=0,last=performance.now();function tick(now){const delta=Math.min(100,now-last);last=now;if(token!==scanToken){resolve(false);return}if(!paused&&!document.hidden){elapsed+=delta;onProgress?.(Math.min(1,elapsed/ms))}if(elapsed>=ms){resolve(true);return}requestAnimationFrame(tick)}requestAnimationFrame(tick)})}
 function fly(productId,from,to){if(!from)return;const a=from.getBoundingClientRect(),b=to.getBoundingClientRect(),el=document.createElement('div');el.className='fly-item';el.innerHTML=productArt(productId);el.style.left=a.left+a.width/2-23+'px';el.style.top=a.top+a.height/2-23+'px';$('fxLayer').append(el);void el.offsetWidth;requestAnimationFrame(()=>{el.style.transform=`translate(${b.left+b.width/2-a.left-a.width/2}px,${b.top+b.height/2-a.top-a.height/2}px) scale(.75)`;el.style.opacity='0'});setTimeout(()=>el.remove(),420)}
 function completePayment(transaction=customer){
@@ -290,19 +304,39 @@ function runDeveloperScenario(key,requestedDay=7){
 }
 function showDeveloperPanel(){
  if(!assertDeveloper())return;
- openModal('developer',`<div class="modal-pad dev-panel"><div class="modal-heading"><div><div class="modal-kicker">DEVELOPER · SANDBOX</div><h2>Uji fungsi Kedai Kita.</h2></div><button id="closeDeveloperPanel" class="icon-btn" aria-label="Tutup">${icon('close')}</button></div><div class="dev-note"><b>Sandbox Firebase · satu sesi aktif</b><p>Data ujian disimpan dalam ruang Developer berasingan di Firebase. Log masuk pada peranti lain akan menamatkan sesi di sini.</p></div><section class="dev-wallet" aria-label="Ubah duit Developer"><div class="dev-wallet-top"><span>DUIT UJIAN SEMASA</span><strong id="devWalletBalance">${money(progress.wallet)}</strong></div><label for="devWalletAmount">Jumlah yang hendak diubah (RM)</label><div class="dev-wallet-form"><input id="devWalletAmount" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" placeholder="Contoh: 500.00"><button type="button" id="devAddMoney" class="primary-btn">+ Tambah</button><button type="button" id="devSubtractMoney" class="secondary-btn">− Tolak</button></div><small id="devWalletHint">Perubahan disimpan ke Firebase untuk akaun Developer ini.</small></section><h3>Ujian segera</h3><div class="dev-scenario-grid">
+ openModal('developer',`<div class="modal-pad dev-panel"><div class="modal-heading"><div><div class="modal-kicker">DEVELOPER · SANDBOX</div><h2>Uji fungsi Kedai Kita.</h2></div><button id="closeDeveloperPanel" class="icon-btn" aria-label="Tutup">${icon('close')}</button></div><div class="dev-note"><b>Sandbox Firebase · satu sesi aktif</b><p>Data ujian disimpan dalam ruang Developer berasingan di Firebase. Log masuk pada peranti lain akan menamatkan sesi di sini.</p></div><section class="dev-wallet" aria-label="Ubah duit Developer"><div class="dev-wallet-top"><span>DUIT KEDAI</span><strong id="devWalletBalance">${money(progress.wallet)}</strong></div><label for="devWalletAmount">Jumlah yang hendak diubah (RM)</label><div class="dev-wallet-form"><input id="devWalletAmount" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" placeholder="Contoh: 500.00"><button type="button" id="devAddMoney" class="primary-btn">+ Tambah</button><button type="button" id="devSubtractMoney" class="secondary-btn">− Tolak</button></div><small id="devWalletHint">Nilai yang sama dipaparkan pada Duit Kedai di bahagian atas dan disimpan ke Firebase.</small></section>
+ <section class="dev-money-reset" aria-label="Reset duit kedai sahaja"><div><b>Reset duit kedai</b><small>Set duit kepada RM0.00 tanpa mengubah hari, inventori, upgrade atau senario ujian.</small></div><button type="button" class="secondary-btn" id="devResetMoney">Reset duit</button></section>
+ <h3>Ujian segera</h3><div class="dev-scenario-grid">
  <button data-dev-scenario="cash">💵 <b>Bayar tunai</b><small>Kira baki sendiri</small></button>
  <button data-dev-scenario="pin">💳 <b>Kad + PIN</b><small>Masukkan PIN</small></button>
  <button data-dev-scenario="decline">🚫 <b>Kad ditolak</b><small>Baki tidak cukup</small></button>
  <button data-dev-scenario="qr">📱 <b>Imbas QR</b><small>Bayaran e-wallet</small></button>
  <button data-dev-scenario="barcode">▥ <b>Barcode rosak</b><small>Masukkan kod manual</small></button>
- <button data-dev-scenario="rush">⚡ <b>Rush Hour</b><small>60s · 10s sabar · untung ×2</small></button>
+ <button data-dev-scenario="rush">⚡ <b>Rush Hour</b><small>60s · 10s sabar · mesin tahap 5</small></button>
  <button data-dev-scenario="refundValid">↩ <b>Refund sah</b><small>Resit sepadan</small></button>
  <button data-dev-scenario="refundInvalid">⚠ <b>Refund salah</b><small>Resit tidak sepadan</small></button>
  <button data-dev-scenario="vip">★ <b>Pelanggan VIP</b><small>Cabaran tip</small></button>
  <button data-dev-scenario="full">🧰 <b>Semua upgrade</b><small>Inventori & peralatan penuh</small></button>
- </div><h3>Ujian hari permainan</h3><div class="dev-day-input"><label for="developerDay">Hari (1–60)</label><input id="developerDay" type="number" min="1" max="60" value="${progress.day}"><button id="devRunDay" class="primary-btn">Buka hari</button></div><div class="dev-panel-footer"><button class="secondary-btn" id="devClearSandbox">Reset data ujian sahaja</button><button class="primary-btn" id="devBack">Kembali</button></div></div>`);
+ </div><h3>Ujian hari permainan</h3><div class="dev-day-input"><label for="developerDay">Hari (1–60)</label><input id="developerDay" type="number" min="1" max="60" value="${progress.day}"><button id="devRunDay" class="primary-btn">Buka hari</button></div><section class="dev-data-reset" aria-label="Reset keseluruhan data ujian"><div><b>Reset semua data ujian</b><small>Padam progres ujian sahaja termasuk hari, inventori, upgrade dan duit kedai. Akaun Firebase kekal.</small></div><button type="button" class="secondary-btn" id="devClearSandbox">Reset data ujian</button></section><p id="devResetError" class="dev-reset-error" role="alert" aria-live="polite"></p><div class="dev-panel-footer"><button class="primary-btn" id="devBack">Kembali ke game</button></div></div>`);
  $('closeDeveloperPanel').onclick=closeModal;$('devBack').onclick=closeModal;
+ async function storeDeveloperWallet(next,action){
+  if(!assertDeveloper())return;
+  if(!Number.isSafeInteger(next)||next<0||next>1000000000){toast('Jumlah duit tidak sah.',true);return}
+  const controls=[$('devAddMoney'),$('devSubtractMoney'),$('devResetMoney'),$('devClearSandbox')];
+  controls.forEach(x=>x.disabled=true);
+  const hint=$('devWalletHint');hint.textContent='Menyimpan '+action+' ke Firebase…';
+  const snapshot=captureGame();
+  const fresh={...snapshot,progress:{...snapshot.progress,wallet:next}};
+  try{
+   await cloud.resetProgress(fresh); // Wait for the authoritative remote save, not a delayed queue.
+   progress.wallet=next;renderHeader();$('devWalletBalance').textContent=money(progress.wallet);
+   hint.textContent='✓ '+action+' disimpan. Duit Kedai sama dengan paparan utama.';
+   $('devWalletAmount').value='';toast(action+' · '+money(next));
+  }catch(error){
+   hint.textContent='⚠ Simpanan gagal. Duit kedai tidak diubah. '+String(error?.message||'Cuba semula.');
+   toast('Tidak dapat menyimpan duit kedai. Cuba semula.',true);
+  }finally{controls.forEach(x=>x.disabled=false)}
+ }
  for(const [buttonId,sign] of [['devAddMoney',1],['devSubtractMoney',-1]]){
   $(buttonId).onclick=async()=>{
    if(!assertDeveloper())return;
@@ -310,26 +344,33 @@ function showDeveloperPanel(){
    if(!/^(?:\d{1,7})(?:\.\d{1,2})?$/.test(raw)){toast('Masukkan amaun RM0.01 hingga RM1,000,000.00 (maksimum dua perpuluhan).',true);return}
    const cents=Math.round(Number(raw)*100);
    if(cents<1||cents>100000000){toast('Amaun mestilah RM0.01 hingga RM1,000,000.00.',true);return}
-   if(sign<0&&progress.wallet<cents){toast('Duit Developer tidak cukup untuk ditolak.',true);return}
-   for(const button of [$('devAddMoney'),$('devSubtractMoney')])button.disabled=true;
-   progress.wallet+=sign*cents;renderHeader();save();
-   $('devWalletBalance').textContent=money(progress.wallet);
-   $('devWalletHint').textContent='Menyegerakkan perubahan dengan Firebase…';
-   await cloud.flush();
-   const synced=cloud.isSavedRemotely?.()===true;
-   $('devWalletHint').textContent=synced?'✓ Duit berjaya disimpan dalam Firebase':'⚠ Data masih menunggu sync. Jangan log keluar sebelum selesai.';
-   for(const button of [$('devAddMoney'),$('devSubtractMoney')])button.disabled=false;
-   toast((sign>0?'Tambah ':'Tolak ')+money(cents)+(synced?' · disimpan dalam Firebase':' · belum disegerakkan'),!synced);
+   const next=progress.wallet+sign*cents;
+   if(next<0){toast('Duit kedai tidak mencukupi untuk ditolak.',true);return}
+   await storeDeveloperWallet(next,sign>0?'Tambah duit':'Tolak duit');
   };
  }
+ $('devResetMoney').onclick=async()=>{
+  if(!assertDeveloper()||!window.confirm('Reset DUIT KEDAI Developer kepada RM0.00 sahaja? Inventori, upgrade dan data ujian lain dikekalkan.'))return;
+  await storeDeveloperWallet(0,'Reset duit kedai');
+ };
  $('modalContent').querySelectorAll('[data-dev-scenario]').forEach(btn=>btn.onclick=()=>runDeveloperScenario(btn.dataset.devScenario));
  $('devRunDay').onclick=()=>runDeveloperScenario('day',Number($('developerDay').value));
  $('devClearSandbox').onclick=async()=>{
-  if(!assertDeveloper()||!window.confirm('Reset semua data UJIAN dalam Firebase untuk akaun Developer ini? Progres pemain biasa tidak terjejas.'))return;
-  scanToken++;busy=false;session=null;customer=null;phase='scan';mode='career';progress=createProgress();ensureOperations(progress);
-  renderedSceneCustomer=undefined;renderedBasket=null;lastTip=0;lastEarned=0;cashPicked=[];
-  await cloud.resetProgress(captureGame());render();showIntro();toast('Data ujian Developer direset dan disimpan');
- };
+  if(!assertDeveloper()||!window.confirm('Reset SEMUA DATA UJIAN Developer dalam Firebase? Ini termasuk duit kedai, inventori dan upgrade ujian. Progres pemain biasa tidak terjejas.'))return;
+  const button=$('devClearSandbox');button.disabled=true;button.textContent='Sedang reset…';
+  const error=$('devResetError');error.textContent='';
+  const fresh={progress:createProgress(),session:null,sound};
+  try{
+   // Never clear the in-memory game before Firebase confirms a successful reset.
+   await cloud.resetProgress(fresh);
+   scanToken++;clearTimeout(resultTimer);stopScannerSound();stopScaleSound();stopDrawerSound();stopChaChing();
+   explicitPause=true;hydrateGame(fresh);
+   toast('Data ujian berjaya direset. Boleh mulakan Hari 1.');
+  }catch(err){
+   error.textContent='Reset tidak berjaya, data ujian asal dikekalkan. '+String(err?.message||'Semak sambungan Firebase, kemudian cuba lagi.');
+   button.disabled=false;button.textContent='Cuba reset data ujian';
+  }
+ };;
 }
 developerAccessChanged(false);
 cloud=createCloudSync({
@@ -351,7 +392,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){save();if(
 let lastTick=performance.now(),sinceSave=0;function loop(now){const dt=Math.min((now-lastTick)/1000,.1);lastTick=now;if(!paused&&!document.hidden&&session&&phase!=='end'){
  if(mode!=='practice'){session.clockMinutes=Math.min(1320,(session.clockMinutes||480)+dt*.35);renderOperations();sinceSave+=dt;if(sinceSave>5){save();sinceSave=0}}
  if(mode==='career'&&tickRushHour(session,dt)){
-   restoreRushPatience();
+   restoreRushPatience();applyMachineSpeeds();
    toast('⚡ Rush Hour tamat! Bonus direkodkan dalam laporan syif.');
    renderOperations();save();
    if(['waiting','supply'].includes(phase)&&dayFinished(session,progress.day)){
@@ -604,7 +645,7 @@ function pressPin(key){
 }
 
 function applyMachineSpeeds(){
- const speed=machineTimings(progress.upgrades);
+ const speed=machineTimings(gameplayMachineUpgrades());
  document.body.style.setProperty('--scan-duration',speed.scanMs+'ms');
  document.body.style.setProperty('--belt-duration',speed.beltMs+'ms');
  document.body.style.setProperty('--item-slide-duration',speed.slideMs+'ms');
@@ -766,8 +807,9 @@ function readyForCustomer(){return (mode==='career'&&rushHourActive(progress.day
 function enterSupplyWait(){customer=null;phase='supply';busy=false;advancePending=false;session.waitSeconds=0;resetStations();render();save()}
 function ensurePaper(){if(mode==='practice'||rushUnlimited()||(mode==='career'&&rushHourActive(progress.day,session))||progress.paper>0)return true;showInventory();toast('Kertas resit habis. Beli satu pek sebelum melayan pelanggan.',true);return false}
 function renderOperations(){
+ syncSceneAtmosphere();
  const s=operatingStore(),rush=mode==='career'&&!!session&&rushHourActive(progress.day,session);
- $('storeClock').textContent=clockText(session?.clockMinutes||480)+(rush?' · ⚡ RUSH HOUR':session?.clockMinutes>=1020?' · Waktu lewat':' · Waktu kedai');
+ $('storeClock').textContent=clockText(session?.clockMinutes||480)+(rush?' · ⚡ RUSH HOUR':session?.clockMinutes>=1080?' · Waktu senja':session?.clockMinutes>=960?' · Golden Hour':' · Waktu kedai');
  const banner=$('rushHourBanner');if(banner){banner.hidden=!rush;if(rush){$('rushClock').textContent=String(Math.ceil(session.rushSecondsRemaining)).padStart(2,'0')+'s';$('rushMultiplier').textContent='×'+rushHourMultiplier(progress.upgrades).toFixed(1);$('rushBar').style.width=(session.rushSecondsRemaining/RUSH_DURATION_SECONDS*100).toFixed(2)+'%';}}
  $('storeClock').classList.toggle('rush-active',rush);
  const stars=session?.stars??3;$('storeStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);$('storeStars').setAttribute('aria-label',stars+' daripada 3 bintang servis');

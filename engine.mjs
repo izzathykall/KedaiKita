@@ -597,7 +597,8 @@ export function tickRushHour(session,seconds){
  if(session.rushSecondsRemaining>0)return false;
  session.rushCompleted=true;return true;
 }
-export function dayTarget(day){return Math.min(12,4+day)}
+// Each day increases the required number of customers; maximum 20 per shift.
+export function dayTarget(day){return Math.min(20,4+Math.max(1,Math.floor(Number(day)||1)))}
 export function createProgress(){return {version:1,day:1,wallet:0,lifetime:0,served:0,bestCombo:0,upgrades:{scanner:0,scale:0,conveyor:0,comfort:0,tips:0,storage:0,card:0,qr:0,rushBoost:0},history:[],unlocked:['essentials'],settings:{motion:true,theme:'mint',volume:.6,music:true,musicVolume:.2}}}
 export function restoreProgress(raw){try{const p=JSON.parse(raw);if(p?.version!==1||!Number.isInteger(p.day)||p.day<1||!Number.isFinite(p.wallet))return createProgress();return {...createProgress(),...p,upgrades:{...createProgress().upgrades,...p.upgrades},history:Array.isArray(p.history)?p.history.slice(-20):[],settings:{...createProgress().settings,...p.settings},unlocked:Array.isArray(p.unlocked)?[...new Set(['essentials',...p.unlocked.filter(id=>CATEGORIES.some(c=>c.id===id))])]:['essentials']}}catch{return createProgress()}}
 export function randomManualCode(rng=Math.random){return String(1000+Math.floor(rng()*9000))}
@@ -671,6 +672,8 @@ export function calculateExpression(expression){
  if(!Number.isFinite(value)||Math.abs(value)>1e12)throw new Error('Nilai terlalu besar.');return Math.round(value*1e8)/1e8;
 }
 
+// Temporary event speed boost: actual purchased equipment levels remain unchanged.
+export function effectiveRushMachineUpgrades(upgrades={},active=false){return active?{...upgrades,scanner:5,scale:5,conveyor:5}:upgrades}
 export function machineTimings(upgrades={}){
  const level=(id,max)=>Math.max(0,Math.min(max,Math.floor(Number(upgrades[id])||0)));
  const conveyor=level('conveyor',5);

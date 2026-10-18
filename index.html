@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#173f37"><meta name="description" content="Jaga kaunter pasar mini anda. Scan barang, timbang hasil segar, kira baki dan bina Kedai Kita!">
 <title>Kedai Kita — Cashier Simulator</title>
-<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-18-rush-hour-60s">
+<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-18-rush-golden-dev-reset-v3">
 </head>
 <body>
 <div class="app" id="gameApp">
@@ -26,13 +26,15 @@
   </nav>
   <div class="operations-bar"><div class="ops-status"><span id="storeClock">08:00</span><span id="storeStars" aria-label="Bintang servis">★ ★ ★</span></div><div class="ops-actions"><button id="operationsBtn">Bekalan</button><span id="supplyStatus">Resit 12</span><div id="mobileControlsSlot" class="mobile-controls-slot" aria-label="Kawalan permainan"><button id="mobileControlsToggle" type="button" class="mobile-controls-toggle" aria-controls="gameTools" aria-expanded="false"><span data-icon="settings"></span><b>Kawalan</b><span class="mobile-chevron" aria-hidden="true">▾</span></button></div></div></div>
   <div id="rushHourBanner" class="rush-hour-banner" role="status" aria-label="Rush Hour aktif" hidden>
-   <div class="rush-hour-heading"><strong>⚡ RUSH HOUR</strong><span>Kesabaran 10s · Untung <b id="rushMultiplier">×2.0</b></span><b class="rush-countdown" id="rushClock">60s</b></div>
+   <div class="rush-hour-heading"><strong>⚡ RUSH HOUR</strong><span>Kesabaran 10s · Mesin MAX · Untung <b id="rushMultiplier">×2.0</b></span><b class="rush-countdown" id="rushClock">60s</b></div>
    <div class="rush-timer-track"><i id="rushBar" style="width:100%"></i></div>
   </div>
   <div class="mobile-tabs" role="tablist" aria-label="Paparan kaunter"><button id="counterTab" class="mobile-tab active" role="tab" aria-selected="true">Kaunter <span data-icon="scan"></span></button><button id="paymentTab" class="mobile-tab" role="tab" aria-selected="false">Resit & bayaran <b id="mobileCount">0</b></button></div>
   <main class="game-grid">
     <section class="work-area" aria-label="Kaunter juruwang">
       <div class="store-scene">
+        <div class="store-atmosphere" aria-hidden="true"><span class="sunbeam beam-one"></span><span class="sunbeam beam-two"></span><span class="dust mote-one"></span><span class="dust mote-two"></span><span class="dust mote-three"></span></div>
+        <span id="atmosphereLabel" class="atmosphere-label" hidden></span>
         <div id="shelfLeft" class="shelf shelf-left"></div>
         <div class="store-sign"><span>kita</span><small>SEDIKIT DEKAT. BANYAK HEMAT.</small></div>
         <div id="shelfRight" class="shelf shelf-right"></div>
@@ -127,7 +129,7 @@
 <script type="module">
 // Versioned loader: the currently published version.json controls the actual CSS and app version.
 // Each release only requires updating version.json after publishing the changed files.
-const fallbackBuild = '2026-10-18-rush-wallet-session-v2';
+const fallbackBuild = '2026-10-18-rush-golden-dev-reset-v3';
 let activeBuild = fallbackBuild;
 try {
   const response = await fetch('./version.json?init=' + Date.now(), {cache:'no-store'});
