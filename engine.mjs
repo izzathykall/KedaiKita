@@ -583,7 +583,7 @@ export function rushHourProfitBonus(marginCents,upgrades={},active=false){
 }
 export function shouldStartRushHour(session,day){
  return !!session&&Number(day)>=1&&!session.rushStarted&&!session.rushCompleted&&
-   (((session.served||0)+(session.lost||0))>=Math.min(5,Math.max(1,Math.ceil(dayTarget(day)*.55)))||Number(session.clockMinutes)>=900);
+   (normalCustomerCount(session)>=Math.min(5,Math.max(1,Math.ceil(dayTarget(day)*.55)))||Number(session.clockMinutes)>=900);
 }
 export function startRushHour(session,day){
  if(!shouldStartRushHour(session,day))return false;
@@ -644,7 +644,11 @@ export function unlockCategory(progress,id){
  }
  return true;
 }
-export function dayFinished(session,day){return (session.served||0)+(session.lost||0)>=dayTarget(day)&&(!session.rushStarted||session.rushCompleted)}
+export function normalCustomerCount(session){
+ // Rush Hour is a bonus event: its customers never advance the daily quota.
+ return Math.max(0,(session?.served||0)+(session?.lost||0)-(session?.rushServed||0)-(session?.rushLost||0));
+}
+export function dayFinished(session,day){return normalCustomerCount(session)>=dayTarget(day)&&(!session.rushStarted||session.rushCompleted)}
 export function tipFor(customer,combo,upgrades){if(customer.willTip===false)return 0;const fraction=Math.max(0,1-customer.elapsed/customer.patience);return Math.round((60+fraction*170+Math.min(combo,10)*20)*(1+(upgrades.tips||0)*.25)*(customer.kind==='vip'?1.5:1)/5)*5}
 export function buyUpgrade(progress,id){const u=UPGRADES.find(u=>u.id===id);if(!u)return false;const level=progress.upgrades[id]||0,cost=u.cost*(level+1);if(level>=u.max||progress.wallet<cost)return false;progress.wallet-=cost;progress.upgrades[id]=level+1;return true}
 
@@ -745,6 +749,9 @@ export function ensureShift(s){if(!s)return;s.stars=Number.isInteger(s.stars)?Ma
  s.rushSecondsRemaining=s.rushCompleted?0:Math.max(0,Math.min(RUSH_DURATION_SECONDS,Number(s.rushSecondsRemaining)||0));
  if(s.rushStarted&&s.rushSecondsRemaining<=0)s.rushCompleted=true;
  s.rushBonus=Math.max(0,Math.floor(Number(s.rushBonus)||0));s.rushSales=Math.max(0,Math.floor(Number(s.rushSales)||0));
+ s.rushServed=Math.max(0,Math.floor(Number(s.rushServed)||0));s.rushLost=Math.max(0,Math.floor(Number(s.rushLost)||0));
+ s.rushRevenue=Math.max(0,Math.floor(Number(s.rushRevenue)||0));s.rushEarned=Math.round(Number(s.rushEarned)||0);
+ s.rushReportPending=!!s.rushReportPending;s.rushReportShown=!!s.rushReportShown;
 }
 export function loseStar(s,reason){ensureShift(s);const before=s.stars;s.stars=Math.max(0,s.stars-1);s.lastStarReason=reason;return before-s.stars}
 export function settleShift(p,s,career=true){ensureShift(s);if(s.settled)return 0;s.settled=true;const loss=s.overpaid;s.earned-=loss;if(career){const paid=Math.min(Math.max(0,p.wallet),loss);p.wallet-=paid;p.supplierDebt+=loss-paid;p.lifetime-=loss}return loss}

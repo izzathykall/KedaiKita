@@ -1,6 +1,6 @@
-import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-18-rush-golden-dev-reset-v3';
+import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-18-rush-recap-reset-secure-v4';
 import {productArt,moneyArt} from './art.mjs';
-import {createCloudSync} from './cloud.mjs?v=2026-10-18-rush-golden-dev-reset-v3';
+import {createCloudSync} from './cloud.mjs?v=2026-10-18-rush-recap-reset-secure-v4';
 
 const $=id=>document.getElementById(id);
 const ICONS={basket:'M3 9h18l-2 11H5L3 9ZM8 9l4-7 4 7M8 13v3m4-3v3m4-3v3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5',shop:'M3 10V5h18v5M4 10v11h16V10M2 10a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0M9 21v-7h6v7',volume:'M11 4 6 8H2v8h4l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14',mute:'M11 4 6 8H2v8h4l5 4V4Zm5 5 6 6m0-6-6 6',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',pause:'M8 4v16m8-16v16',scan:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M6 12h12M7 9v6m3-6v6m4-6v6m3-6v6',scale:'M6 7h12l3 14H3L6 7Zm3 0V5a3 3 0 0 1 6 0v2m-3 4v5m-2-2h4',arrow:'M4 12h16m-6-6 6 6-6 6',heart:'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',flag:'M5 21V3m0 0c5-3 9 3 14 0v10c-5 3-9-3-14 0',receipt:'M5 3h14v19l-3-2-4 2-4-2-3 2V3Zm3 5h8m-8 4h8m-8 4h5',lock:'M6 10h12v11H6V10Zm3 0V6a3 3 0 0 1 6 0v4',card:'M2 5h20v14H2V5Zm0 5h20M6 15h4',qr:'M3 3h6v6H3V3Zm12 0h6v6h-6V3ZM3 15h6v6H3v-6Zm12 0h3v3h3v3h-6v-6Zm6-3v3M12 3v3m0 6v3M3 12h6m3 6v3',cash:'M2 5h20v14H2V5Zm10 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM5 8h1m12 8h1',check:'M5 12l4 4L19 6',close:'M6 6l12 12M6 18 18 6',play:'m8 4 12 8-12 8V4Z',snow:'M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4m13 9-4 1 1 4M4 14l4 1-1 4m13-9-4-1 1-4',spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z',undo:'M8 4 3 9l5 5M3 9h10a7 7 0 0 1 0 14',reset:'M4 8a9 9 0 1 1-1 8M4 3v5h5',help:'M9 8a3 3 0 1 1 5 2c-1 1-2 1-2 4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z'};
@@ -16,7 +16,7 @@ let paymentMinimized=false,musicUnlocked=false,musicLevel=0,musicTarget=-1,music
 let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=null,musicSource=null,chaChingBuffer=null,chaChingPromise=null,chaChingSource=null;
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-rush-golden-dev-reset-v3';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-rush-recap-reset-secure-v4';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
@@ -73,13 +73,26 @@ function restoreRushPatience(){
  delete customer.rushOriginalPatience;
 }
 function beginDailyRush(){
- if(mode!=='career'||!startRushHour(session,progress.day))return false;
- if(customer&&!customer.paid)applyRushPatience(customer);
- if(customer&&!customer.paid)customer.rushUnlimited=true;
- toast('⚡ RUSH HOUR! 60 saat · Sabar 10 saat · Untung ×'+rushHourMultiplier(progress.upgrades).toFixed(1));
- applyMachineSpeeds();renderOperations();save();return true;
+ if(mode!=='career'||modalKind==='rush-start'||!shouldStartRushHour(session,progress.day))return false;
+ // Present a proper modal BEFORE enabling the event; time is frozen until accepted.
+ openModal('rush-start',`<div class="modal-pad rush-event-modal"><div class="rush-event-symbol">⚡</div><div class="modal-kicker">CABARAN KHAS · HARI ${progress.day}</div><h2>Rush Hour akan bermula!</h2><p>Dalam 60 saat, pelanggan cuma sabar selama <b>10 saat</b>. Scanner, penimbang dan conveyor menjadi tahap MAX. Untung barang ×${rushHourMultiplier(progress.upgrades).toFixed(1)}, stok dan resit tanpa had.</p><div class="rush-event-stats"><span><b>60s</b><small>Tempoh</small></span><span><b>10s</b><small>Kesabaran</small></span><span><b>×${rushHourMultiplier(progress.upgrades).toFixed(1)}</b><small>Untung</small></span></div><p class="rush-event-hint">Pelanggan Rush Hour tidak dikira dalam sasaran harian.</p><button class="primary-btn rush-event-primary" id="rushEventStart">⚡ Mula Rush Hour</button></div>`);
+ $('rushEventStart').onclick=()=>{
+  if(!startRushHour(session,progress.day)){closeModal();return;}
+  if(customer&&!customer.paid){applyRushPatience(customer);customer.rushUnlimited=true;customer.rushCustomer=true;}
+  applyMachineSpeeds();render();save();closeModal();beep('start');
+  if(['success','lost'].includes(phase))advance();
+  else if(phase==='waiting'){session.waitSeconds=0;newCustomer();}
+ };
+ return true;
 }
-function newSession(selectedMode='career'){mode=selectedMode;if(mode==='practice')practiceStore=null;session={dayStart:JSON.parse(JSON.stringify(progress)),day:progress.day,mode,served:0,lost:0,totalSales:0,tips:0,earned:0,mistakes:0,index:0,bestCombo:0,weighed:0,scans:0,perfectCash:0,claimedMissions:[],seenPeople:[],rushStarted:false,rushCompleted:false,rushSecondsRemaining:0,rushBonus:0,rushSales:0};ensureShift(session);combo=0;initIllustrations();newCustomer()}
+function showRushEnd(){
+ if(!session?.rushReportPending||session.rushReportShown)return false;
+ const count=session.rushServed||0,lost=session.rushLost||0;
+ openModal('rush-end',`<div class="modal-pad rush-event-modal"><div class="rush-event-symbol">✦</div><div class="modal-kicker">CABARAN SELESAI</div><h2>Rush Hour tamat!</h2><p>Hebat! Berikut ialah hasil jualan pelanggan semasa Rush Hour hari ini.</p><div class="rush-end-earnings"><small>UNTUNG BERSIH + TIP RUSH HOUR</small><strong>${money(session.rushEarned||0)}</strong></div><div class="rush-event-stats"><span><b>${count}</b><small>Pelanggan dilayan</small></span><span><b>${money(session.rushRevenue||0)}</b><small>Jumlah jualan</small></span><span><b>+${money(session.rushBonus||0)}</b><small>Bonus pengganda</small></span></div>${lost?`<p class="rush-event-hint">${lost} pelanggan Rush Hour tidak sempat dilayan.</p>`:''}<p class="rush-event-hint">Pelanggan Rush Hour tidak menambah sasaran harian. Sambung pelanggan biasa untuk tamat syif.</p><button class="primary-btn rush-event-primary" id="rushEventContinue">Teruskan bermain ${icon('arrow')}</button></div>`);
+ $('rushEventContinue').onclick=()=>{session.rushReportPending=false;session.rushReportShown=true;save();closeModal();if(['success','lost'].includes(phase))advance();else if(['waiting','supply'].includes(phase)&&dayFinished(session,progress.day))showSummary()};
+ return true;
+}
+function newSession(selectedMode='career'){mode=selectedMode;if(mode==='practice')practiceStore=null;session={dayStart:JSON.parse(JSON.stringify(progress)),day:progress.day,mode,served:0,lost:0,totalSales:0,tips:0,earned:0,mistakes:0,index:0,bestCombo:0,weighed:0,scans:0,perfectCash:0,claimedMissions:[],seenPeople:[],rushStarted:false,rushCompleted:false,rushSecondsRemaining:0,rushBonus:0,rushSales:0,rushServed:0,rushLost:0,rushRevenue:0,rushEarned:0,rushReportPending:false,rushReportShown:false};ensureShift(session);combo=0;initIllustrations();newCustomer()}
 function newCustomer(){
  ensureShift(session);
  if(mode!=='practice'&&!readyForCustomer()){enterSupplyWait();return}advancePending=false;paymentMinimized=false;scanToken++;busy=false;cashPicked=[];phase='scan';
@@ -90,7 +103,7 @@ function newCustomer(){
  const rush=mode==='career'&&rushHourActive(progress.day,session);
  const selected=makeCustomer(mode==='practice'?Math.max(2,progress.day):progress.day,session.index,Math.random,{seen:session.seenPeople,forcedPersonId:featuredId,paymentMethods:availablePaymentMethods(progress.upgrades,mode==='practice'),upgrades:effectiveRushMachineUpgrades(progress.upgrades,rush),challenges:mode==='career',unlocked:mode==='practice'?CATEGORIES.map(c=>c.id):progress.unlocked,stock:mode==='practice'||rush?null:progress.inventory});
  if(!selected){session.practiceDay=(session.practiceDay||1)+1;session.seenPeople=[];toast('Syif latihan baharu bermula.');newCustomer();return}
- customer=selected;if(rush)customer.rushUnlimited=true;applyMachineSpeeds();prepareReturnCustomer();session.seenPeople.push(customer.person.id);
+ customer=selected;if(rush){customer.rushUnlimited=true;customer.rushCustomer=true;}applyMachineSpeeds();prepareReturnCustomer();session.seenPeople.push(customer.person.id);
  customer.patience+=(progress.upgrades.comfort||0)*15;
  // Even a level-5 comfort upgrade cannot override the 10-second Rush Hour challenge.
  if(rush)applyRushPatience(customer);
@@ -110,12 +123,13 @@ function syncSceneAtmosphere(){
  document.body.classList.toggle('store-golden-hour',golden);
  document.body.classList.toggle('store-evening',evening);
  document.body.classList.toggle('rush-machine-max',rushMachinesActive());
+ document.body.classList.toggle('store-rush-active',mode==='career'&&rushHourActive(progress.day,session));
  const label=$('atmosphereLabel');if(label)label.textContent=golden?'✦ GOLDEN HOUR':evening?'✦ SENJA':'';
  if(label)label.hidden=!(golden||evening);
 }
 function resetStations(){$('scaleItem').innerHTML='';$('scaleItem').dataset.uid='';setScaleReading(null);$('scaleState').textContent='SEDIA';$('scaleZone').classList.remove('stable');$('weightProgress').style.width='0';$('scaleCaption').textContent='Hasil segar · '+(machineTimings(gameplayMachineUpgrades()).weighMs/1000)+' saat';$('scaleZone').classList.remove('weighing','highlight');$('scannerZone').classList.remove('scanning','highlight');$('scannerStatus').textContent='Sedia untuk scan'}
 function render(){refreshCalculatorPresets();renderHeader();renderScene();renderProducts();renderReceipt();renderPayment();icons();renderPatience();renderActivity()}
-function renderHeader(){renderOperations();renderPaymentAvailability();$('dayLabel').textContent=mode==='practice'?'Latihan':'Hari '+String(progress.day).padStart(2,'0');$('walletLabel').textContent=money(progress.wallet);$('comboLabel').innerHTML='×'+combo+' <span>✦</span>';$('missionText').textContent=mode==='practice'?'Belajar ikut rentak sendiri':dayTarget(progress.day)+' pelanggan unik hari ini';$('servedLabel').textContent=mode==='practice'?String(session?.served||0)+' siap':((session?.served||0)+(session?.lost||0))+' / '+dayTarget(progress.day);$('missionProgress').style.width=(mode==='practice'?0:Math.min(100,((session?.served||0)+(session?.lost||0))/dayTarget(progress.day)*100))+'%';$('dayMood').textContent=['Pagi yang ceria','Petang yang sibuk','Jiran datang lagi'][Math.min(2,Math.floor((session?.served||0)/3))];$('soundBtn').innerHTML=icon(sound?'volume':'mute');$('soundBtn').classList.toggle('off',!sound);$('soundBtn').setAttribute('aria-label',sound?'Matikan bunyi':'Hidupkan bunyi');$('shopBtn').disabled=mode==='practice';$('missionBtn').classList.toggle('reward-ready',!!session&&dailyMissions(session).some(m=>m.value>=m.target&&!(session.claimedMissions||[]).includes(m.id)));applySettings();syncBackgroundMusic()}
+function renderHeader(){renderOperations();renderPaymentAvailability();$('dayLabel').textContent=mode==='practice'?'Latihan':'Hari '+String(progress.day).padStart(2,'0');$('walletLabel').textContent=money(progress.wallet);$('comboLabel').innerHTML='×'+combo+' <span>✦</span>';$('missionText').textContent=mode==='practice'?'Belajar ikut rentak sendiri':dayTarget(progress.day)+' pelanggan biasa hari ini';$('servedLabel').textContent=mode==='practice'?String(session?.served||0)+' siap':normalCustomerCount(session)+' / '+dayTarget(progress.day);$('missionProgress').style.width=(mode==='practice'?0:Math.min(100,normalCustomerCount(session)/dayTarget(progress.day)*100))+'%';$('dayMood').textContent=['Pagi yang ceria','Petang yang sibuk','Jiran datang lagi'][Math.min(2,Math.floor((session?.served||0)/3))];$('soundBtn').innerHTML=icon(sound?'volume':'mute');$('soundBtn').classList.toggle('off',!sound);$('soundBtn').setAttribute('aria-label',sound?'Matikan bunyi':'Hidupkan bunyi');$('shopBtn').disabled=mode==='practice';$('missionBtn').classList.toggle('reward-ready',!!session&&dailyMissions(session).some(m=>m.value>=m.target&&!(session.claimedMissions||[]).includes(m.id)));applySettings();syncBackgroundMusic()}
 function renderScene(){
  document.body.classList.toggle('waiting-customer',!!session&&!customer);
  if(session&&!customer){$('customerArt').style.visibility='hidden';$('customerName').textContent='Kaunter sedia';$('customerRole').textContent=phase==='supply'?'Bekalan perlu ditambah':'Waktu lewat · pelanggan makin kurang';$('speech').textContent=phase==='supply'?'Tambah bekalan untuk sambung berniaga.':'Menunggu pelanggan tiba…';return}$('customerArt').style.visibility='';const person=customer?.person||PEOPLE[0];
@@ -192,17 +206,24 @@ function completePayment(transaction=customer){
  lastEarned=itemMargin+lastTip+rushBonus;
  session.rushBonus=(session.rushBonus||0)+rushBonus;
  if(rushBonus)session.rushSales=(session.rushSales||0)+1;
- session.served++;if(transaction.method==='cash'&&!transaction.cashMistakes&&!transaction.overpaid)session.perfectCash=(session.perfectCash||0)+1;session.totalSales+=amountDue(transaction);session.tips+=lastTip;session.earned+=lastEarned;session.overpaid+=transaction.overpaid||0;
+ session.served++;if(transaction.rushCustomer){session.rushServed=(session.rushServed||0)+1;session.rushRevenue=(session.rushRevenue||0)+amountDue(transaction);session.rushEarned=(session.rushEarned||0)+lastEarned;}if(transaction.method==='cash'&&!transaction.cashMistakes&&!transaction.overpaid)session.perfectCash=(session.perfectCash||0)+1;session.totalSales+=amountDue(transaction);session.tips+=lastTip;session.earned+=lastEarned;session.overpaid+=transaction.overpaid||0;
  if(mode==='career'){if(!rushUnlimited(transaction)){takeStock(progress,transaction.items);progress.paper--;}receiveStoreCash(progress,amountDue(transaction)+lastTip);progress.wallet+=rushBonus;progress.lifetime+=lastEarned;progress.bestCombo=Math.max(progress.bestCombo,combo);recordSale(transaction);if(transaction.method==='card'){progress.cardHealth=Math.max(0,progress.cardHealth-Math.max(4,24-4*Math.max(1,progress.upgrades.card||1)));progress.cardBroken=progress.cardHealth===0}}
  session.clockMinutes=Math.min(1320,session.clockMinutes+90);render();save();if(transaction.method==='cash')playChaChing();else beep('success');floatingTip(lastTip);if(combo%3===0)confetti(24);
  showTransactionResult(lastTip,starLost,reason,transaction.overpaid||0);advance();
 }
 function advance(){
- if(advancePending||!['success','lost'].includes(phase))return;if(mode==='career'&&session.stars===0){showStarRecovery();return}advancePending=true;
- if(mode==='career'){beginDailyRush();if(dayFinished(session,progress.day)){phase='end';save();renderPayment();showSummary();return}}
+ if(advancePending||!['success','lost'].includes(phase))return;
+ if(mode==='career'&&session.stars===0){showStarRecovery();return}
+ // Interstitials must resolve before spawning the next customer or ending a shift.
+ if(mode==='career'){
+  if(session.rushReportPending&&showRushEnd())return;
+  if(beginDailyRush())return;
+  if(dayFinished(session,progress.day)){phase='end';save();renderPayment();showSummary();return}
+ }
+ advancePending=true;
  session.index++;const wait=mode==='practice'||rushHourActive(progress.day,session)?0:arrivalWait(session.clockMinutes);if(wait){session.waitSeconds=wait;customer=null;phase='waiting';advancePending=false;resetStations();render();save()}else newCustomer();
 }
-function loseCustomer(){if(!['scan','offer','change'].includes(phase))return;scanToken++;busy=false;cancelDrag();phase='lost';session.lost++;const starLost=loseStar(session,'Pelanggan menunggu terlalu lama.');showTransactionResult(0,starLost,'Pelanggan menunggu terlalu lama.');combo=0;resetStations();render();save();toast('Pelanggan hilang sabar. Cuba lagi!',true);advance()}
+function loseCustomer(){if(!['scan','offer','change'].includes(phase))return;scanToken++;busy=false;cancelDrag();phase='lost';session.lost++;if(customer?.rushCustomer)session.rushLost=(session.rushLost||0)+1;const starLost=loseStar(session,'Pelanggan menunggu terlalu lama.');showTransactionResult(0,starLost,'Pelanggan menunggu terlalu lama.');combo=0;resetStations();render();save();toast('Pelanggan hilang sabar. Cuba lagi!',true);advance()}
 function floatingTip(amount){if(!amount)return;const r=$('walletLabel').getBoundingClientRect(),el=document.createElement('div');el.className='floating-tip';el.textContent='+'+money(amount);el.style.left=r.left+'px';el.style.top=r.bottom+18+'px';$('fxLayer').append(el);setTimeout(()=>el.remove(),1850)}
 function confetti(count=45){for(let i=0;i<count;i++){const e=document.createElement('i');e.className='confetti';e.style.left=Math.random()*100+'vw';e.style.background=['#a2bd85','#edaf72','#e1cc91','#709988'][i%4];e.style.setProperty('--drift',(Math.random()-.5)*250+'px');e.style.animationDelay=Math.random()*.5+'s';$('fxLayer').append(e);setTimeout(()=>e.remove(),3000)}}
 function openModal(kind,html){if(modalKind==='stars-empty'&&kind!=='stars-empty')return;$('modal').dataset.kind=kind;document.body.classList.toggle('style-preview',kind==='style-preview');if(kind!=='style-preview'){previewTheme=null;applySettings()}cancelCalculatorDrag();cancelDrag();cancelBankCardDrag();paused=true;document.body.classList.add('paused');modalKind=kind;if(kind==='pause'){explicitPause=true;stopScaleSound()};syncBackgroundMusic();$('modalContent').innerHTML=html;icons($('modalContent'));if(!$('modal').open)$('modal').showModal()}
@@ -219,23 +240,22 @@ function showShop(returnTo='game'){
  $('modalContent').querySelectorAll('[data-upgrade]').forEach(b=>b.onclick=()=>{{const previous=progress.upgrades[b.dataset.upgrade]||0;if(buyUpgrade(progress,b.dataset.upgrade)){if(b.dataset.upgrade==='comfort'&&customer)customer.patience+=15;save();renderHeader();beep('success');showShop(destination);if(['card','qr'].includes(b.dataset.upgrade))toast(previous===0?'Bayaran '+(b.dataset.upgrade==='card'?'kad':'QR')+' dibuka untuk pelanggan seterusnya!':'Peralatan pembayaran dinaik taraf ke tahap '+(previous+1));else if(b.dataset.upgrade==='storage')toast('Kapasiti stor kini '+stockCapacity(progress)+' unit / kg setiap produk.')}}});
  $('modalContent').querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>{if(unlockCategory(progress,b.dataset.category)){save();renderHeader();initIllustrations();showShop(destination);beep('success');confetti(18);toast('Kategori '+CATEGORIES.find(c=>c.id===b.dataset.category).name+' dibuka!')}});
 }
-function showSummary(){closeCalculator();ensureShift(session);settleShift(progress,session,mode==='career');phase='end';save();const stars=session.stars;openModal('summary',`<div class="modal-pad" style="text-align:center"><div class="modal-kicker" style="justify-content:center">SYIF HARI ${progress.day} SELESAI</div><div class="stars">${'★'.repeat(stars)+'☆'.repeat(3-stars)}</div><p class="last-tip-summary">Tip pelanggan terakhir: <b>${money(lastTip)}</b></p><h2>${stars===3?'Cashier kegemaran taman.':'Kerja yang bagus hari ini!'}</h2><p style="margin:auto">${session.served} pelanggan dilayan. Esok lebih ramai jiran akan singgah.</p><div class="day-summary"><div><small>JUMLAH JUALAN</small><b>${money(session.totalSales)}</b></div><div><small>UNTUNG BERSIH + TIP</small><b>${money(session.earned)}</b></div><div><small>COMBO TERBAIK</small><b>×${session.bestCombo}</b></div></div><p class="muted">Bonus Rush Hour: <b>${money(session.rushBonus||0)}</b> · ${session.rushSales||0} transaksi berganda<br>Tip: ${money(session.tips)} · Baki terlebih: −${money(session.overpaid)}<br>Pulangan: ${session.returnCount} · Nilai bayaran balik: ${money(session.refunds)}<br>Kos resit/pembaikan: ${money(session.expenses)} · Hutang kedai: ${money(progress.supplierDebt)}<br>Terlepas: ${session.lost} · Silap baki: ${session.mistakes}<br>${session.served>=dayTarget(progress.day)&&session.stars===3?'Bonus syif sempurna <b>RM5.00</b> diterima pada hari seterusnya.':'Layan semua pelanggan dengan 3 bintang untuk bonus RM5.'}</p><button class="secondary-btn" id="summaryInventory" style="width:100%;margin-bottom:10px">Inventori & bekalan esok</button><button class="summary-missions secondary-btn" id="summaryMissions" style="width:100%;margin-bottom:12px">Semak & tuntut ganjaran misi</button><div class="summary-actions"><button class="secondary-btn" id="summaryShop">${icon('shop')} Naik taraf</button><button class="primary-btn" id="nextDay">Hari ${progress.day+1} ${icon('arrow')}</button></div></div>`);$('summaryInventory').onclick=()=>showInventory('summary');$('summaryMissions').onclick=()=>showMissions('summary');$('summaryShop').onclick=()=>showShop('summary');$('nextDay').onclick=()=>{const bonus=session.served>=dayTarget(progress.day)&&session.stars===3?500:0;progress.wallet+=bonus;progress.lifetime+=bonus;progress.served+=session.served;progress.history.push({day:progress.day,served:session.served,earned:session.earned+bonus,stars});progress.history=progress.history.slice(-20);progress.day++;explicitPause=false;newSession('career');$('modal').close();paused=false;modalKind=null;document.body.classList.remove('paused');save();beep('start');syncBackgroundMusic();toast((bonus?'Bonus RM5 diterima. ':'')+'Selamat datang ke hari '+progress.day+'!')};confetti(35)}
+function showSummary(){closeCalculator();ensureShift(session);settleShift(progress,session,mode==='career');phase='end';save();const stars=session.stars;openModal('summary',`<div class="modal-pad" style="text-align:center"><div class="modal-kicker" style="justify-content:center">SYIF HARI ${progress.day} SELESAI</div><div class="stars">${'★'.repeat(stars)+'☆'.repeat(3-stars)}</div><p class="last-tip-summary">Tip pelanggan terakhir: <b>${money(lastTip)}</b></p><h2>${stars===3?'Cashier kegemaran taman.':'Kerja yang bagus hari ini!'}</h2><p style="margin:auto">${session.served} pelanggan dilayan (${normalCustomerCount(session)} dikira untuk sasaran; ${session.rushServed||0} ketika Rush Hour).</p><div class="day-summary"><div><small>JUMLAH JUALAN</small><b>${money(session.totalSales)}</b></div><div><small>UNTUNG BERSIH + TIP</small><b>${money(session.earned)}</b></div><div><small>COMBO TERBAIK</small><b>×${session.bestCombo}</b></div></div><p class="muted">Hasil Rush Hour: <b>${money(session.rushEarned||0)}</b> · Bonus <b>${money(session.rushBonus||0)}</b> · ${session.rushServed||0} pelanggan tambahan<br>Tip: ${money(session.tips)} · Baki terlebih: −${money(session.overpaid)}<br>Pulangan: ${session.returnCount} · Nilai bayaran balik: ${money(session.refunds)}<br>Kos resit/pembaikan: ${money(session.expenses)} · Hutang kedai: ${money(progress.supplierDebt)}<br>Terlepas: ${session.lost} · Silap baki: ${session.mistakes}<br>${normalCustomerCount(session)>=dayTarget(progress.day)&&session.stars===3?'Bonus syif sempurna <b>RM5.00</b> diterima pada hari seterusnya.':'Layan semua pelanggan dengan 3 bintang untuk bonus RM5.'}</p><button class="secondary-btn" id="summaryInventory" style="width:100%;margin-bottom:10px">Inventori & bekalan esok</button><button class="summary-missions secondary-btn" id="summaryMissions" style="width:100%;margin-bottom:12px">Semak & tuntut ganjaran misi</button><div class="summary-actions"><button class="secondary-btn" id="summaryShop">${icon('shop')} Naik taraf</button><button class="primary-btn" id="nextDay">Hari ${progress.day+1} ${icon('arrow')}</button></div></div>`);$('summaryInventory').onclick=()=>showInventory('summary');$('summaryMissions').onclick=()=>showMissions('summary');$('summaryShop').onclick=()=>showShop('summary');$('nextDay').onclick=()=>{const bonus=normalCustomerCount(session)>=dayTarget(progress.day)&&session.stars===3?500:0;progress.wallet+=bonus;progress.lifetime+=bonus;progress.served+=session.served;progress.history.push({day:progress.day,served:session.served,earned:session.earned+bonus,stars});progress.history=progress.history.slice(-20);progress.day++;explicitPause=false;newSession('career');$('modal').close();paused=false;modalKind=null;document.body.classList.remove('paused');save();beep('start');syncBackgroundMusic();toast((bonus?'Bonus RM5 diterima. ':'')+'Selamat datang ke hari '+progress.day+'!')};confetti(35)}
 
 function setMobileView(view){const pay=view==='payment';document.body.classList.toggle('view-payment',pay);$('counterTab').classList.toggle('active',!pay);$('paymentTab').classList.toggle('active',pay);$('counterTab').setAttribute('aria-selected',String(!pay));$('paymentTab').setAttribute('aria-selected',String(pay))}
 Object.assign(ICONS,{user:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8',moon:'M20 15.5A8.7 8.7 0 0 1 8.5 4 9 9 0 1 0 20 15.5Z',calculator:'M5 2h14v20H5V2Zm3 3h8v4H8V5Zm0 8h1m3 0h1m3 0h1m-9 4h1m3 0h1m3 0h1',ticket:'M3 6h18v4a2 2 0 0 0 0 4v4H3v-4a2 2 0 0 0 0-4V6Zm12 0v12',clock:'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 4v6l4 2',settings:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2',book:'M3 4h7l2 2 2-2h7v16h-7l-2 2-2-2H3V4Zm9 2v16'});
 
 // Developer sandbox — requires a configured Firebase Authentication UID.
-// ?dev=1 exposes an ACCESS SETUP entry, never grants sandbox access itself.
-const developerSetupRequested=new URLSearchParams(window.location.search).get('dev')==='1';
+// Developer access is exclusively controlled by the existing UID allowlist.
 let developerMode=false;
 function developerAccessChanged(enabled){
  developerMode=!!enabled;
  const button=$('developerPanelBtn');
  if(button){
-  button.hidden=!(developerMode||developerSetupRequested);
-  button.classList.toggle('dev-setup-locked',!developerMode);
-  button.innerHTML=developerMode?'🛠️ <span>DEV TEST</span>':'🔒 <span>DEV SETUP</span>';
-  button.setAttribute('aria-label',developerMode?'Buka panel ujian developer':'Semak dan aktifkan akses Developer dalam Akaun');
+  button.hidden=!developerMode;
+  button.classList.remove('dev-setup-locked');
+  button.innerHTML='🛠️ <span>DEV TEST</span>';
+  button.setAttribute('aria-label','Buka panel ujian Developer');
  }
  document.body.classList.toggle('developer-mode',developerMode);
  if(developerMode)toast('Mod Developer aktif · semua ujian disimpan secara berasingan');
@@ -263,7 +283,7 @@ function runDeveloperScenario(key,requestedDay=7){
  }
  newSession('career');
  if(key==='rush'){
-  session.index=1;session.clockMinutes=750;session.seenPeople=[];session.rushStarted=true;session.rushCompleted=false;session.rushSecondsRemaining=RUSH_DURATION_SECONDS;newCustomer();
+  session.index=1;session.clockMinutes=750;session.seenPeople=[];session.rushStarted=true;session.rushCompleted=false;session.rushSecondsRemaining=RUSH_DURATION_SECONDS;session.rushReportPending=false;session.rushReportShown=false;newCustomer();
  }
  if(key==='barcode'){
   const item=customer.items.find(i=>!i.weighted);
@@ -355,22 +375,21 @@ function showDeveloperPanel(){
  };
  $('modalContent').querySelectorAll('[data-dev-scenario]').forEach(btn=>btn.onclick=()=>runDeveloperScenario(btn.dataset.devScenario));
  $('devRunDay').onclick=()=>runDeveloperScenario('day',Number($('developerDay').value));
- $('devClearSandbox').onclick=async()=>{
-  if(!assertDeveloper()||!window.confirm('Reset SEMUA DATA UJIAN Developer dalam Firebase? Ini termasuk duit kedai, inventori dan upgrade ujian. Progres pemain biasa tidak terjejas.'))return;
-  const button=$('devClearSandbox');button.disabled=true;button.textContent='Sedang reset…';
-  const error=$('devResetError');error.textContent='';
-  const fresh={progress:createProgress(),session:null,sound};
-  try{
-   // Never clear the in-memory game before Firebase confirms a successful reset.
-   await cloud.resetProgress(fresh);
-   scanToken++;clearTimeout(resultTimer);stopScannerSound();stopScaleSound();stopDrawerSound();stopChaChing();
-   explicitPause=true;hydrateGame(fresh);
-   toast('Data ujian berjaya direset. Boleh mulakan Hari 1.');
-  }catch(err){
-   error.textContent='Reset tidak berjaya, data ujian asal dikekalkan. '+String(err?.message||'Semak sambungan Firebase, kemudian cuba lagi.');
-   button.disabled=false;button.textContent='Cuba reset data ujian';
-  }
- };;
+ $('devClearSandbox').onclick=()=>{
+  if(!assertDeveloper())return;
+  openSafeResetFlow({
+   title:'Reset semua data ujian Developer',
+   description:'Hanya sandbox Developer akan bermula semula: duit kedai, hari, inventori dan upgrade ujian. Data kerjaya pemain biasa serta akaun Firebase tidak dipadam.',
+   onCancel:showDeveloperPanel,
+   onExecute:async()=>{
+    const fresh={progress:createProgress(),session:null,sound};
+    // Wait for Firebase first, preserving data if the network call fails.
+    await cloud.resetProgress(fresh);
+    scanToken++;clearTimeout(resultTimer);stopScannerSound();stopScaleSound();stopDrawerSound();stopChaChing();
+    explicitPause=true;hydrateGame(fresh);toast('Data ujian berjaya direset. Boleh mulakan Hari 1.');
+   }
+  });
+ };
 }
 developerAccessChanged(false);
 cloud=createCloudSync({
@@ -381,25 +400,26 @@ cloud=createCloudSync({
  onDeveloperChanged:developerAccessChanged
 });
 initIllustrations();icons();renderHeader();renderScene();renderProducts();renderPayment();showIntro();
-$('developerPanelBtn').onclick=()=>{if(assertDeveloper())showDeveloperPanel();else cloud?.openAccount()};
+$('developerPanelBtn').onclick=()=>{if(assertDeveloper())showDeveloperPanel()};
 $('inventoryBtn').onclick=()=>showInventory();$('operationsBtn').onclick=()=>showInventory();$('calcBtn').onclick=showCalculator;$('missionBtn').onclick=showMissions;$('catalogueBtn').onclick=()=>showCodePad();$('settingsBtn').onclick=showSettings;$('bagZone').onclick=showBag;$('nightBtn').onclick=toggleDark;$('undoScanBtn').onclick=undoScan;
 $('counterTab').onclick=()=>setMobileView('counter');$('paymentTab').onclick=()=>setMobileView('payment');
-$('soundBtn').onclick=()=>{sound=!sound;if(!sound){stopScannerSound();stopChaChing();stopScaleSound();stopDrawerSound()}renderHeader();save()};$('pauseBtn').onclick=()=>{if($('modal').open){if(!['intro','summary'].includes(modalKind))closeModal()}else showPause()};$('shopBtn').onclick=()=>{if(modalKind==='intro')return;showShop()};$('fullBtn').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();else toast('Ajukan peranti secara melintang untuk ruang lebih luas.')}catch{toast('Skrin penuh tidak disokong di pelayar ini.')}};
+$('soundBtn').onclick=()=>{sound=!sound;if(!sound){stopScannerSound();stopChaChing();stopScaleSound();stopDrawerSound()}renderHeader();save()};$('pauseBtn').onclick=()=>{if($('modal').open){if(!['intro','summary','rush-start','rush-end'].includes(modalKind))closeModal()}else showPause()};$('shopBtn').onclick=()=>{if(modalKind==='intro')return;showShop()};$('fullBtn').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();else toast('Ajukan peranti secara melintang untuk ruang lebih luas.')}catch{toast('Skrin penuh tidak disokong di pelayar ini.')}};
 $('scannerZone').onclick=()=>{if(paused)return;toast('Tekan barang berbungkus atau seret ke scanner.')};$('scaleZone').onclick=()=>{if(paused)return;toast('Tekan hasil segar atau seret ke penimbang.')};
-$('modal').addEventListener('cancel',e=>{e.preventDefault();if(!['intro','summary'].includes(modalKind))closeModal()});
-document.addEventListener('keydown',e=>{if(handleCalculatorKey(e)||handlePaymentOverlayKey(e))return;if(e.key==='Escape'||e.key.toLowerCase()==='p'){if($('modal').open){if(!['intro','summary'].includes(modalKind))closeModal()}else showPause();return}if(!paused&&phase==='offer'&&customer?.cardStage==='pin'&&(/^\d$/.test(e.key)||['Backspace','Enter'].includes(e.key))){e.preventDefault();pressPin(e.key==='Backspace'?'⌫':e.key==='Enter'?'OK':e.key);return}if(!paused&&/^[1-9]$/.test(e.key)&&customer){const p=customer.items.filter(p=>!p.scanned)[+e.key-1];if(p)processItem(p.uid)}});
+$('modal').addEventListener('cancel',e=>{e.preventDefault();if(!['intro','summary','rush-start','rush-end'].includes(modalKind))closeModal()});
+document.addEventListener('keydown',e=>{if(handleCalculatorKey(e)||handlePaymentOverlayKey(e))return;if(e.key==='Escape'||e.key.toLowerCase()==='p'){if($('modal').open){if(!['intro','summary','rush-start','rush-end'].includes(modalKind))closeModal()}else showPause();return}if(!paused&&phase==='offer'&&customer?.cardStage==='pin'&&(/^\d$/.test(e.key)||['Backspace','Enter'].includes(e.key))){e.preventDefault();pressPin(e.key==='Backspace'?'⌫':e.key==='Enter'?'OK':e.key);return}if(!paused&&/^[1-9]$/.test(e.key)&&customer){const p=customer.items.filter(p=>!p.scanned)[+e.key-1];if(p)processItem(p.uid)}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){save();if(!paused)showPause()}syncBackgroundMusic()});window.addEventListener('pagehide',()=>{save();musicUnlocked=false;musicFade=null;musicTarget=0;writeMusicLevel(0);$('backgroundMusic').pause();stopScannerSound();stopChaChing();stopScaleSound();stopDrawerSound()});window.addEventListener('pageshow',()=>{if(session&&modalKind!=='intro'){musicUnlocked=true;syncBackgroundMusic()}});
 let lastTick=performance.now(),sinceSave=0;function loop(now){const dt=Math.min((now-lastTick)/1000,.1);lastTick=now;if(!paused&&!document.hidden&&session&&phase!=='end'){
  if(mode!=='practice'){session.clockMinutes=Math.min(1320,(session.clockMinutes||480)+dt*.35);renderOperations();sinceSave+=dt;if(sinceSave>5){save();sinceSave=0}}
  if(mode==='career'&&tickRushHour(session,dt)){
    restoreRushPatience();applyMachineSpeeds();
-   toast('⚡ Rush Hour tamat! Bonus direkodkan dalam laporan syif.');
+   session.rushReportPending=true;
    renderOperations();save();
-   if(['waiting','supply'].includes(phase)&&dayFinished(session,progress.day)){
-     phase='end';showSummary();requestAnimationFrame(loop);return;
+   // Wait for the current Rush Hour customer to finish before displaying totals.
+   if(!customer||['success','lost'].includes(phase)||!customer.rushCustomer){
+     showRushEnd();requestAnimationFrame(loop);return;
    }
  }
- if(mode==='career'&&!session.rushStarted)beginDailyRush();
+ if(mode==='career'&&!session.rushStarted&&beginDailyRush()){requestAnimationFrame(loop);return;}
  if(phase==='waiting'){session.waitSeconds=Math.max(0,session.waitSeconds-dt);renderWaiting();if(session.waitSeconds<=0)newCustomer()}
  else if(phase==='supply'&&readyForCustomer())newCustomer();
  else if(customer&&mode!=='practice'&&phase==='scan'){customer.elapsed+=dt;renderPatience();if(customer.elapsed>=customer.patience)loseCustomer()}
@@ -513,7 +533,7 @@ function showCodePad(uid=null){
 function showSettings(){
  if(!session||modalKind==='intro')return;
  const settings=progress.settings||{motion:true,theme:'mint'};
- openModal('settings',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">KEDAI IKUT GAYA ANDA</div><h2>Tetapan.</h2></div><button class="icon-btn" id="closeSettings" aria-label="Tutup">${icon('close')}</button></div><div class="setting-row"><div><b>Semua bunyi</b><small>Aktifkan atau senyapkan audio game.</small></div><button class="toggle ${sound?'on':''}" id="toggleSound" aria-label="Efek bunyi" aria-pressed="${sound}"><i></i></button></div><div class="sound-settings"><label for="soundVolume">Volume efek bunyi <b id="volumeLabel">${Math.round(audioVolume()*100)}%</b></label><input id="soundVolume" type="range" min="0" max="100" step="5" value="${Math.round(audioVolume()*100)}" aria-label="Kekuatan bunyi"></div>${effectSettingsHTML()}${musicSettingsHTML()}<div class="setting-row"><div><b>Animasi penuh</b><small>Gerakan produk, pelanggan dan konfeti.</small></div><button class="toggle ${settings.motion!==false?'on':''}" id="toggleMotion" aria-label="Animasi penuh" aria-pressed="${settings.motion!==false}"><i></i></button></div><div class="theme-heading">Warna kedai</div><button class="secondary-btn" id="openStyles">Preview & beli warna kedai</button><p class="muted">Mod santai tidak mengubah progres kerjaya.</p><section class="game-reset-panel" aria-label="Zon pengurusan progres"><div class="reset-panel-icon">${icon('reset')}</div><div class="reset-panel-copy"><strong>Pengurusan progres</strong><small>Mulakan permainan baharu dari Hari 1. Progres dan pembelian upgrade akan ditetapkan semula selepas pengesahan.</small><span class="reset-notice">Tindakan kekal · akaun log masuk tidak dipadam</span></div><button type="button" class="secondary-btn reset-open-btn" id="openResetGame">Reset progres</button></section><button class="primary-btn" id="backSettings">Selesai ${icon('check')}</button></div>`);
+ openModal('settings',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">KEDAI IKUT GAYA ANDA</div><h2>Tetapan.</h2></div><button class="icon-btn" id="closeSettings" aria-label="Tutup">${icon('close')}</button></div><div class="setting-row"><div><b>Semua bunyi</b><small>Aktifkan atau senyapkan audio game.</small></div><button class="toggle ${sound?'on':''}" id="toggleSound" aria-label="Efek bunyi" aria-pressed="${sound}"><i></i></button></div><div class="sound-settings"><label for="soundVolume">Volume efek bunyi <b id="volumeLabel">${Math.round(audioVolume()*100)}%</b></label><input id="soundVolume" type="range" min="0" max="100" step="5" value="${Math.round(audioVolume()*100)}" aria-label="Kekuatan bunyi"></div>${effectSettingsHTML()}${musicSettingsHTML()}<div class="setting-row"><div><b>Animasi penuh</b><small>Gerakan produk, pelanggan dan konfeti.</small></div><button class="toggle ${settings.motion!==false?'on':''}" id="toggleMotion" aria-label="Animasi penuh" aria-pressed="${settings.motion!==false}"><i></i></button></div><div class="theme-heading">Warna kedai</div><button class="secondary-btn" id="openStyles">Preview & beli warna kedai</button><p class="muted">Mod santai tidak mengubah progres kerjaya.</p><section class="game-reset-compact" aria-label="Pengurusan progres"><div><strong>Reset progres</strong><small>Mulakan semula dari Hari 1. Akaun log masuk kekal.</small></div><button type="button" class="secondary-btn" id="openResetGame">Reset</button></section><button class="primary-btn" id="backSettings">Selesai ${icon('check')}</button></div>`);
  bindEffectSettings();bindMusicSettings();$('closeSettings').onclick=closeModal;$('backSettings').onclick=closeModal;
  $('soundVolume').oninput=()=>{progress.settings.volume=Number($('soundVolume').value)/100;$('volumeLabel').textContent=Math.round(audioVolume()*100)+'%';refreshEffectLevels();save()};
  $('toggleSound').onclick=()=>{sound=!sound;if(!sound){stopScannerSound();stopChaChing();stopScaleSound();stopDrawerSound()}save();renderHeader();showSettings()};
@@ -522,33 +542,49 @@ function showSettings(){
 }
 
 
-// Reset is an explicit, irreversible player action. Data remains untouched until
-// the remote authenticated save succeeds; guest mode is reset separately.
-function showResetGameConfirm(){
- const kind=modalKind;
- if(!session||!['settings','reset-game'].includes(kind))return;
- openModal('reset-game',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">PENGESAHAN RESET</div><h2>Reset semua progres?</h2></div><button class="icon-btn" id="cancelResetX" aria-label="Batal reset">${icon('close')}</button></div><div class="reset-warning"><span class="reset-warning-symbol">${icon('help')}</span><div><b>Pastikan anda mahu bermula semula</b><p>Hari, duit kedai, inventori, kelas, upgrade, statistik dan syif akan kembali ke tetapan asal. Akaun pemain akan kekal aktif. Tindakan ini tidak boleh dibatalkan.</p></div></div><label class="reset-confirm-label"><input type="checkbox" id="resetConfirmCheck"> <span>Saya faham semua progres akaun ini akan bermula semula.</span></label><p id="resetError" role="alert" class="code-error" aria-live="polite"></p><div class="reset-actions"><button class="secondary-btn" id="cancelResetGame">Batal</button><button class="primary-btn reset-danger" id="confirmResetGame" disabled>Ya, reset permainan</button></div></div>`);
- const cancel=()=>showSettings();
+// Two independent checks: a randomly generated multiplication question first,
+// then explicit consent. Neither step changes local or remote game data.
+function openSafeResetFlow({title,description,onCancel,onExecute}){
+ const first=2+Math.floor(Math.random()*8),second=2+Math.floor(Math.random()*8);
+ openModal('reset-challenge',`<div class="modal-pad reset-security"><div class="modal-heading"><div><div class="modal-kicker">PENGESAHAN 1 DARIPADA 2</div><h2>Semak sebelum reset.</h2></div><button class="icon-btn" id="cancelResetX" aria-label="Batal">${icon('close')}</button></div><p class="muted">Untuk meneruskan <b>${title}</b>, jawab soalan ringkas ini dahulu. Tiada data akan dipadam pada langkah ini.</p><form id="resetMathForm" class="reset-math-form"><label for="resetMathAnswer">Berapakah ${first} × ${second}?</label><input id="resetMathAnswer" type="number" inputmode="numeric" min="0" max="100" step="1" required placeholder="Masukkan jawapan" autocomplete="off"><p class="reset-error" id="resetMathError" role="alert" aria-live="polite"></p><div class="reset-actions"><button type="button" class="secondary-btn" id="cancelResetGame">Batal</button><button type="submit" class="primary-btn">Semak jawapan ${icon('arrow')}</button></div></form></div>`);
+ const cancel=()=>onCancel();
  $('cancelResetX').onclick=cancel;$('cancelResetGame').onclick=cancel;
- const ok=$('confirmResetGame');$('resetConfirmCheck').onchange=()=>ok.disabled=!$('resetConfirmCheck').checked;
- ok.onclick=async()=>{
-  if(!$('resetConfirmCheck').checked||ok.disabled)return;
-  ok.disabled=true;$('cancelResetGame').disabled=true;$('cancelResetX').disabled=true;
-  const fresh={progress:createProgress(),session:null,sound};
-  try{
+ $('resetMathForm').onsubmit=event=>{
+  event.preventDefault();
+  if(Number($('resetMathAnswer').value)!==first*second||!$('resetMathAnswer').value.trim()){
+   $('resetMathError').textContent='Jawapan tidak tepat. Cuba sekali lagi.';beep('error');return;
+  }
+  $('modalContent').innerHTML=`<div class="modal-pad reset-security"><div class="modal-heading"><div><div class="modal-kicker">PENGESAHAN 2 DARIPADA 2</div><h2>Setuju untuk reset?</h2></div><button class="icon-btn" id="cancelResetX" aria-label="Batal">${icon('close')}</button></div><div class="reset-warning"><span class="reset-warning-symbol">${icon('help')}</span><div><b>${title}</b><p>${description}</p></div></div><label class="reset-confirm-label"><input type="checkbox" id="resetConfirmCheck"><span>Saya faham perubahan ini kekal dan saya bersetuju untuk meneruskannya.</span></label><p class="reset-error" id="resetError" role="alert" aria-live="polite"></p><div class="reset-actions"><button class="secondary-btn" id="cancelResetGame">Batal</button><button class="primary-btn reset-danger" id="confirmResetGame" disabled>Ya, saya setuju</button></div></div>`;
+  $('cancelResetX').onclick=cancel;$('cancelResetGame').onclick=cancel;
+  const btn=$('confirmResetGame');$('resetConfirmCheck').onchange=()=>btn.disabled=!$('resetConfirmCheck').checked;
+  btn.onclick=async()=>{
+   if(btn.disabled||!$('resetConfirmCheck').checked)return;
+   btn.disabled=true;$('cancelResetGame').disabled=true;$('cancelResetX').disabled=true;
+   btn.textContent='Sedang menyimpan…';
+   try{await onExecute()}
+   catch(error){
+    $('resetError').textContent='Reset tidak berjaya. Data asal dikekalkan. '+String(error?.message||'Semak sambungan Firebase dan cuba lagi.');
+    btn.textContent='Cuba reset semula';btn.disabled=false;
+    $('cancelResetGame').disabled=false;$('cancelResetX').disabled=false;
+   }
+  };
+ };
+}
+function showResetGameConfirm(){
+ if(modalKind!=='settings')return;
+ openSafeResetFlow({
+  title:'Reset progres permainan',
+  description:'Hari, duit kedai, inventori, kelas, upgrade, statistik dan syif akan kembali ke tetapan asal. Akaun Firebase kekal. Tindakan ini tidak boleh dibatalkan.',
+  onCancel:showSettings,
+  onExecute:async()=>{
+   const fresh={progress:createProgress(),session:null,sound};
    if(cloud)await cloud.resetProgress(fresh);
    else localStorage.setItem(STORAGE,JSON.stringify(fresh));
-   // Prevent previous game timers from continuing after the reset.
    scanToken++;clearTimeout(resultTimer);advancePending=false;explicitPause=true;
-   closeCalculator();stopScannerSound();stopScaleSound();stopDrawerSound();stopChaChing();
-   hideUpdatePrompt();
-   hydrateGame(fresh);
-   toast('Progres berjaya direset. Selamat datang ke Hari 1!');
-  }catch(error){
-   $('resetError').textContent='Reset belum berjaya. Data lama dikekalkan. '+String(error?.message||'Semak sambungan dan cuba lagi.');
-   ok.disabled=false;$('cancelResetGame').disabled=false;$('cancelResetX').disabled=false;
+   closeCalculator();stopScannerSound();stopScaleSound();stopDrawerSound();stopChaChing();hideUpdatePrompt();
+   hydrateGame(fresh);toast('Progres berjaya direset. Selamat datang ke Hari 1!');
   }
- };
+ });
 }
 
 function normalizeSession(){
@@ -957,6 +993,10 @@ function finishReturnDecision(payout=0){
  lastTip=0;
  lastEarned=-payout;
  session.served++;
+ if(customer.rushCustomer){
+  session.rushServed=(session.rushServed||0)+1;
+  session.rushEarned=(session.rushEarned||0)-payout;
+ }
  session.clockMinutes=Math.min(1320,session.clockMinutes+90);
  phase='success';busy=false;
  render();

@@ -935,3 +935,44 @@ body.rush-machine-max .scanner .station-label::after,body.rush-machine-max .scal
 .dev-reset-error{color:#aa483c;font-size:11px;line-height:1.6;min-height:0}
 @media(max-width:540px){.dev-money-reset,.dev-data-reset{flex-direction:column;align-items:stretch}.dev-money-reset button,.dev-data-reset button{width:100%}.atmosphere-label{font-size:7px;top:8px;right:8px}}
 body.reduced-motion .store-atmosphere *,body.reduced-motion .store-atmosphere{animation:none!important;transition:none!important}
+
+
+/* V4: compact, clearly separated reset panel with two-stage security. */
+.game-reset-compact{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 15px;margin:23px 0 28px;border:1px solid #e0d5cc;border-radius:13px;background:var(--white)}
+.game-reset-compact>div{min-width:0;display:flex;flex-direction:column;gap:5px}
+.game-reset-compact strong{font-size:13px;color:var(--ink)}
+.game-reset-compact small{font-size:11px;color:var(--muted);line-height:1.5}
+.game-reset-compact button{flex:none;font-size:12px;min-width:84px;padding:10px 14px;border:1px solid #dfbdb3;color:#a85c49;background:transparent;border-radius:10px;font-weight:700}
+.game-reset-compact+ #backSettings{margin-top:4px!important}
+.reset-security h2{margin-bottom:9px}
+.reset-math-form{border:1px solid var(--line);background:var(--mint);border-radius:15px;padding:18px;margin-top:18px}
+.reset-math-form label{display:block;font-size:19px;font-weight:800;line-height:1.5;color:var(--ink)}
+.reset-math-form input{display:block;width:100%;min-height:48px;border:1px solid #cadacf;border-radius:10px;padding:10px 14px;margin-top:13px;background:var(--white);font-size:18px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.reset-error{font-size:12px;color:#a44137;min-height:17px;margin:8px 0 0;line-height:1.5}
+.developer-approved-label{background:var(--mint);border:1px solid var(--line);padding:10px 13px;border-radius:10px;color:var(--green);font-size:12px;font-weight:750}
+@media(max-width:480px){.game-reset-compact{gap:10px;padding:12px 13px}.game-reset-compact button{min-width:70px;padding:9px 10px}.reset-math-form{padding:12px}}
+
+/* A gentle golden shimmer during Rush Hour, not a high-frequency strobe. */
+body.store-rush-active .store-scene{position:relative;isolation:isolate;animation:rushSceneGlow 2.8s ease-in-out infinite}
+body.store-rush-active .store-scene::after{content:'';position:absolute;inset:0;z-index:4;pointer-events:none;border-radius:inherit;background:linear-gradient(116deg,transparent 18%,rgba(255,243,174,.18) 39%,rgba(255,218,99,.29) 50%,transparent 73%);background-size:270% 100%;animation:rushGoldSweep 3.8s ease-in-out infinite;mix-blend-mode:screen}
+body.store-rush-active .store-atmosphere{opacity:1!important}
+body.store-rush-active .store-atmosphere .sunbeam{background:linear-gradient(90deg,transparent,rgba(255,215,122,.22),rgba(255,239,184,.13),transparent)}
+@keyframes rushSceneGlow{0%,100%{box-shadow:inset 0 0 24px #f5be5f18,0 7px 24px #af782614}50%{box-shadow:inset 0 0 65px #ffe29a73,0 0 28px #f7c55c8a}}
+@keyframes rushGoldSweep{0%{background-position:125% center;opacity:.28}52%{opacity:.98}100%{background-position:-125% center;opacity:.28}}
+.rush-event-modal{text-align:center;max-width:580px;margin:auto;padding-top:28px;padding-bottom:28px}
+.rush-event-symbol{width:70px;height:70px;display:grid;place-items:center;margin:0 auto 16px;border-radius:22px;background:linear-gradient(145deg,#f9dc9a,#ffb84e);color:#754414;font-size:39px;box-shadow:0 12px 32px #b6802840}
+.rush-event-modal h2{font-size:clamp(23px,3.7vw,31px);margin:6px 0 13px;color:var(--ink)}
+.rush-event-modal>p{font-size:13px;line-height:1.75;color:var(--muted);margin:9px auto 15px;max-width:460px}
+.rush-event-modal>p b{color:var(--ink)}
+.rush-event-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:17px 0 10px}
+.rush-event-stats>span{background:var(--mint);border:1px solid var(--line);border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.rush-event-stats b{font-size:clamp(15px,2.6vw,22px);color:var(--green);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.rush-event-stats small{font-size:10px;color:var(--muted)}
+.rush-event-modal .rush-event-hint{font-size:11px;color:var(--muted);margin:15px auto}
+.rush-event-primary{width:100%;min-height:50px;font-size:14px;margin-top:6px}
+.rush-end-earnings{display:flex;flex-direction:column;align-items:center;padding:18px 10px;border-radius:14px;background:linear-gradient(130deg,#fdf4dc,#e9efdd);border:1px solid #e4d7ae}
+.rush-end-earnings small{font-size:10px;letter-spacing:.075em;color:#726044;font-weight:750}
+.rush-end-earnings strong{font-size:clamp(25px,4.5vw,36px);color:#22533e;margin-top:4px;font-variant-numeric:tabular-nums}
+@media(prefers-reduced-motion:reduce){body.store-rush-active .store-scene,body.store-rush-active .store-scene::after{animation:none!important}}
+body.reduced-motion.store-rush-active .store-scene,body.reduced-motion.store-rush-active .store-scene::after{animation:none!important}
+body[data-theme="dark"] .rush-end-earnings{background:#344338;border-color:#5a6249}body[data-theme="dark"] .rush-end-earnings strong{color:#d7f1c3}

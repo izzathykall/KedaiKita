@@ -134,15 +134,8 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   const showOverview = () => {
     show();showRegion('overview');ui.title.textContent='Akaun Kedai Kita';ui.hint.textContent='Progres kerjaya disimpan mengikut akaun ini.';
     ui.current.textContent=user?.email||'Akaun pemain';message(syncError?errorMalay(syncError):'Data akaun anda telah dimuatkan.');
-    const setup=byId('developerSetupDetails'),access=byId('developerAccessStatus'),help=byId('developerAccessHelp'),uid=byId('developerUid'),copy=byId('copyDeveloperUid');
-    if(setup){
-      setup.open=developerSandbox||new URLSearchParams(window.location.search).get('dev')==='1';
-      if(access)access.textContent=developerSandbox?'Aktif · Sandbox':'Belum aktif';
-      if(access)access.classList.toggle('active',developerSandbox);
-      if(help)help.textContent=developerSandbox?'Akaun Developer aktif. Progres ujian dan duit Developer disimpan berasingan dalam Firebase. Hanya satu peranti boleh menggunakan akaun ini pada satu masa.':'Akaun ini belum disenaraikan sebagai Developer. Ikut langkah di bawah untuk mengaktifkannya.';
-      if(uid)uid.value=user?.uid||'';
-      if(copy)copy.textContent='Salin UID';
-    }
+    const approved=byId('developerAccessEnabled');
+    if(approved)approved.hidden=!developerSandbox;
   };
   const setMode = selected => {
     mode=selected; ui.login.classList.toggle('active',selected==='login');

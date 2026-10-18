@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#173f37"><meta name="description" content="Jaga kaunter pasar mini anda. Scan barang, timbang hasil segar, kira baki dan bina Kedai Kita!">
 <title>Kedai Kita — Cashier Simulator</title>
-<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-18-rush-golden-dev-reset-v3">
+<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-18-rush-recap-reset-secure-v4">
 </head>
 <body>
 <div class="app" id="gameApp">
@@ -101,16 +101,7 @@
     <div id="accountOverview" hidden>
       <div class="account-current"><span>✦</span><div><small>AKAUN AKTIF</small><strong id="accountCurrent"></strong></div></div>
       <p class="account-sync-small" id="accountSyncLabel">Simpanan akaun tersedia</p>
-      <details class="developer-access-details" id="developerSetupDetails">
-        <summary><span>🛠️ Akses Developer</span><b id="developerAccessStatus">Semak akses</b></summary>
-        <div class="developer-access-body">
-          <p id="developerAccessHelp">Semak sama ada akaun ini dibenarkan membuka panel ujian.</p>
-          <label for="developerUid">UID Firebase akaun ini</label>
-          <div class="developer-uid-row"><input id="developerUid" type="text" readonly aria-label="UID Firebase akaun semasa"><button id="copyDeveloperUid" type="button" class="account-secondary">Salin UID</button></div>
-          <p class="developer-help-steps"><b>Untuk aktifkan:</b> Cipta/log masuk akaun ujian → salin UID di atas → masukkan ke <code>developer-config.js</code> → upload fail ke GitHub dan refresh. Jangan masukkan kata laluan dalam kod.</p>
-          <a class="developer-firebase-link" href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer">Buka Firebase Console ↗</a>
-        </div>
-      </details>
+      <p id="developerAccessEnabled" class="developer-approved-label" hidden>🛠️ Developer Mode aktif · Data ujian disimpan secara berasingan.</p>
     </div>
     <div class="account-actions" id="accountControls">
       <button type="button" id="accountGuest" class="account-secondary">Main sebagai tetamu (offline)</button>
@@ -129,7 +120,7 @@
 <script type="module">
 // Versioned loader: the currently published version.json controls the actual CSS and app version.
 // Each release only requires updating version.json after publishing the changed files.
-const fallbackBuild = '2026-10-18-rush-golden-dev-reset-v3';
+const fallbackBuild = '2026-10-18-rush-recap-reset-secure-v4';
 let activeBuild = fallbackBuild;
 try {
   const response = await fetch('./version.json?init=' + Date.now(), {cache:'no-store'});
