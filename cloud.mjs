@@ -210,7 +210,8 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   };
   async function flush() {
     if(timer){clearTimeout(timer);timer=null}
-    if(writing||!ready||!user||!queued||!api||!activeSessionToken)return;
+    if(writing){if(writesPending)await writesPending;return queued?flush():true;}
+    if(!ready||!user||!queued||!api||!activeSessionToken)return !queued;
     const uid=user.uid, value=queued;queued=null;writing=true;
     try {
       if(!activeSessionToken){throw new Error('Sesi akaun tidak aktif')}
@@ -223,11 +224,13 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
         syncError=null;setStatus(queued?'Menyimpan progres…':'✓ Progres disimpan');
       }
     } catch(err) {
-      if(user?.uid===uid){syncError=err;queued=queued||value;setStatus('Simpanan belum disegerakkan · progres selamat di peranti')}
+      if(user?.uid===uid){syncError=err;queued=queued||value;setStatus('Simpanan belum disegerakkan · progres selamat di peranti');diagnostic('menyimpan progres',err)}
+      throw err;
     } finally {
       writing=false;writesPending=null;
-      if(queued&&user?.uid===uid&&!syncError)timer=setTimeout(flush,3000);
+      if(queued&&user?.uid===uid&&!syncError)timer=setTimeout(()=>{flush().catch(()=>{})},3000);
     }
+    return !queued;
   }
   async function resetProgress(state) {
     // A reset must never accidentally upload an old debounced snapshot later.
@@ -261,7 +264,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     const data=clone(state);
     if(user){data._cloudPending=true;data._clientStamp=`${Date.now()}-${++saveCounter}`}
     writeLocal(currentKey,data);
-    if(ready&&user&&activeSessionToken&&!syncError)stage(data);
+    if(ready&&user&&activeSessionToken)stage(data);
     else if(ready&&!user)setStatus('Disimpan pada peranti · mod tetamu');
   }
   async function finishAccount(state) {
@@ -371,7 +374,17 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   async function logOut() {
     if(!auth||!user)return;
     setBusy(true);message('Menyimpan progres sebelum log keluar…');
-    if(queued)await flush();if(writesPending)try{await writesPending}catch{}
+    try{
+      // Capture the newest purchase/state before releasing the account session.
+      queueSave(capture());
+      if(!activeSessionToken)throw new Error('Sesi Firebase tidak aktif.');
+      if(writesPending)await writesPending;
+      if(queued)await withTimeout(flush(),DATA_TIMEOUT_MS,'menyimpan sebelum log keluar');
+      if(queued||syncError)throw new Error('Progres belum disimpan dalam Firebase.');
+    }catch(err){
+      setBusy(false);message('Log keluar dibatalkan. Progres belum berjaya disimpan ke Firebase. Semak internet / Database Rules dan cuba lagi. '+errorDetails(err,'simpan'),true);
+      setStatus('⚠ Progres belum disegerakkan · jangan log keluar');return;
+    }
     ready=false;guestMode=false;
     const uid=user.uid,token=activeSessionToken;
     detachSessionWatch();activeSessionToken=null;clearSessionLocal(uid);

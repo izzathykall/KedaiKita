@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-19-v26-upgrade-save",
+  "version": "2026-10-19-v27-cloud-save-logout-guard",
   "label": "Laporan penutupan syif profesional",
-  "notes": "Buang 2 nota upgrade, simpan pembelian ke Firebase dan kekalkan upgrade semasa restart hari"
+  "notes": "Fix Firebase upgrade persistence: retry pending writes, show errors, prevent logout before save succeeds"
 }
