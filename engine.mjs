@@ -66,6 +66,9 @@ export const PRODUCTS = [
   {"id": "led", "name": "Lampu LED", "price": 1290, "category": "electrical", "color": "#dce2e9"}
 ,{"id": "croissant", "name": "Croissant mentega", "price": 450, "category": "bakery", "color": "#efd8b8"},{"id": "muffin", "name": "Mufin coklat", "price": 380, "category": "bakery", "color": "#efd8b8"},{"id": "oats", "name": "Oat segera", "price": 890, "category": "bakery", "color": "#efd8b8"},{"id": "jam", "name": "Jem strawberi", "price": 650, "category": "bakery", "color": "#efd8b8"},{"id": "nuggets", "name": "Nuget ayam", "price": 1290, "category": "frozen", "color": "#cce5ee"},{"id": "sausage", "name": "Sosej ayam", "price": 790, "category": "frozen", "color": "#cce5ee"},{"id": "dumpling", "name": "Dumpling sayur", "price": 1090, "category": "frozen", "color": "#cce5ee"},{"id": "frozenroti", "name": "Roti paratha beku", "price": 850, "category": "frozen", "color": "#cce5ee"},{"id": "diapers", "name": "Lampin bayi", "price": 2490, "category": "baby", "color": "#f0dce5"},{"id": "babywipes", "name": "Tisu basah bayi", "price": 590, "category": "baby", "color": "#f0dce5"},{"id": "babybottle", "name": "Botol susu bayi", "price": 1590, "category": "baby", "color": "#f0dce5"},{"id": "babyporridge", "name": "Bubur bayi", "price": 1290, "category": "baby", "color": "#f0dce5"},{"id": "catfood", "name": "Makanan kucing", "price": 790, "category": "pets", "color": "#e3dec8"},{"id": "dogfood", "name": "Makanan anjing", "price": 990, "category": "pets", "color": "#e3dec8"},{"id": "catlitter", "name": "Pasir kucing", "price": 1890, "category": "pets", "color": "#e3dec8"},{"id": "petshampoo", "name": "Syampu haiwan", "price": 1290, "category": "pets", "color": "#e3dec8"},{"id": "notebook", "name": "Buku nota", "price": 450, "category": "stationery", "color": "#e1dcf1"},{"id": "pencils", "name": "Pensel 6 batang", "price": 350, "category": "stationery", "color": "#e1dcf1"},{"id": "crayons", "name": "Krayon warna", "price": 690, "category": "stationery", "color": "#e1dcf1"},{"id": "glue", "name": "Gam sekolah", "price": 250, "category": "stationery", "color": "#e1dcf1"},{"id": "soil", "name": "Tanah tanaman", "price": 590, "category": "garden", "color": "#d8e4c7"},{"id": "seeds", "name": "Benih cili", "price": 290, "category": "garden", "color": "#d8e4c7"},{"id": "plantpot", "name": "Pasu bunga", "price": 750, "category": "garden", "color": "#d8e4c7"},{"id": "fertilizer", "name": "Baja organik", "price": 1290, "category": "garden", "color": "#d8e4c7"},{"id": "plaster", "name": "Plaster luka", "price": 390, "category": "health", "color": "#d6e9e3"},{"id": "mask", "name": "Pelitup muka", "price": 590, "category": "health", "color": "#d6e9e3"},{"id": "sanitizer", "name": "Pensanitasi tangan", "price": 650, "category": "health", "color": "#d6e9e3"},{"id": "thermometer", "name": "Termometer digital", "price": 1890, "category": "health", "color": "#d6e9e3"}].map(p=>({...p,category:p.category||(p.weighted?'fresh':['soap','detergent'].includes(p.id)?'household':['juice','cookies','snack','butter','icecream'].includes(p.id)?'snacks':p.id==='nasi'?'meals':'essentials')}));
 export const PEOPLE = [
+  {id:'custom-izzat',name:'Izzat',role:'Jurutera profesional',community:'Melayu',skin:'#bd8b69',hair:'#282e36',shirt:'#527d97',hairStyle:'short',profession:'engineer',line:'Saya singgah selepas pemeriksaan tapak.'},
+  {id:'custom-wawa',name:'Wawa',role:'Pengurus perniagaan',community:'Melayu',skin:'#d9a481',hair:'#322b32',shirt:'#956d83',scarf:true,scarfColor:'#8b6684',profession:'manager',line:'Saya perlu sambung urusan pejabat sebentar lagi.'},
+
   {
     "id": "person-1",
     "name": "Aina",
@@ -153,6 +156,7 @@ export const PEOPLE = [
     "id": "person-8",
     "name": "Sakinah",
     "role": "Pengarah program",
+    "profession": "director",
     "community": "Melayu",
     "skin": "#c79773",
     "hair": "#382c2a",
@@ -654,28 +658,4 @@ export function returnPolicy(product){
 export function returnMatches(record,claim,item,day){
  const rule=returnPolicy(item);
  return !!(record&&claim&&rule&&!record.returned&&record.paid>0&&day>=record.day&&day-record.day<=rule.days&&claim.receipt===record.receipt&&claim.day===record.day&&claim.productId===record.productId&&claim.quantity===1&&claim.paid===record.paid&&item.id===record.productId);
-},
-  {
-    "id": "person-11",
-    "name": "Izzat",
-    "role": "Jurutera profesional",
-    "community": "Melayu",
-    "skin": "#b88762",
-    "hair": "#2f2d32",
-    "shirt": "#6d8fa8",
-    "line": "Saya singgah sekejap sebelum sambung kerja.",
-    "hairStyle": "short"
-  },
-  {
-    "id": "person-12",
-    "name": "Wawa",
-    "role": "Pengurus perniagaan",
-    "community": "Melayu",
-    "skin": "#d8a07a",
-    "hair": "#342b2f",
-    "shirt": "#c98e6a",
-    "line": "Saya mahu urus beli barang dengan cepat hari ini.",
-    "scarf": true,
-    "scarfColor": "#b48b72"
-  }
-
+}
