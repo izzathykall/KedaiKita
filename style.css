@@ -954,7 +954,9 @@ body.reduced-motion .store-atmosphere *,body.reduced-motion .store-atmosphere{an
 
 /* A gentle golden shimmer during Rush Hour, not a high-frequency strobe. */
 body.store-rush-active .store-scene{position:relative;isolation:isolate;animation:rushSceneGlow 2.8s ease-in-out infinite}
-body.store-rush-active .store-scene::after{content:'';position:absolute;inset:0;z-index:4;pointer-events:none;border-radius:inherit;background:linear-gradient(116deg,transparent 18%,rgba(255,243,174,.18) 39%,rgba(255,218,99,.29) 50%,transparent 73%);background-size:270% 100%;animation:rushGoldSweep 3.8s ease-in-out infinite;mix-blend-mode:screen}
+/* Keep the original scene bottom trim (which uses ::after).
+   A dedicated overlay owns the moving light instead. */
+body.store-rush-active .rush-gold-sweep{opacity:1;animation:rushGoldSweep 3.8s ease-in-out infinite}
 body.store-rush-active .store-atmosphere{opacity:1!important}
 body.store-rush-active .store-atmosphere .sunbeam{background:linear-gradient(90deg,transparent,rgba(255,215,122,.22),rgba(255,239,184,.13),transparent)}
 @keyframes rushSceneGlow{0%,100%{box-shadow:inset 0 0 24px #f5be5f18,0 7px 24px #af782614}50%{box-shadow:inset 0 0 65px #ffe29a73,0 0 28px #f7c55c8a}}
@@ -973,6 +975,113 @@ body.store-rush-active .store-atmosphere .sunbeam{background:linear-gradient(90d
 .rush-end-earnings{display:flex;flex-direction:column;align-items:center;padding:18px 10px;border-radius:14px;background:linear-gradient(130deg,#fdf4dc,#e9efdd);border:1px solid #e4d7ae}
 .rush-end-earnings small{font-size:10px;letter-spacing:.075em;color:#726044;font-weight:750}
 .rush-end-earnings strong{font-size:clamp(25px,4.5vw,36px);color:#22533e;margin-top:4px;font-variant-numeric:tabular-nums}
-@media(prefers-reduced-motion:reduce){body.store-rush-active .store-scene,body.store-rush-active .store-scene::after{animation:none!important}}
-body.reduced-motion.store-rush-active .store-scene,body.reduced-motion.store-rush-active .store-scene::after{animation:none!important}
+@media(prefers-reduced-motion:reduce){body.store-rush-active .store-scene,body.store-rush-active .rush-gold-sweep{animation:none!important}}
+body.reduced-motion.store-rush-active .store-scene,body.reduced-motion.store-rush-active .rush-gold-sweep{animation:none!important}
 body[data-theme="dark"] .rush-end-earnings{background:#344338;border-color:#5a6249}body[data-theme="dark"] .rush-end-earnings strong{color:#d7f1c3}
+
+
+/* ==============================================================
+   GOLDEN RUSH V5 · visual festival like a busy, sunlit store.
+   All effects are decorative and pointer-events:none; no gameplay
+   interaction is blocked. Animations are slow pulses, never strobes.
+   ============================================================== */
+.rush-screen-fx{
+  position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:18;
+  opacity:0;visibility:hidden;transition:opacity .55s ease,visibility .55s;
+  isolation:isolate;
+}
+body.store-rush-active .rush-screen-fx{opacity:1;visibility:visible}
+.rush-global-halo{
+  position:absolute;inset:-15%;opacity:.66;
+  background:radial-gradient(ellipse at 15% 56%,rgba(255,191,57,.13),transparent 40%),
+    radial-gradient(ellipse at 86% 53%,rgba(255,183,49,.12),transparent 40%),
+    radial-gradient(ellipse at 50% -5%,rgba(255,238,148,.19),transparent 58%);
+  animation:rushScreenBreath 4.7s ease-in-out infinite;
+}
+.rush-global-rays{
+  position:absolute;left:50%;top:-40%;width:170vmax;height:135vmax;
+  transform:translateX(-50%) rotate(-10deg);transform-origin:50% 10%;opacity:.24;
+  background:repeating-conic-gradient(from 15deg at 50% 10%,
+    rgba(255,202,75,.1) 0deg,rgba(255,228,136,.17) 4deg,transparent 9deg,transparent 24deg);
+  mask-image:linear-gradient(to bottom,#000 0%,transparent 85%);
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,transparent 85%);
+  animation:rushRayRotate 13s ease-in-out infinite alternate;
+}
+.rush-fx-star{
+  position:absolute;left:var(--x);top:var(--y);color:#ffcb43;
+  font-size:clamp(11px,1.9vw,27px);font-weight:900;
+  text-shadow:0 0 3px #fff,0 0 10px #fff1b1,0 0 24px #ffb338;
+  opacity:.1;animation:rushStarTwinkle var(--speed) ease-in-out var(--delay) infinite;
+  filter:drop-shadow(0 0 2px #ffa629);
+}
+.rush-fx-star:nth-of-type(3n){color:#fffaf0;font-size:clamp(9px,1.4vw,20px)}
+.rush-fx-star:nth-of-type(4n){color:#ffc047;transform:rotate(-23deg)}
+/* Little festive crowd behind the main customer, always behind dialogue. */
+.rush-crowd{position:absolute;inset:0;pointer-events:none;z-index:1;opacity:0;transition:opacity .5s ease}
+body.store-rush-active .rush-crowd{opacity:.64}
+.rush-crowd-person{position:absolute;left:var(--px);bottom:27px;width:var(--size);height:calc(var(--size) * 1.65);filter:drop-shadow(0 4px 5px rgba(43,72,45,.13));animation:rushCrowdBob 4.2s ease-in-out var(--shift) infinite}
+.rush-crowd-person:before{content:'';position:absolute;left:25%;top:0;width:50%;height:34%;border-radius:50% 50% 45% 45%;background:var(--skin);box-shadow:inset 0 7px 0 #543a2d70}
+.rush-crowd-person:after{content:'';position:absolute;bottom:0;left:0;right:0;height:65%;border-radius:45% 45% 0 0;background:linear-gradient(120deg,var(--shirt),#f5dbaf44)}
+.rush-scene-fx{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:4;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s}
+body.store-rush-active .rush-scene-fx{opacity:1;visibility:visible}
+.rush-gold-flood{position:absolute;inset:-20%;background:
+  radial-gradient(ellipse at 48% 22%,rgba(255,244,169,.36),transparent 44%),
+  radial-gradient(ellipse at 6% 80%,rgba(255,188,69,.23),transparent 45%),
+  radial-gradient(ellipse at 93% 60%,rgba(255,211,98,.22),transparent 43%);
+  mix-blend-mode:screen;animation:rushScenePulse 3.8s ease-in-out infinite}
+.rush-gold-sweep{position:absolute;inset:0;opacity:0;
+  background:linear-gradient(116deg,transparent 18%,rgba(255,250,195,.10) 38%,rgba(255,239,126,.42) 50%,transparent 73%);
+  background-size:250% 100%;mix-blend-mode:screen}
+.rush-gold-ray{position:absolute;left:32%;top:-45%;height:230%;width:21%;opacity:.65;
+  transform:rotate(27deg);filter:blur(7px);
+  background:linear-gradient(90deg,transparent,rgba(255,240,171,.49),transparent);
+  animation:rushBeamSway 4.2s ease-in-out infinite alternate}
+.rush-gold-ray.ray-b{left:78%;width:14%;opacity:.55;animation-delay:-2s}
+.rush-glitter-field{position:absolute;inset:0;opacity:.76;
+  background-image:radial-gradient(circle,#fffbe3 0 2px,transparent 3px),
+    radial-gradient(circle,#ffd05f 0 3px,transparent 4px),
+    radial-gradient(circle,#fff6cc 0 1.5px,transparent 2.5px);
+  background-position:0 0,35px 60px,90px 23px;
+  background-size:130px 105px,173px 131px,92px 79px;
+  filter:drop-shadow(0 0 5px #ffe8a1);
+  animation:rushGlitterDrift 7s linear infinite}
+body.store-rush-active .store-scene{border-color:#f3cc67;background-color:#f3e1b0;box-shadow:inset 0 0 55px rgba(255,232,161,.5),0 0 26px rgba(241,175,42,.42);animation:rushSceneGlowStrong 3.3s ease-in-out infinite}
+body.store-rush-active .store-atmosphere .sunbeam{background:linear-gradient(90deg,transparent,rgba(255,224,124,.45),rgba(255,253,214,.38),transparent);filter:blur(5px)}
+body.store-rush-active .store-atmosphere .dust{background:#fff9b8;box-shadow:0 0 6px #fff,0 0 16px #ffc64d}
+body.store-rush-active .rush-hour-banner{
+  background:linear-gradient(105deg,#98291b 0%,#df5a24 50%,#a6321c 100%);
+  border:1px solid #ffcf5b;color:#fff9e9;
+  box-shadow:0 0 0 2px rgba(255,227,150,.36),0 5px 21px #e78d3880,0 0 30px #ffbb4280;
+}
+body.store-rush-active .rush-hour-heading>strong{color:#fff0a6;text-shadow:0 0 10px #ffe3a2}
+body.store-rush-active .rush-timer-track{background:#4d1c2870}
+body.store-rush-active .rush-timer-track i{background:linear-gradient(90deg,#ffe58e,#fffef2);box-shadow:0 0 10px #fff1b6}
+body.store-rush-active .day-pill{box-shadow:0 0 0 1px #f0c56f,0 0 20px #ffbc4d55}
+body.store-rush-active .store-scene .atmosphere-label{border:1px solid #fff3ae;background:linear-gradient(110deg,#9b421c,#e39a30);color:#fffbed;box-shadow:0 0 17px #ffcc7faa}
+body.store-rush-active .scanner,body.store-rush-active .scale{box-shadow:inset 0 0 0 2px #efcf76,0 0 22px #ffb84a6b,0 0 40px #fbd76436;animation:rushStationGlow 3s ease-in-out infinite}
+body.store-rush-active .conveyor{box-shadow:0 0 0 2px #ffe0a1,0 0 26px #ffd07166,0 4px 14px #bb782a40}
+body.store-rush-active .customer-info{box-shadow:0 -1px 0 rgba(255,251,217,.6),0 0 19px #ffd58955}
+/* Modal dialogs (native top layer) and all buttons remain interactive. */
+@keyframes rushSceneGlowStrong{0%,100%{box-shadow:inset 0 0 24px #ffde9545,0 0 18px #e9a44b45}50%{box-shadow:inset 0 0 80px #fff2b1a1,0 0 32px #ffcf7299}}
+@keyframes rushStarTwinkle{0%,100%{opacity:.15;transform:scale(.65) rotate(-8deg)}45%{opacity:1;transform:scale(1.2) rotate(15deg)}72%{opacity:.52;transform:scale(.95) rotate(3deg)}}
+@keyframes rushScreenBreath{0%,100%{opacity:.58}50%{opacity:.9}}
+@keyframes rushRayRotate{from{transform:translateX(-50%) rotate(-10deg)}to{transform:translateX(-50%) rotate(10deg)}}
+@keyframes rushScenePulse{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes rushBeamSway{from{transform:rotate(20deg) translateX(-9%)}to{transform:rotate(32deg) translateX(15%)}}
+@keyframes rushGlitterDrift{from{background-position:0 0,35px 60px,90px 23px}to{background-position:45px -90px,90px -35px,30px -75px}}
+@keyframes rushCrowdBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes rushStationGlow{0%,100%{box-shadow:inset 0 0 0 1px #e1bd63,0 0 13px #ffc84c60}50%{box-shadow:inset 0 0 0 2px #f9dc8d,0 0 28px #ffd568a1}}
+/* Dark mode must stay legible, even under the golden decoration. */
+body[data-theme="dark"].store-rush-active .store-scene{background-color:#465848}
+/* Small screens: reduce full-screen compositing and prioritize readable controls. */
+@media(max-width:600px){.rush-fx-star{font-size:13px}.rush-global-rays{opacity:.23}.rush-crowd-person{transform:scale(.85);transform-origin:bottom center}.rush-screen-fx{opacity:0}body.store-rush-active .rush-screen-fx{opacity:.8}}
+/* User animation preference and OS reduced-motion setting: keep a calm static glow. */
+@media(prefers-reduced-motion:reduce){
+ body.store-rush-active .rush-screen-fx *,body.store-rush-active .rush-scene-fx *,body.store-rush-active .rush-crowd *,
+ body.store-rush-active .store-scene,body.store-rush-active .scanner,body.store-rush-active .scale{animation:none!important}
+ .rush-global-rays{opacity:.15}.rush-fx-star{opacity:.4}.rush-gold-flood{opacity:.75}.rush-gold-sweep{opacity:.42}
+}
+body.reduced-motion.store-rush-active .rush-screen-fx *,body.reduced-motion.store-rush-active .rush-scene-fx *,body.reduced-motion.store-rush-active .rush-crowd *,
+body.reduced-motion.store-rush-active .store-scene,body.reduced-motion.store-rush-active .scanner,body.reduced-motion.store-rush-active .scale{animation:none!important}
+body.reduced-motion.store-rush-active .rush-fx-star{opacity:.4}
+body.reduced-motion.store-rush-active .rush-gold-sweep{opacity:.35}

@@ -1,6 +1,6 @@
-import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-18-rush-recap-reset-secure-v4';
+import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-18-golden-rush-refundoff-v5';
 import {productArt,moneyArt} from './art.mjs';
-import {createCloudSync} from './cloud.mjs?v=2026-10-18-rush-recap-reset-secure-v4';
+import {createCloudSync} from './cloud.mjs?v=2026-10-18-golden-rush-refundoff-v5';
 
 const $=id=>document.getElementById(id);
 const ICONS={basket:'M3 9h18l-2 11H5L3 9ZM8 9l4-7 4 7M8 13v3m4-3v3m4-3v3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5',shop:'M3 10V5h18v5M4 10v11h16V10M2 10a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0M9 21v-7h6v7',volume:'M11 4 6 8H2v8h4l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14',mute:'M11 4 6 8H2v8h4l5 4V4Zm5 5 6 6m0-6-6 6',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',pause:'M8 4v16m8-16v16',scan:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M6 12h12M7 9v6m3-6v6m4-6v6m3-6v6',scale:'M6 7h12l3 14H3L6 7Zm3 0V5a3 3 0 0 1 6 0v2m-3 4v5m-2-2h4',arrow:'M4 12h16m-6-6 6 6-6 6',heart:'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',flag:'M5 21V3m0 0c5-3 9 3 14 0v10c-5 3-9-3-14 0',receipt:'M5 3h14v19l-3-2-4 2-4-2-3 2V3Zm3 5h8m-8 4h8m-8 4h5',lock:'M6 10h12v11H6V10Zm3 0V6a3 3 0 0 1 6 0v4',card:'M2 5h20v14H2V5Zm0 5h20M6 15h4',qr:'M3 3h6v6H3V3Zm12 0h6v6h-6V3ZM3 15h6v6H3v-6Zm12 0h3v3h3v3h-6v-6Zm6-3v3M12 3v3m0 6v3M3 12h6m3 6v3',cash:'M2 5h20v14H2V5Zm10 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM5 8h1m12 8h1',check:'M5 12l4 4L19 6',close:'M6 6l12 12M6 18 18 6',play:'m8 4 12 8-12 8V4Z',snow:'M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4m13 9-4 1 1 4M4 14l4 1-1 4m13-9-4-1 1-4',spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z',undo:'M8 4 3 9l5 5M3 9h10a7 7 0 0 1 0 14',reset:'M4 8a9 9 0 1 1-1 8M4 3v5h5',help:'M9 8a3 3 0 1 1 5 2c-1 1-2 1-2 4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z'};
@@ -16,7 +16,7 @@ let paymentMinimized=false,musicUnlocked=false,musicLevel=0,musicTarget=-1,music
 let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=null,musicSource=null,chaChingBuffer=null,chaChingPromise=null,chaChingSource=null;
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-rush-recap-reset-secure-v4';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-18-golden-rush-refundoff-v5';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
@@ -74,11 +74,14 @@ function restoreRushPatience(){
 }
 function beginDailyRush(){
  if(mode!=='career'||modalKind==='rush-start'||!shouldStartRushHour(session,progress.day))return false;
+ // Do not start Rush Hour in the middle of a return. Let the refund finish first;
+ // advance() will offer the Rush Hour popup before the next buying customer.
+ if(customer?.kind==='return'&&!['success','lost'].includes(phase))return false;
  // Present a proper modal BEFORE enabling the event; time is frozen until accepted.
  openModal('rush-start',`<div class="modal-pad rush-event-modal"><div class="rush-event-symbol">⚡</div><div class="modal-kicker">CABARAN KHAS · HARI ${progress.day}</div><h2>Rush Hour akan bermula!</h2><p>Dalam 60 saat, pelanggan cuma sabar selama <b>10 saat</b>. Scanner, penimbang dan conveyor menjadi tahap MAX. Untung barang ×${rushHourMultiplier(progress.upgrades).toFixed(1)}, stok dan resit tanpa had.</p><div class="rush-event-stats"><span><b>60s</b><small>Tempoh</small></span><span><b>10s</b><small>Kesabaran</small></span><span><b>×${rushHourMultiplier(progress.upgrades).toFixed(1)}</b><small>Untung</small></span></div><p class="rush-event-hint">Pelanggan Rush Hour tidak dikira dalam sasaran harian.</p><button class="primary-btn rush-event-primary" id="rushEventStart">⚡ Mula Rush Hour</button></div>`);
  $('rushEventStart').onclick=()=>{
   if(!startRushHour(session,progress.day)){closeModal();return;}
-  if(customer&&!customer.paid){applyRushPatience(customer);customer.rushUnlimited=true;customer.rushCustomer=true;}
+  if(customer&&!customer.paid&&customer.kind!=='return'){applyRushPatience(customer);customer.rushUnlimited=true;customer.rushCustomer=true;}
   applyMachineSpeeds();render();save();closeModal();beep('start');
   if(['success','lost'].includes(phase))advance();
   else if(phase==='waiting'){session.waitSeconds=0;newCustomer();}
@@ -124,8 +127,9 @@ function syncSceneAtmosphere(){
  document.body.classList.toggle('store-evening',evening);
  document.body.classList.toggle('rush-machine-max',rushMachinesActive());
  document.body.classList.toggle('store-rush-active',mode==='career'&&rushHourActive(progress.day,session));
- const label=$('atmosphereLabel');if(label)label.textContent=golden?'✦ GOLDEN HOUR':evening?'✦ SENJA':'';
- if(label)label.hidden=!(golden||evening);
+ const rushActive=mode==='career'&&rushHourActive(progress.day,session);
+ const label=$('atmosphereLabel');if(label)label.textContent=rushActive?'⚡ GOLDEN RUSH':golden?'✦ GOLDEN HOUR':evening?'✦ SENJA':'';
+ if(label)label.hidden=!(rushActive||golden||evening);
 }
 function resetStations(){$('scaleItem').innerHTML='';$('scaleItem').dataset.uid='';setScaleReading(null);$('scaleState').textContent='SEDIA';$('scaleZone').classList.remove('stable');$('weightProgress').style.width='0';$('scaleCaption').textContent='Hasil segar · '+(machineTimings(gameplayMachineUpgrades()).weighMs/1000)+' saat';$('scaleZone').classList.remove('weighing','highlight');$('scannerZone').classList.remove('scanning','highlight');$('scannerStatus').textContent='Sedia untuk scan'}
 function render(){refreshCalculatorPresets();renderHeader();renderScene();renderProducts();renderReceipt();renderPayment();icons();renderPatience();renderActivity()}
@@ -959,7 +963,8 @@ function recordSale(transaction){
  transaction.items.forEach((p,i)=>{const paid=i===transaction.items.length-1?total-allocated:Math.floor(total*itemPrice(p)/Math.max(1,transaction.total));allocated+=paid;progress.sales.push({id:progress.day+'-'+seq+'-'+i,receipt:'KK-'+String(seq).padStart(5,'0'),day:progress.day,productId:p.id,grams:p.grams,paid,cost:stockCost(p,stockUnits(p),progress.day),returned:false})});progress.sales=progress.sales.slice(-120);
 }
 function prepareReturnCustomer(){
- if(mode==='practice'||progress.day<2||session.index<2||(session.index+progress.day)%4!==0)return;
+ // No refund customers during the 60-second Rush Hour. They return only after it ends.
+ if(mode==='practice'||(mode==='career'&&rushHourActive(progress.day,session))||progress.day<2||session.index<2||(session.index+progress.day)%4!==0)return;
  const record=[...progress.sales].reverse().find(x=>{const rule=returnPolicy(PRODUCTS.find(p=>p.id===x.productId));return rule&&!x.returned&&x.paid>0&&progress.day-x.day<=rule.days});if(!record)return;
  const product=PRODUCTS.find(p=>p.id===record.productId),rule=returnPolicy(product);
  customer.kind='return';customer.returnId=record.id;customer.returnReason=rule.reason;customer.returnCondition=rule.condition;customer.returnClaim={receipt:record.receipt,day:record.day,productId:record.productId,quantity:1,paid:record.paid};
