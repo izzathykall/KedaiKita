@@ -129,6 +129,13 @@ try {
   }
 } catch { /* offline: open the bundled fallback version */ }
 window.__KEDAI_ACTIVE_VERSION__=activeBuild;
-document.getElementById('gameStyles').href='./style.css?v=2026-10-18-hijab-pin-top-v11"scaleSound" src="./digital-scale.wav" preload="auto"></audio>
+document.getElementById('gameStyles').href='./style.css?v='+encodeURIComponent(activeBuild);
+const config=document.createElement('script');
+config.src='./developer-config.js?v='+encodeURIComponent(activeBuild);
+config.onload=()=>import('./app.mjs?v='+encodeURIComponent(activeBuild));
+config.onerror=()=>import('./app.mjs?v='+encodeURIComponent(activeBuild));
+document.head.appendChild(config);
+</script>
+<audio id="scaleSound" src="./digital-scale.wav" preload="auto"></audio>
 <audio id="drawerSound" src="./drawer-open.mp3" preload="auto"></audio>
 </body></html>
