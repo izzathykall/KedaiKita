@@ -151,15 +151,15 @@ export const PEOPLE = [
   },
   {
     "id": "person-8",
-    "name": "Siti Hawa",
-    "role": "Pemilik kedai bunga",
+    "name": "Sakinah",
+    "role": "Pengarah program",
     "community": "Melayu",
     "skin": "#c79773",
     "hair": "#382c2a",
     "shirt": "#ba8f96",
     "line": "Hari ini nak masak untuk keluarga.",
     "scarf": true,
-    "scarfColor": "#b78d79"
+    "scarfColor": "#8e74a8"
   },
   {
     "id": "person-9",
@@ -488,10 +488,7 @@ export const PEOPLE = [
     "line": "Barang sedikit sahaja hari ini.",
     "hairStyle": "short",
     "glasses": true
-  },
-  {"id":"person-izzat","name":"Izzat","role":"Jurutera Profesional","community":"Jiran","skin":"#bc8b6b","hair":"#2d2927","shirt":"#649a90","line":"Singgah beli beberapa barang.","hairStyle":"short"},
-  {"id":"person-sakinah","name":"Sakinah","role":"Pengarah Program","community":"Jiran","skin":"#ce9d7e","hair":"#302b2b","shirt":"#b78c9c","line":"Saya mahu beli barang dapur.","scarf":true,"scarfColor":"#94768e"},
-  {"id":"person-wawa","name":"Wawa","role":"Pengurus Perniagaan","community":"Jiran","skin":"#cd9b7a","hair":"#322e30","shirt":"#88a5a1","line":"Saya singgah sebelum balik.","hairStyle":"long"}
+  }
 ];
 export const CATEGORIES = [
   {
@@ -504,57 +501,55 @@ export const CATEGORIES = [
   {
     "id": "fresh",
     "name": "Hasil segar",
-    "cost": 2700,
+    "cost": 1500,
     "art": "apple",
     "description": "Buah, sayur, ayam dan ikan untuk ditimbang."
   },
   {
     "id": "snacks",
     "name": "Snek & tenusu",
-    "cost": 3600,
+    "cost": 2000,
     "art": "icecream",
     "description": "Snek, jus, biskut, mentega dan aiskrim."
   },
   {
     "id": "kuih",
     "name": "Kuih tradisional",
-    "cost": 4500,
+    "cost": 2500,
     "art": "serimuka",
     "description": "12 jenis kuih kegemaran rakyat Malaysia."
   },
   {
     "id": "meals",
     "name": "Hidangan tempatan",
-    "cost": 7200,
+    "cost": 4000,
     "art": "nasi",
     "description": "Nasi lemak, satay, laksa, rendang dan banyak lagi."
   },
   {
     "id": "household",
     "name": "Penjagaan rumah",
-    "cost": 8100,
+    "cost": 4500,
     "art": "detergent",
     "description": "Barangan penjagaan diri dan kebersihan rumah."
   },
   {
     "id": "electrical",
     "name": "Peralatan elektrik",
-    "cost": 18000,
+    "cost": 10000,
     "art": "ricecooker",
     "description": "8 peralatan elektrik, termasuk periuk nasi dan kipas."
   },
-{"id": "bakery", "name": "Bakeri & sarapan", "cost": 5800, "art": "croissant", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "frozen", "name": "Makanan sejuk beku", "cost": 9000, "art": "nuggets", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "baby", "name": "Keperluan bayi", "cost": 9900, "art": "diapers", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "pets", "name": "Haiwan peliharaan", "cost": 8100, "art": "catfood", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "stationery", "name": "Alat tulis", "cost": 4500, "art": "notebook", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "garden", "name": "Taman & kebun", "cost": 7200, "art": "soil", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "health", "name": "Penjagaan kesihatan", "cost": 8100, "art": "plaster", "description": "4 pilihan baharu untuk rak kedai anda."}
+{"id": "bakery", "name": "Bakeri & sarapan", "cost": 3200, "art": "croissant", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "frozen", "name": "Makanan sejuk beku", "cost": 5000, "art": "nuggets", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "baby", "name": "Keperluan bayi", "cost": 5500, "art": "diapers", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "pets", "name": "Haiwan peliharaan", "cost": 4500, "art": "catfood", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "stationery", "name": "Alat tulis", "cost": 2500, "art": "notebook", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "garden", "name": "Taman & kebun", "cost": 4000, "art": "soil", "description": "4 pilihan baharu untuk rak kedai anda."},{"id": "health", "name": "Penjagaan kesihatan", "cost": 4500, "art": "plaster", "description": "4 pilihan baharu untuk rak kedai anda."}
 ];
 export const UPGRADES = [
-  {id:'card',name:'Terminal kad',icon:'card',cost:3500,max:5,type:'payment',desc:'Tahap 1 membuka kad; tahap lanjut mengurangkan kehausan dan risiko kerosakan.'},
-  {id:'qr',name:'Scanner QR',icon:'qr',cost:2500,max:5,type:'payment',desc:'Tahap 1 membuka QR; tahap lanjut mempercepat pengesahan bayaran.'},
-  {id:'rushBoost',name:'Pengganda Rush Hour',icon:'spark',cost:100000,max:5,desc:'Untung Rush Hour bermula ×2; setiap tahap +0.3 sehingga ×3.5. Kos upgrade tinggi.'},
-  {id:'storage',name:'Kapasiti stor',icon:'basket',cost:2600,max:5,desc:'Tambah had stok 5 unit/kg setiap naik taraf. Bermula dengan 20.'},
-  {id:'conveyor',name:'Motor conveyor',icon:'arrow',cost:1500,max:5,desc:'Barang maju dan tali sawat bergerak lebih pantas.'},
-  {id:'scale',name:'Penimbang pantas',icon:'scale',cost:1800,max:5,desc:'Bacaan berat stabil lebih cepat.'},
-  {id:'scanner',name:'Scanner pantas',icon:'scan',cost:2000,max:5,desc:'Scan barang lebih pantas.'},
-  {id:'comfort',name:'Pendingin hawa',icon:'snow',cost:2500,max:5,desc:'Pelanggan lebih sabar (+15 saat).'},
-  {id:'tips',name:'Kaunter premium',icon:'spark',cost:3000,max:5,desc:'Tip pelanggan bertambah 25%.'}
+  {id:'card',name:'Terminal kad',icon:'card',cost:3500,max:1,type:'payment',desc:'Buka bayaran sentuh kad dan cip kad dengan pengesahan PIN.'},
+  {id:'qr',name:'Scanner QR',icon:'qr',cost:2500,max:1,type:'payment',desc:'Buka bayaran QR. Imbas kod pada telefon pelanggan.'},
+  {id:'conveyor',name:'Motor conveyor',icon:'arrow',cost:1500,max:3,desc:'Barang maju dan tali sawat bergerak lebih pantas.'},
+  {id:'scale',name:'Penimbang pantas',icon:'scale',cost:1800,max:3,desc:'Bacaan berat stabil lebih cepat.'},
+  {id:'scanner',name:'Scanner pantas',icon:'scan',cost:2000,max:2,desc:'Scan barang lebih pantas.'},
+  {id:'comfort',name:'Pendingin hawa',icon:'snow',cost:2500,max:2,desc:'Pelanggan lebih sabar (+15 saat).'},
+  {id:'tips',name:'Kaunter premium',icon:'spark',cost:3000,max:2,desc:'Tip pelanggan bertambah 25%.'}
 ];
 export const DENOMS = [10000,5000,2000,1000,500,100,50,20,10,5];
 export function money(cents){return 'RM '+(cents/100).toFixed(2)}
@@ -564,50 +559,14 @@ export function netTotal(customer){return Math.max(0,customer.total-(customer.di
 export function amountDue(customer){const total=netTotal(customer);return customer.method==='cash'&&customer.kind!=='return'?Math.round(total/5)*5:total}
 export function tenderFor(total){return [500,1000,2000,5000,10000,20000].find(v=>v>=total)||Math.ceil(total/10000)*10000}
 export function changeParts(cents){const parts=[];for(const value of DENOMS){const count=Math.floor(cents/value);if(count)parts.push({value,count});cents%=value}return {parts,remainder:cents}}
-// One 60-second Rush Hour per career shift, measured in active REAL seconds.
-// Pause and backgrounding do not consume the countdown; state is persisted in session.
-export const RUSH_DURATION_SECONDS=60;
-export const RUSH_PATIENCE_SECONDS=10;
-export function rushHourActive(day,session){
- return Number(day)>=1&&!!session&&!!session.rushStarted&&!session.rushCompleted&&Number(session.rushSecondsRemaining)>0;
-}
-export function rushHourPeriod(day,session){return rushHourActive(day,session)?1:0}
-export function rushHourMultiplier(upgrades={}){
- const level=Math.max(0,Math.min(5,Math.floor(Number(upgrades?.rushBoost)||0)));
- return 2+level*.3;
-}
-export function rushHourProfitBonus(marginCents,upgrades={},active=false){
- // Extra profit is a game reward funded by the game, not an additional customer charge.
- // Never multiply a loss or a refund. Tip and total charged remain unchanged.
- return active?Math.round(Math.max(0,marginCents)*(rushHourMultiplier(upgrades)-1)):0;
-}
-export function shouldStartRushHour(session,day){
- return !!session&&Number(day)>=1&&!session.rushStarted&&!session.rushCompleted&&
-   (normalCustomerCount(session)>=Math.min(5,Math.max(1,Math.ceil(dayTarget(day)*.55)))||Number(session.clockMinutes)>=900);
-}
-export function startRushHour(session,day){
- if(!shouldStartRushHour(session,day))return false;
- session.rushStarted=true;session.rushCompleted=false;session.rushSecondsRemaining=RUSH_DURATION_SECONDS;
- return true;
-}
-export function tickRushHour(session,seconds){
- if(!session?.rushStarted||session.rushCompleted||!Number.isFinite(seconds)||seconds<=0)return false;
- session.rushSecondsRemaining=Math.max(0,(session.rushSecondsRemaining||0)-seconds);
- if(session.rushSecondsRemaining<.001)session.rushSecondsRemaining=0;
- if(session.rushSecondsRemaining>0)return false;
- session.rushCompleted=true;return true;
-}
-// Each day increases the required number of customers; maximum 20 per shift.
-export function dayTarget(day){return Math.min(20,4+Math.max(1,Math.floor(Number(day)||1)))}
-export function createProgress(){return {version:1,day:1,wallet:0,lifetime:0,served:0,bestCombo:0,upgrades:{scanner:0,scale:0,conveyor:0,comfort:0,tips:0,storage:0,card:0,qr:0,rushBoost:0},history:[],unlocked:['essentials'],settings:{motion:true,theme:'mint',volume:.6,music:true,musicVolume:.2}}}
+export function dayTarget(day){return Math.min(12,4+day)}
+export function createProgress(){return {version:1,day:1,wallet:0,lifetime:0,served:0,bestCombo:0,upgrades:{scanner:0,scale:0,conveyor:0,comfort:0,tips:0,card:0,qr:0},history:[],unlocked:['essentials'],settings:{motion:true,theme:'mint',volume:.6,music:true,musicVolume:.2}}}
 export function restoreProgress(raw){try{const p=JSON.parse(raw);if(p?.version!==1||!Number.isInteger(p.day)||p.day<1||!Number.isFinite(p.wallet))return createProgress();return {...createProgress(),...p,upgrades:{...createProgress().upgrades,...p.upgrades},history:Array.isArray(p.history)?p.history.slice(-20):[],settings:{...createProgress().settings,...p.settings},unlocked:Array.isArray(p.unlocked)?[...new Set(['essentials',...p.unlocked.filter(id=>CATEGORIES.some(c=>c.id===id))])]:['essentials']}}catch{return createProgress()}}
 export function randomManualCode(rng=Math.random){return String(1000+Math.floor(rng()*9000))}
 export function availableProducts(unlocked=['essentials']){return PRODUCTS.filter(p=>unlocked.includes(p.category))}
-export function choosePerson(seen=[],rng=Math.random,forcedPersonId=null){
- if(forcedPersonId){const candidate=PEOPLE.find(p=>p.id===forcedPersonId);if(candidate&&!seen.includes(candidate.id)&&!seen.includes(candidate.name))return candidate;}
-const available=PEOPLE.filter(p=>!seen.includes(p.id)&&!seen.includes(p.name));return available.length?available[Math.floor(rng()*available.length)]:null}
+export function choosePerson(seen=[],rng=Math.random){const available=PEOPLE.filter(p=>!seen.includes(p.id)&&!seen.includes(p.name));return available.length?available[Math.floor(rng()*available.length)]:null}
 export function makeCustomer(day,index,rng=Math.random,options={}){
- const person=choosePerson(options.seen||[],rng,options.forcedPersonId);if(!person)return null;
+ const person=choosePerson(options.seen||[],rng);if(!person)return null;
  const pool=availableProducts(options.unlocked||['essentials']);const remaining=options.stock?{...options.stock}:null;
  const count=Math.min(9,3+Math.floor(day/2)+Math.floor(rng()*3));
  const items=[];
@@ -616,39 +575,11 @@ export function makeCustomer(day,index,rng=Math.random,options={}){
  const allowed=options.paymentMethods||['cash'];const methods=['cash','card','qr','cash'].filter(m=>m==='cash'||allowed.includes(m));
  const method=index===0?'cash':methods[Math.floor(rng()*methods.length)];
  const kind=index%4===2?'vip':index%4===3?'express':'regular';
- // Random barcode failures appear from Day 4; upgraded scanners fail less often.
- // Only packed goods can have the unreadable label, and at most one per customer.
- const challenges=options.challenges!==false;
- const scannerLevel=Math.max(0,Math.min(5,Number(options.upgrades?.scanner)||0));
- const barcodeChance=Math.max(.045,.21-scannerLevel*.035);
- if(challenges&&day>=4&&rng()<barcodeChance){const packed=items.filter(i=>!i.weighted);if(packed.length){const damaged=packed[Math.floor(rng()*packed.length)];damaged.damaged=true;damaged.manualCode=randomManualCode(rng)}}
- // A card decline is not the same as a broken terminal.  Customers can use
- // another card or pay cash, with a new interaction required in either case.
- const cardLevel=Math.max(1,Math.min(5,Number(options.upgrades?.card)||1));
- const declineChance=Math.max(.04,.17-(cardLevel-1)*.03);
- const fail=challenges&&method==='card'&&day>=11&&rng()<declineChance;
- const declineRoll=rng();
- const cardDeclineReason=fail?(declineRoll<.45?'insufficient':declineRoll<.75?'technical':'expired'):null;
- return {person,items,method,willTip:rng()<.4,dialogueSeed:Math.floor(rng()*10000),cardFailure:false,cardDeclineReason,cardDeclineHandled:false,total:basketTotal(items),tender:tenderFor(basketTotal(items)),patience:Math.round(Math.max(65,115-day*4)*(kind==='express'?.8:1)),elapsed:0,kind,hasCoupon:index%3===1,couponApplied:false,discount:0,requiresPin:method==='card'&&rng()<.5,cardPin:String(1000+Math.floor(rng()*9000)),cardStage:'ready',pinInput:''};
+ if(day>=2&&index%3===1){const damaged=items.find(i=>!i.weighted);if(damaged){damaged.damaged=true;damaged.manualCode=randomManualCode(rng)}}
+ return {person,items,method,willTip:rng()<.4,dialogueSeed:Math.floor(rng()*10000),cardFailure:method==='card'&&day>=2&&rng()<.12,total:basketTotal(items),tender:tenderFor(basketTotal(items)),patience:Math.round(Math.max(65,115-day*4)*(kind==='express'?.8:1)),elapsed:0,kind,hasCoupon:index%3===1,couponApplied:false,discount:0,requiresPin:method==='card'&&rng()<.5,cardPin:String(1000+Math.floor(rng()*9000)),cardStage:'ready',pinInput:''};
 }
-export function unlockCategory(progress,id){
- const c=CATEGORIES.find(c=>c.id===id);
- progress.unlocked??=['essentials'];
- if(!c||progress.unlocked.includes(id)||progress.wallet<c.cost)return false;
- // Only refill the newly purchased category; never overwrite the stock of other classes.
- ensureOperations(progress);
- progress.wallet-=c.cost;
- progress.unlocked.push(id);
- for(const item of PRODUCTS.filter(p=>p.category===id)){
-  progress.inventory[item.id]=20*(item.weighted?1000:1);
- }
- return true;
-}
-export function normalCustomerCount(session){
- // Rush Hour is a bonus event: its customers never advance the daily quota.
- return Math.max(0,(session?.served||0)+(session?.lost||0)-(session?.rushServed||0)-(session?.rushLost||0));
-}
-export function dayFinished(session,day){return normalCustomerCount(session)>=dayTarget(day)&&(!session.rushStarted||session.rushCompleted)}
+export function unlockCategory(progress,id){const c=CATEGORIES.find(c=>c.id===id);progress.unlocked??=['essentials'];if(!c||progress.unlocked.includes(id)||progress.wallet<c.cost)return false;progress.wallet-=c.cost;progress.unlocked.push(id);return true}
+export function dayFinished(session,day){return (session.served||0)+(session.lost||0)>=dayTarget(day)}
 export function tipFor(customer,combo,upgrades){if(customer.willTip===false)return 0;const fraction=Math.max(0,1-customer.elapsed/customer.patience);return Math.round((60+fraction*170+Math.min(combo,10)*20)*(1+(upgrades.tips||0)*.25)*(customer.kind==='vip'?1.5:1)/5)*5}
 export function buyUpgrade(progress,id){const u=UPGRADES.find(u=>u.id===id);if(!u)return false;const level=progress.upgrades[id]||0,cost=u.cost*(level+1);if(level>=u.max||progress.wallet<cost)return false;progress.wallet-=cost;progress.upgrades[id]=level+1;return true}
 
@@ -676,12 +607,10 @@ export function calculateExpression(expression){
  if(!Number.isFinite(value)||Math.abs(value)>1e12)throw new Error('Nilai terlalu besar.');return Math.round(value*1e8)/1e8;
 }
 
-// Temporary event speed boost: actual purchased equipment levels remain unchanged.
-export function effectiveRushMachineUpgrades(upgrades={},active=false){return active?{...upgrades,scanner:5,scale:5,conveyor:5}:upgrades}
 export function machineTimings(upgrades={}){
  const level=(id,max)=>Math.max(0,Math.min(max,Math.floor(Number(upgrades[id])||0)));
- const conveyor=level('conveyor',5);
- return {beltMs:[1700,1200,800,500,390,310][conveyor],slideMs:[580,410,270,170,130,100][conveyor],scanMs:[450,320,230,180,140,110][level('scanner',5)],weighMs:[1000,750,570,430,330,260][level('scale',5)]};
+ const conveyor=level('conveyor',3);
+ return {beltMs:[1700,1200,800,500][conveyor],slideMs:[580,410,270,170][conveyor],scanMs:[450,320,190][level('scanner',2)],weighMs:[1000,750,500,300][level('scale',3)]};
 }
 
 export function availablePaymentMethods(upgrades={},practice=false){return ['cash',...(practice||upgrades.card>=1?['card']:[]),...(practice||upgrades.qr>=1?['qr']:[])]}
@@ -689,77 +618,28 @@ export function availablePaymentMethods(upgrades={},practice=false){return ['cas
 // Stock quantities are units for packaged goods and grams for weighed goods.
 export const STOCK_TARGET=8, PAPER_PACK=20, PAPER_COST=200, CARD_REPAIR_COST=1200;
 export function stockUnits(p){return p.weighted?p.grams:1}
-export function stockCapacity(progress){const lvl=Math.max(0,Math.min(5,Math.floor(Number(progress?.upgrades?.storage)||0)));return 20+5*lvl}
-export function stockTarget(p,progress=null){const amount=progress?stockCapacity(progress):STOCK_TARGET;return p.weighted?amount*1000:amount}
-// Simulated wholesale market: stable within each game day, fluctuates on the next.
-// A small product-specific cycle produces realistic variations without a network dependency.
-export function wholesaleRate(product,day=1){
- const code=String(product.id||'').split('').reduce((acc,char)=>((acc*31+char.charCodeAt(0))>>>0),2166136261);
- const date=Math.max(1,Math.floor(Number(day)||1));
- const seed=Math.imul((code ^ Math.imul(date,2654435761))>>>0,1664525)>>>0;
- const fluctuation=((seed+1013904223)>>>0)%19-9; // -9 to +9 points, differs by item/day
- return (82+fluctuation)/100;
-}
-export function wholesaleChange(product,day=1){
- const today=wholesaleRate(product,day),yesterday=wholesaleRate(product,Math.max(1,day-1));
- return Math.round((today-yesterday)/yesterday*100);
-}
-export function stockCost(p,quantity,day=1){return Math.max(1,Math.round(p.price*wholesaleRate(p,day)*quantity/(p.weighted?1000:1)))}
+export function stockTarget(p){return p.weighted?STOCK_TARGET*1000:STOCK_TARGET}
+export function stockCost(p,quantity){return Math.max(1,Math.round(p.price*.82*quantity/(p.weighted?1000:1)))}
 export function ensureOperations(p){
  const fresh=!p.inventory||typeof p.inventory!=='object';p.inventory=fresh?{}:p.inventory;
  for(const item of PRODUCTS){const old=p.inventory[item.id];p.inventory[item.id]=fresh&&p.unlocked.includes(item.category)?stockTarget(item):Math.max(0,Math.floor(Number(old)||0))}
  p.paper=Number.isInteger(p.paper)?Math.max(0,p.paper):12;p.cardHealth=Number.isFinite(p.cardHealth)?Math.max(0,Math.min(100,p.cardHealth)):100;p.cardBroken=!!p.cardBroken||p.cardHealth===0;
  p.supplierDebt=Math.max(0,Math.round(Number(p.supplierDebt)||0));p.sales=Array.isArray(p.sales)?p.sales.slice(-120):[];p.saleSequence=Math.max(0,Math.floor(p.saleSequence||0));return fresh;
 }
-// Units for wrapped items and kilograms for weighed items. One purchase is capped
-// at 20 units/kg per product; existing stock may be higher after multiple purchases.
-export const MAX_STOCK_PURCHASE=20, LOW_STOCK_UNITS=5;
-export function stockQuote(p,id=null,units=null){
- ensureOperations(p);
- const manual=units!==null;
- if(manual&&(!id||!Number.isInteger(units)||units<1||units>MAX_STOCK_PURCHASE))return {lines:[],total:0,manual:true};
- const lines=availableProducts(p.unlocked).filter(x=>!id||x.id===id).map(x=>{
-  const available=Math.max(0,stockTarget(x,p)-p.inventory[x.id]);
-  const requested=manual?units*(x.weighted?1000:1):Math.min(available,MAX_STOCK_PURCHASE*(x.weighted?1000:1));
-  const quantity=manual?(requested<=available?requested:0):requested;
-  return {id:x.id,name:x.name,weighted:!!x.weighted,quantity,cost:quantity?stockCost(x,quantity,p.day):0};
- }).filter(x=>x.quantity>0);
- return {lines,total:lines.reduce((sum,x)=>sum+x.cost,0),manual};
-}
+export function stockQuote(p,id=null){ensureOperations(p);const lines=availableProducts(p.unlocked).filter(x=>!id||x.id===id).map(x=>({id:x.id,name:x.name,weighted:!!x.weighted,quantity:Math.max(0,stockTarget(x)-p.inventory[x.id])})).filter(x=>x.quantity>0);for(const x of lines)x.cost=stockCost(PRODUCTS.find(i=>i.id===x.id),x.quantity);return {lines,total:lines.reduce((sum,x)=>sum+x.cost,0)}}
 export function payStoreCost(p,cost,credit=false){if(!Number.isInteger(cost)||cost<0||(!credit&&p.wallet<cost))return false;const paid=Math.min(Math.max(0,p.wallet),cost);p.wallet-=paid;p.supplierDebt+=cost-paid;return true}
-export function buyStock(p,quote,credit=false){
- ensureOperations(p);
- if(!quote||!Array.isArray(quote.lines)||!quote.lines.length||!Number.isInteger(quote.total)||quote.total<=0)return false;
- // Recalculate the amounts using trusted catalogue prices. Do not allow a
- // modified quantity, duplicated product, or stale automatic restock quote.
- const expected=quote.manual
-  ?(quote.lines.length===1?stockQuote(p,quote.lines[0].id,quote.lines[0].quantity/(quote.lines[0].weighted?1000:1)):null)
-  :stockQuote(p);
- if(!expected||expected.lines.length!==quote.lines.length||expected.total!==quote.total)return false;
- if(!quote.lines.every(line=>expected.lines.some(x=>x.id===line.id&&x.weighted===line.weighted&&x.quantity===line.quantity&&x.cost===line.cost)))return false;
- if(!payStoreCost(p,expected.total,credit))return false;
- for(const line of expected.lines)p.inventory[line.id]+=line.quantity;
- return true;
-}
+export function buyStock(p,quote,credit=false){const fresh=stockQuote(p);if(!quote?.lines?.length)return false;for(const line of quote.lines){const current=fresh.lines.find(x=>x.id===line.id);if(!current||current.quantity!==line.quantity||current.cost!==line.cost)return false}if(quote.total!==quote.lines.reduce((n,x)=>n+x.cost,0)||!payStoreCost(p,quote.total,credit))return false;for(const line of quote.lines)p.inventory[line.id]+=line.quantity;return true}
 export function stockForBasket(p,items){const needed={};for(const x of items)needed[x.id]=(needed[x.id]||0)+stockUnits(x);return Object.entries(needed).every(([id,n])=>(p.inventory[id]||0)>=n)}
 export function takeStock(p,items){if(!stockForBasket(p,items))return false;for(const x of items)p.inventory[x.id]-=stockUnits(x);return true}
 export function receiveStoreCash(p,cents){const repayment=Math.min(p.supplierDebt||0,Math.max(0,Math.floor(cents*.3)));p.supplierDebt-=repayment;p.wallet+=cents-repayment;return repayment}
-export function ensureShift(s){if(!s)return;s.stars=Number.isInteger(s.stars)?Math.max(0,Math.min(3,s.stars)):3;s.clockMinutes=Number.isFinite(s.clockMinutes)?s.clockMinutes:480;s.overpaid=Math.max(0,s.overpaid||0);s.expenses=s.expenses||0;s.refunds=s.refunds||0;s.returnCount=s.returnCount||0;s.waitSeconds=Math.max(0,s.waitSeconds||0);
- s.rushStarted=!!s.rushStarted;s.rushCompleted=!!s.rushCompleted;
- s.rushSecondsRemaining=s.rushCompleted?0:Math.max(0,Math.min(RUSH_DURATION_SECONDS,Number(s.rushSecondsRemaining)||0));
- if(s.rushStarted&&s.rushSecondsRemaining<=0)s.rushCompleted=true;
- s.rushBonus=Math.max(0,Math.floor(Number(s.rushBonus)||0));s.rushSales=Math.max(0,Math.floor(Number(s.rushSales)||0));
- s.rushServed=Math.max(0,Math.floor(Number(s.rushServed)||0));s.rushLost=Math.max(0,Math.floor(Number(s.rushLost)||0));
- s.rushRevenue=Math.max(0,Math.floor(Number(s.rushRevenue)||0));s.rushEarned=Math.round(Number(s.rushEarned)||0);
- s.rushReportPending=!!s.rushReportPending;s.rushReportShown=!!s.rushReportShown;
-}
+export function ensureShift(s){if(!s)return;s.stars=Number.isInteger(s.stars)?Math.max(0,Math.min(3,s.stars)):3;s.clockMinutes=Number.isFinite(s.clockMinutes)?s.clockMinutes:480;s.overpaid=Math.max(0,s.overpaid||0);s.expenses=s.expenses||0;s.refunds=s.refunds||0;s.returnCount=s.returnCount||0;s.waitSeconds=Math.max(0,s.waitSeconds||0)}
 export function loseStar(s,reason){ensureShift(s);const before=s.stars;s.stars=Math.max(0,s.stars-1);s.lastStarReason=reason;return before-s.stars}
 export function settleShift(p,s,career=true){ensureShift(s);if(s.settled)return 0;s.settled=true;const loss=s.overpaid;s.earned-=loss;if(career){const paid=Math.min(Math.max(0,p.wallet),loss);p.wallet-=paid;p.supplierDebt+=loss-paid;p.lifetime-=loss}return loss}
 export function arrivalWait(minutes,rng=Math.random){return minutes<1020?0:minutes<1140?3+Math.floor(rng()*3):6+Math.floor(rng()*4)}
 export function clockText(minutes){const n=Math.min(1320,Math.floor(minutes));return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0')}
 export const CUSTOMER_LINES={
  welcome:['Singgah beli barang dapur sebelum balik.','Hari ini nak masak untuk keluarga.','Boleh asingkan barang yang berat ya? Terima kasih!','Saya suka singgah kedai kejiranan macam ni.','Nak beli bekalan untuk hujung minggu.','Hujan tadi, nasib baik kedai masih buka.','Ada tetamu datang malam ini. Kena tambah barang.','Baru balik kerja, singgah sekejap beli barang.','Anak-anak kirim barang untuk sarapan esok.','Beli sikit dahulu, nanti saya singgah lagi.','Hai! Semoga perniagaan hari ini lancar.','Nak lengkapkan barang yang tak cukup di rumah.'],
- cash:['Saya bayar tunai ya. Tolong semak bakinya.','Ini duitnya. Boleh pulangkan baki saya?','Saya ada wang kertas, harap ada baki ya.'],card:['Saya guna kad debit. Kad saya sudah sedia.','Boleh bayar kad? Kad saya di sini.','Saya nak guna kad untuk pembelian ini.'],qr:['Saya dah buka QR pada telefon.','Boleh imbas kod e-wallet saya?','Telefon dah sedia, saya bayar QR ya.'],change:['Terima kasih. Saya tunggu baki.','Semak dulu, tak mengapa.','Boleh beri baki yang tepat ya.'],thanks:['Terima kasih, layanan awak baik!','Ini sedikit tip untuk awak. Jumpa lagi!','Semoga kedai makin maju. Terima kasih!'],thanksNoTip:['Terima kasih, jumpa lagi!','Terima kasih atas layanan hari ini.','Semoga kedai makin maju. Jumpa lagi!'],returns:['Saya tersalah beli barang ini. Masih berbungkus, ini resitnya.','Barang ini belum dibuka. Boleh bantu pulangkan?','Keluarga saya terbeli dua. Saya bawa resit untuk pulangkan satu.']};
+ cash:['Saya bayar tunai ya. Tolong semak bakinya.','Ini duitnya. Boleh pulangkan baki saya?','Saya ada wang kertas, harap ada baki ya.'],card:['Saya guna kad debit. Kad saya sudah sedia.','Boleh bayar kad? Kad saya di sini.','Saya nak guna kad untuk pembelian ini.'],qr:['Saya dah buka QR pada telefon.','Boleh imbas kod e-wallet saya?','Telefon dah sedia, saya bayar QR ya.'],change:['Terima kasih. Saya tunggu baki.','Semak dulu, tak mengapa.','Boleh beri baki yang tepat ya.'],thanks:['Terima kasih, layanan awak baik!','Ini sedikit tip untuk awak. Jumpa lagi!','Semoga kedai makin maju. Terima kasih!'],returns:['Saya tersalah beli barang ini. Masih berbungkus, ini resitnya.','Barang ini belum dibuka. Boleh bantu pulangkan?','Keluarga saya terbeli dua. Saya bawa resit untuk pulangkan satu.']};
 export function customerLine(c,key){const lines=CUSTOMER_LINES[key]||CUSTOMER_LINES.welcome;return (key==='returns'&&c.returnReason?c.returnReason:lines[(c.dialogueSeed||0)%lines.length]).replaceAll(',', '')}
 
 export function cardRepairCost(store){const health=Math.max(0,Math.min(100,store.cardHealth??100));return health===100&&!store.cardBroken?0:200+10*(100-(store.cardBroken?0:health))}
@@ -774,4 +654,28 @@ export function returnPolicy(product){
 export function returnMatches(record,claim,item,day){
  const rule=returnPolicy(item);
  return !!(record&&claim&&rule&&!record.returned&&record.paid>0&&day>=record.day&&day-record.day<=rule.days&&claim.receipt===record.receipt&&claim.day===record.day&&claim.productId===record.productId&&claim.quantity===1&&claim.paid===record.paid&&item.id===record.productId);
-}
+},
+  {
+    "id": "person-11",
+    "name": "Izzat",
+    "role": "Jurutera profesional",
+    "community": "Melayu",
+    "skin": "#b88762",
+    "hair": "#2f2d32",
+    "shirt": "#6d8fa8",
+    "line": "Saya singgah sekejap sebelum sambung kerja.",
+    "hairStyle": "short"
+  },
+  {
+    "id": "person-12",
+    "name": "Wawa",
+    "role": "Pengurus perniagaan",
+    "community": "Melayu",
+    "skin": "#d8a07a",
+    "hair": "#342b2f",
+    "shirt": "#c98e6a",
+    "line": "Saya mahu urus beli barang dengan cepat hari ini.",
+    "scarf": true,
+    "scarfColor": "#b48b72"
+  }
+
