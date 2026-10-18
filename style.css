@@ -1121,3 +1121,8 @@ body.store-rush-active .receipt-title,body.store-rush-active .receipt-total,body
 .store-scene .customer-info .customer-vip-badge,.store-scene .customer-info .customer-vip-tip{font-size:8px;padding:3px 6px}
 .store-scene .customer{bottom:7px;max-height:260px}
 @media(max-width:740px){.store-scene .customer-info{min-height:36px!important;padding:3px 7px!important}.store-scene .customer-info .mini-avatar{width:24px;height:24px}}
+
+/* V9: biodata pekerjaan alongside customer name */
+.store-scene .customer-info .customer-occupation{display:inline-flex;vertical-align:middle;align-items:center;max-width:clamp(70px,15vw,180px);padding:3px 7px;margin-left:7px;border-radius:20px;border:1px solid #d5e1d4;background:#eaf2e6;color:#466c59;font-size:9px;font-weight:650;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.store-scene .customer-info .customer-occupation[hidden]{display:none!important}
+@media(max-width:600px){.store-scene .customer-info .customer-occupation{font-size:8px;max-width:95px;padding:2px 5px;margin-left:4px}}
