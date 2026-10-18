@@ -1098,3 +1098,17 @@ body.store-rush-active .pos-panel>*{position:relative;z-index:1}
 body.store-rush-active .receipt-title,body.store-rush-active .receipt-total,body.store-rush-active #paymentArea,body.store-rush-active .pos-top{box-shadow:0 0 0 1px rgba(255,231,167,.22)}
 @keyframes rushPanelShine{0%,100%{opacity:.45}50%{opacity:.95}}
 @keyframes rushPanelSparkles{0%{transform:translate3d(0,0,0);opacity:.18}20%{opacity:.72}50%{transform:translate3d(-8px,8px,0);opacity:.5}100%{transform:translate3d(5px,16px,0);opacity:.12}}
+
+/* V7: white customer strip overlaps avatar on purpose, with torso still visible. */
+.store-scene .customer{z-index:8!important;bottom:9px!important}
+.store-scene .customer-info{z-index:11!important;bottom:8px!important;left:clamp(10px,2.5%,26px)!important;right:clamp(10px,2.5%,26px)!important;min-height:48px!important;padding:6px 11px!important;gap:8px!important;border-radius:13px!important}
+.store-scene .customer-info .mini-avatar{width:30px;height:30px;flex:none}
+.store-scene .customer-info strong{display:inline-block;vertical-align:middle;font-size:12px}
+.store-scene .customer-info small{font-size:9px;margin-top:1px}
+.customer-vip-badge,.customer-vip-tip{display:inline-flex;align-items:center;vertical-align:middle;margin-left:9px;padding:4px 8px;border-radius:7px;font-size:9px;font-weight:800;white-space:nowrap}
+.customer-vip-badge{background:#fff2c6;color:#a56b17}
+.customer-vip-tip{background:#f8e4e9;color:#a04d68}
+.customer-vip-badge[hidden],.customer-vip-tip[hidden]{display:none!important}
+.store-scene .customer-info.vip{border-color:#e8c57c;box-shadow:0 4px 18px #ba9b5a25}
+@media(max-width:740px){.customer-vip-badge,.customer-vip-tip{font-size:8px;padding:3px 5px;margin-left:5px}.store-scene .customer-info{padding:5px 8px!important;min-height:44px!important}}
+@media(max-width:490px){.customer-vip-tip{display:none!important}.store-scene .customer-info .patience-wrap{gap:4px}.store-scene .customer-info .patience-track{width:42px}}

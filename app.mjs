@@ -143,6 +143,7 @@ function renderScene(){
  $('customerBadge').textContent=person.name.charAt(0);$('customerBadge').style.background=person.shirt+'44';
  $('customerArt').classList.toggle('happy',phase==='success');$('customerArt').classList.toggle('disappointed',phase==='lost');
  $('customerInfo').classList.toggle('vip',customer.kind==='vip');
+ $('customerVipBadge').hidden=customer.kind!=='vip';$('customerVipTip').hidden=customer.kind!=='vip';
 
  $('speech').textContent=customer.kind==='return'?(customer.returnReason||customerLine(customer,'returns')):phase==='success'?customerLine(customer,lastTip>0?'thanks':'thanksNoTip'):phase==='lost'?'Saya kena pergi dulu. Lain kali ya.':phase==='change'?customerLine(customer,'change'):phase==='offer'?customerLine(customer,customer.method):customer.hasCoupon?'Saya ada kupon 10%. Tolong gunakan diskaun saya ya.':customerLine(customer,'welcome');requestAnimationFrame(positionCustomerDialogue);
 }
