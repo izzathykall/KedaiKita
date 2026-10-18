@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-18-v23-clock-only",
+  "version": "2026-10-19-v24-revert-text-layout",
   "label": "Laporan penutupan syif profesional",
-  "notes": "Jam sahaja tanpa perkataan sebelah jam"
+  "notes": "Kekalkan jam sahaja; pulihkan CSS sebelum perubahan teks terpotong dan kabur v22"
 }
