@@ -1,1 +1,5 @@
-{"version": "2026-10-18-rush-v6", "label": "Rush Hour tanpa refund + Golden Festival berkilau", "notes": "Developer sandbox reset without verification; compact Rush Hour bar; safer glow layers and receipt sparkle."}
+{
+  "version": "2026-10-18-rush-v7",
+  "label": "VIP badge dan bar pelanggan lebih kecil",
+  "notes": "Developer sandbox reset without verification; compact Rush Hour bar; safer glow layers and receipt sparkle."
+}
