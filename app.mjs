@@ -404,8 +404,9 @@ function showDeveloperPanel(){
    }
    scanToken++;clearTimeout(resultTimer);stopScannerSound();stopScaleSound();stopDrawerSound();stopChaChing();
    explicitPause=true;hydrateGame(fresh);render();save();
-   toast(hydrated?'Data ujian berjaya direset. Boleh mulakan Hari 1.':'Data ujian direset pada peranti ini.');
-   showDeveloperPanel();
+   // hydrateGame() has already opened the fresh Day 1 intro. Do not reopen the
+   // developer panel here: it can leave the newly reset game paused behind a modal.
+   toast(hydrated?'Data ujian berjaya direset. Tekan Buka kedai untuk Hari 1.':'Data ujian direset pada peranti ini.');
   }catch(error){
    if($('devResetError'))$('devResetError').textContent='Reset data ujian gagal. '+String(error?.message||'Cuba semula.');
    toast('Reset data ujian gagal.',true);
