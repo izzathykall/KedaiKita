@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-19-v25-layout-account",
+  "version": "2026-10-19-v26-upgrade-save",
   "label": "Laporan penutupan syif profesional",
-  "notes": "Navigation bar + account popups redesign; receipt aligned with bottom stations"
+  "notes": "Buang 2 nota upgrade, simpan pembelian ke Firebase dan kekalkan upgrade semasa restart hari"
 }
