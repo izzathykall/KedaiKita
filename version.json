@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-18-v22-night-label-viewport-legibility",
+  "version": "2026-10-18-v23-clock-only",
   "label": "Laporan penutupan syif profesional",
-  "notes": "Betulkan label malam selepas 19:00, elak teks bawah terpotong dan kabur"
+  "notes": "Jam sahaja tanpa perkataan sebelah jam"
 }
