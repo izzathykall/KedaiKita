@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-18-shift-v18",
-  "label": "Penutupan syif manual",
-  "notes": "Developer sandbox moved to sibling path to satisfy Firebase validation"
+  "version": "2026-10-18-shift-report-v19",
+  "label": "Laporan penutupan syif profesional",
+  "notes": "Professional responsive shift report UI; gameplay calculations unchanged"
 }
