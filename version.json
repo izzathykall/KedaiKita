@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-18-shift-report-v20",
+  "version": "2026-10-18-senja-malam-v21",
   "label": "Laporan penutupan syif profesional",
-  "notes": "Professional responsive shift report UI; gameplay calculations unchanged"
+  "notes": "Senja 18:00–18:59; malam bermula 19:00 ikut jam permainan"
 }

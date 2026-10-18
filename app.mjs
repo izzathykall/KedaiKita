@@ -122,14 +122,16 @@ function gameplayMachineUpgrades(){return effectiveRushMachineUpgrades(progress.
 function syncSceneAtmosphere(){
  const minutes=Number(session?.clockMinutes)||480;
  const golden=minutes>=960&&minutes<1080&&mode==='career'; // 16:00–18:00 game time
- const evening=minutes>=1080&&mode==='career';
+ const dusk=minutes>=1080&&minutes<1140&&mode==='career'; // 18:00–18:59
+ const night=minutes>=1140&&mode==='career'; // 19:00 onwards
  document.body.classList.toggle('store-golden-hour',golden);
- document.body.classList.toggle('store-evening',evening);
+ document.body.classList.toggle('store-evening',dusk);
+ document.body.classList.toggle('store-night',night);
  document.body.classList.toggle('rush-machine-max',rushMachinesActive());
  document.body.classList.toggle('store-rush-active',mode==='career'&&rushHourActive(progress.day,session));
  const rushActive=mode==='career'&&rushHourActive(progress.day,session);
- const label=$('atmosphereLabel');if(label)label.textContent=rushActive?'⚡ GOLDEN RUSH':golden?'✦ GOLDEN HOUR':evening?'✦ SENJA':'';
- if(label)label.hidden=!(rushActive||golden||evening);
+ const label=$('atmosphereLabel');if(label)label.textContent=rushActive?'⚡ GOLDEN RUSH':golden?'✦ GOLDEN HOUR':dusk?'✦ SENJA':night?'☾ MALAM':'';
+ if(label)label.hidden=!(rushActive||golden||dusk||night);
 }
 function resetStations(){$('scaleItem').innerHTML='';$('scaleItem').dataset.uid='';setScaleReading(null);$('scaleState').textContent='SEDIA';$('scaleZone').classList.remove('stable');$('weightProgress').style.width='0';$('scaleCaption').textContent='Hasil segar · '+(machineTimings(gameplayMachineUpgrades()).weighMs/1000)+' saat';$('scaleZone').classList.remove('weighing','highlight');$('scannerZone').classList.remove('scanning','highlight');$('scannerStatus').textContent='Sedia untuk scan'}
 function render(){refreshCalculatorPresets();renderHeader();renderScene();renderProducts();renderReceipt();renderPayment();icons();renderPatience();renderActivity()}
