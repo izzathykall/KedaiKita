@@ -1142,3 +1142,14 @@ body.store-rush-active .payment-sheet>*{position:relative;z-index:1}
 #paymentArea:has(.card-pin-guide) .card-pin-guide strong{font-size:23px;letter-spacing:5px;color:#4a3a27}
 #paymentArea:has(.card-pin-guide) .card-pin-guide .code-error{font-size:11px}
 #paymentArea:has(.card-pin-guide) .payment-scene{width:100%;flex-shrink:0}
+
+/* v15: QR tanpa butang dan panel pembayaran muat satu skrin pada tablet. */
+.payment-overlay{padding:clamp(6px,1.5vh,16px)}
+.payment-sheet{max-height:calc(100dvh - 12px);display:flex;flex-direction:column;overflow:hidden}
+.payment-sheet-header{flex:0 0 auto;padding:clamp(9px,1.5vh,17px) 20px}
+.payment-sheet #paymentArea{min-height:0;overflow:auto;overscroll-behavior:contain;padding:clamp(8px,1.3vh,16px) 20px}
+.payment-overlay[data-method="qr"] .payment-sheet #paymentArea{display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.payment-overlay[data-method="qr"] .qr-scene{height:min(48dvh,390px);min-height:180px;flex:0 1 auto}
+.payment-overlay[data-method="qr"] .qr-instructions{margin:0;padding:9px 12px;font-size:clamp(10px,1.5vh,13px);line-height:1.4;flex:0 0 auto}
+@media(max-height:650px){.payment-overlay[data-method="qr"] .qr-scene{height:38dvh;min-height:155px}.payment-sheet-header h2{font-size:22px}}
+@media(max-width:600px){.payment-overlay{padding:5px}.payment-sheet{max-height:calc(100dvh - 10px)}.payment-sheet-header{padding:9px 12px}.payment-sheet #paymentArea{padding:8px 12px}.payment-overlay[data-method="qr"] .qr-scene{height:43dvh}}

@@ -630,8 +630,8 @@ function cashArtStack(amount){return changeParts(amount).parts.flatMap(p=>Array.
 function renderDigital(){
  if(customer.method==='card'){renderCardTerminal();return}
  const stage=customer.cardStage||'ready',working=stage==='processing';
- $('paymentArea').innerHTML=`<div id="payDevice" class="payment-scene qr-scene stage-${stage}"><div class="customer-phone"><div class="phone-camera"></div><small>DOMPET PELANGGAN</small><b>${customer.person.name}</b><button class="phone-qr" id="qrTarget" aria-label="Imbas kod QR pada telefon" ${working?'disabled':''}>${qrArt()}<i class="qr-scan-line"></i></button><span>${money(amountDue(customer))}</span><small>Tunjukkan kod untuk diimbas</small></div><div class="qr-hand-scanner" id="qrScanner" role="button" tabindex="0" aria-label="Ambil scanner kemudian imbas QR">${icon('scan')}<i></i></div><div class="qr-light-cone"></div></div><button class="primary-btn" id="digitalPay" ${working?'disabled':''}>${working?'Mengesahkan bayaran…':'Ambil scanner '+icon('scan')}</button><p class="payment-hint">Seret scanner ke QR. Atau tekan Ambil scanner kemudian tekan kod pada telefon.</p>`;
- $('digitalPay').onclick=armQrScanner;if(!working)bindQrScanner();
+ $('paymentArea').innerHTML=`<div id="payDevice" class="payment-scene qr-scene stage-${stage}"><div class="customer-phone"><div class="phone-camera"></div><small>DOMPET PELANGGAN</small><b>${customer.person.name}</b><button class="phone-qr" id="qrTarget" aria-label="Imbas kod QR pada telefon" ${working?'disabled':''}>${qrArt()}<i class="qr-scan-line"></i></button><span>${money(amountDue(customer))}</span><small>Tunjukkan kod untuk diimbas</small></div><div class="qr-hand-scanner" id="qrScanner" role="button" tabindex="0" aria-label="Ambil scanner kemudian imbas QR">${icon('scan')}<i></i></div><div class="qr-light-cone"></div></div><p class="payment-hint qr-instructions">${working?'Mengesahkan bayaran…':'Seret scanner ke kod QR pada telefon, atau tekan scanner kemudian tekan kod QR.'}</p>`;
+ if(!working)bindQrScanner();
 }
 const CARD_DECLINE_MESSAGES={
  insufficient:'Baki kad tidak mencukupi. Minta pelanggan menggunakan kad lain atau wang tunai.',
@@ -730,7 +730,7 @@ function returnCash(index,transaction,button){
 function armQrScanner(){
  if(paused||busy||phase!=='offer'||customer.method!=='qr'||customer.cardStage==='processing')return;
  customer.qrArmed=true;$('payDevice').classList.add('qr-armed');
- $('digitalPay').innerHTML='Sekarang tekan kod QR pada telefon '+icon('scan');
+ // Scanner is controlled directly; no separate payment button.
  $('qrTarget').setAttribute('aria-label','Scanner sedia. Tekan untuk imbas QR');
 }
 function scanQrTarget(){
