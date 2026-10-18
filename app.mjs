@@ -361,6 +361,13 @@ function showDeveloperPanel(){
    toast('Tidak dapat menyimpan duit kedai. Cuba semula.',true);
   }finally{controls.forEach(x=>x.disabled=false)}
  }
+ function writeDeveloperSandboxLocal(state){
+  const key=cloud?.getStorageKey?.();
+  if(!key)throw new Error('Ruang simpanan Developer belum sedia.');
+  const payload={...state,_cloudPending:true,_clientStamp:`dev-reset-${Date.now()}`};
+  localStorage.setItem(key,JSON.stringify(payload));
+  return payload;
+ }
  for(const [buttonId,sign] of [['devAddMoney',1],['devSubtractMoney',-1]]){
   $(buttonId).onclick=async()=>{
    if(!assertDeveloper())return;
@@ -374,25 +381,34 @@ function showDeveloperPanel(){
   };
  }
  $('devResetMoney').onclick=async()=>{
-  if(!assertDeveloper()||!window.confirm('Reset DUIT KEDAI Developer kepada RM0.00 sahaja? Inventori, upgrade dan data ujian lain dikekalkan.'))return;
+  if(!assertDeveloper())return;
   await storeDeveloperWallet(0,'Reset duit kedai');
  };
  $('modalContent').querySelectorAll('[data-dev-scenario]').forEach(btn=>btn.onclick=()=>runDeveloperScenario(btn.dataset.devScenario));
  $('devRunDay').onclick=()=>runDeveloperScenario('day',Number($('developerDay').value));
- $('devClearSandbox').onclick=()=>{
+ $('devClearSandbox').onclick=async()=>{
   if(!assertDeveloper())return;
-  openSafeResetFlow({
-   title:'Reset semua data ujian Developer',
-   description:'Hanya sandbox Developer akan bermula semula: duit kedai, hari, inventori dan upgrade ujian. Data kerjaya pemain biasa serta akaun Firebase tidak dipadam.',
-   onCancel:showDeveloperPanel,
-   onExecute:async()=>{
-    const fresh={progress:createProgress(),session:null,sound};
-    // Wait for Firebase first, preserving data if the network call fails.
+  const controls=[$('devAddMoney'),$('devSubtractMoney'),$('devResetMoney'),$('devClearSandbox')];
+  controls.forEach(x=>x.disabled=true);
+  const error=$('devResetError');if(error)error.textContent='';
+  const fresh={progress:createProgress(),session:null,sound};
+  try{
+   let hydrated=false;
+   try{
     await cloud.resetProgress(fresh);
-    scanToken++;clearTimeout(resultTimer);stopScannerSound();stopScaleSound();stopDrawerSound();stopChaChing();
-    explicitPause=true;hydrateGame(fresh);toast('Data ujian berjaya direset. Boleh mulakan Hari 1.');
+    hydrated=true;
+   }catch(remoteError){
+    writeDeveloperSandboxLocal(fresh);
+    if(error)error.textContent='Firebase tidak membenarkan reset automatik. Sandbox Developer direset pada peranti ini dan akan cuba disimpan semula kemudian.';
    }
-  });
+   scanToken++;clearTimeout(resultTimer);stopScannerSound();stopScaleSound();stopDrawerSound();stopChaChing();
+   explicitPause=true;hydrateGame(fresh);render();save();
+   toast(hydrated?'Data ujian berjaya direset. Boleh mulakan Hari 1.':'Data ujian direset pada peranti ini.');
+   showDeveloperPanel();
+  }catch(error){
+   if($('devResetError'))$('devResetError').textContent='Reset data ujian gagal. '+String(error?.message||'Cuba semula.');
+   toast('Reset data ujian gagal.',true);
+  }finally{controls.forEach(x=>{if(x)x.disabled=false})}
  };
 }
 developerAccessChanged(false);
