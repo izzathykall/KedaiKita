@@ -875,7 +875,7 @@ function ensurePaper(){if(mode==='practice'||rushUnlimited()||(mode==='career'&&
 function renderOperations(){
  syncSceneAtmosphere();
  const s=operatingStore(),rush=mode==='career'&&!!session&&rushHourActive(progress.day,session);
- $('storeClock').textContent=clockText(session?.clockMinutes||480)+(rush?' · ⚡ RUSH HOUR':session?.clockMinutes>=1080?' · Waktu senja':session?.clockMinutes>=960?' · Golden Hour':' · Waktu kedai');
+ $('storeClock').textContent=clockText(session?.clockMinutes||480)+(rush?' · ⚡ RUSH HOUR':session?.clockMinutes>=1140?' · Waktu malam':session?.clockMinutes>=1080?' · Waktu senja':session?.clockMinutes>=960?' · Golden Hour':' · Waktu kedai');
  const banner=$('rushHourBanner');if(banner){banner.hidden=!rush;if(rush){$('rushClock').textContent=String(Math.ceil(session.rushSecondsRemaining)).padStart(2,'0')+'s';$('rushMultiplier').textContent='×'+rushHourMultiplier(progress.upgrades).toFixed(1);$('rushBar').style.width=(session.rushSecondsRemaining/RUSH_DURATION_SECONDS*100).toFixed(2)+'%';}}
  $('storeClock').classList.toggle('rush-active',rush);
  const stars=session?.stars??3;$('storeStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);$('storeStars').setAttribute('aria-label',stars+' daripada 3 bintang servis');
