@@ -105,7 +105,7 @@ body[data-theme="dark"] :is(.inventory-money,.supply-cards>div,.supply-confirm-l
 @media(max-height:650px){.scale>.station-label{top:6px}.operations-bar{min-height:25px;padding-bottom:4px}}
 .waiting-customer .patience-wrap,.waiting-customer .mini-avatar{visibility:hidden}.last-tip-summary{margin:8px 0 14px!important;font-size:13px}
 /* Organized stock room and cosmetic previews */
-#modal[data-kind="inventory"]{width:min(1120px,96vw);max-width:1120px}.inventory-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:24px 0 14px}.inventory-toolbar>input{flex:1;min-width:180px;border:1px solid var(--line);border-radius:12px;padding:13px;background:var(--white);color:var(--ink);font:inherit}.inventory-toolbar label{display:flex;gap:6px;align-items:center;font-size:12px}.inventory-list{display:block;max-height:48vh;overflow:auto;padding:3px 8px 12px 2px}.stock-category{margin:0 0 12px;border:1px solid var(--line);border-radius:15px;overflow:hidden}.stock-category summary{display:flex;justify-content:space-between;gap:14px;padding:16px 18px;background:var(--mint);cursor:pointer;font-weight:700}.stock-category summary:before{content:'+'}.stock-category[open] summary:before{content:'−'}.stock-category summary>span{flex:1}.stock-category summary small{font-weight:400}.stock-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:14px}.stock-card{min-width:0;display:grid;grid-template-columns:54px 1fr;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:12px}.stock-card>svg{width:54px;height:66px}.stock-card b{display:block;font-size:12px;margin:5px 0}.stock-card span{display:block;font-weight:700;font-size:13px}.stock-card small{font-size:9px;font-weight:400;line-height:1.6;display:block}.stock-card meter{width:100%;height:9px;grid-column:1/-1;accent-color:var(--green)}.stock-card button{grid-column:1/-1;font-size:10px;min-height:35px}.stock-card.low-stock{border-color:#d69b54}.stock-card[hidden],.stock-category[hidden]{display:none}.inventory-panel #restockAll{position:sticky;top:0;z-index:2}.style-preview{background:var(--preview);border-radius:18px;padding:22px;text-align:center;color:#294c40;border:5px solid #fff8;margin:18px 0}.style-preview>span{font-size:11px;letter-spacing:3px}.style-preview strong,.style-preview small{display:block;margin:10px}.preview-shelves{display:flex;justify-content:center;border-bottom:8px solid #fff8;margin:12px auto;width:80%}.preview-shelves svg{width:20%;height:70px}.theme-option small{display:block;font-size:10px;margin-top:6px}.star-recovery{text-align:center}.star-recovery .empty-stars{font-size:55px;color:#c5944e;letter-spacing:8px;margin:25px}.star-recovery button{width:100%;margin:8px 0}.star-recovery>small{display:block;line-height:1.8;color:var(--muted);margin-top:15px}
+#modal[data-kind="inventory"]{width:min(1120px,96vw);max-width:1120px}.inventory-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:24px 0 14px}.inventory-toolbar>input{flex:1;min-width:180px;border:1px solid var(--line);border-radius:12px;padding:13px;background:var(--white);color:var(--ink);font:inherit}.inventory-toolbar label{display:flex;gap:6px;align-items:center;font-size:12px}.inventory-list{display:block;max-height:48vh;overflow:auto;padding:3px 8px 12px 2px}.stock-category{margin:0 0 12px;border:1px solid var(--line);border-radius:15px;overflow:hidden}.stock-category summary{display:flex;justify-content:space-between;gap:14px;padding:16px 18px;background:var(--mint);cursor:pointer;font-weight:700}.stock-category summary:before{content:'+'}.stock-category[open] summary:before{content:'−'}.stock-category summary>span{flex:1}.stock-category summary small{font-weight:400}.stock-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:14px}.stock-card{min-width:0;display:grid;grid-template-columns:54px 1fr;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:12px}.stock-card>svg{width:54px;height:66px}.stock-card b{display:block;font-size:12px;margin:5px 0}.stock-card span{display:block;font-weight:700;font-size:13px}.stock-card small{font-size:9px;font-weight:400;line-height:1.6;display:block}.stock-card meter{width:100%;height:9px;grid-column:1/-1;accent-color:var(--green)}.stock-card button{grid-column:1/-1;font-size:10px;min-height:35px}.stock-card.low-stock{border-color:#d69b54}.stock-card[hidden],.stock-category[hidden]{display:none}.inventory-panel #restockAll{position:sticky;top:0;z-index:2}.style-preview{background:var(--preview);border-radius:18px;padding:22px;text-align:center;color:#294c40;border:5px solid #fff8;margin:18px 0}.style-preview>span{font-size:11px;letter-spacing:3px}.style-preview strong,.style-preview small{display:block;margin:10px}.preview-shelves{display:flex;justify-content:center;border-bottom:8px solid #fff8;margin:12px auto;width:80%}.preview-shelves svg{width:20%;height:70px}.theme-option small{display:block;font-size:10px;margin-top:6px}.star-recovery{text-align:center}.star-recovery .empty-stars{font-size:55px;color:#c5944e;letter-spacing:8px;margin:25px}.star-recovery p,.star-recovery small{text-align:center}.star-recovery .supply-confirm-total{justify-content:center;gap:18px;text-align:center}.star-recovery button{width:100%;margin:8px 0}.star-recovery>small{display:block;line-height:1.8;color:var(--muted);margin-top:15px}
 body[data-theme="lavender"]{--cream:#f2eef7;--ink:#4a3e61;--green:#74608e;--mint:#dcd1ed;--orange:#ba8f69}body[data-theme="rose"]{--cream:#fbf0f2;--ink:#633e4e;--green:#995f76;--mint:#efd0da;--orange:#cc9c63}body[data-theme="honey"]{--cream:#faf5e5;--ink:#5a4a25;--green:#897336;--mint:#f0dda4;--orange:#c88b46}body[data-theme="terracotta"]{--cream:#f5ece5;--ink:#653f33;--green:#966149;--mint:#dfb5a0;--orange:#cc954e}body[data-theme="ocean"]{--cream:#edf7f4;--ink:#244f54;--green:#357d7c;--mint:#a9dcd8;--orange:#d99d63}body:is([data-theme="lavender"],[data-theme="rose"],[data-theme="honey"],[data-theme="terracotta"],[data-theme="ocean"]) .store-scene{background-color:var(--mint);background-image:linear-gradient(90deg,transparent 49.7%,#ffffff55 50%,transparent 50.3%)}body:is([data-theme="lavender"],[data-theme="rose"],[data-theme="honey"],[data-theme="terracotta"],[data-theme="ocean"]) .store-scene:before{background:repeating-linear-gradient(90deg,var(--green) 0 40px,#fff6e3 40px 80px)}body:is([data-theme="lavender"],[data-theme="rose"],[data-theme="honey"],[data-theme="terracotta"],[data-theme="ocean"]) .store-scene:after{background:var(--green)}
 body[data-theme="dark"] .stock-card{background:#253e31;border-color:#52674c}body[data-theme="dark"] .stock-category summary{background:#3c5440}body[data-theme="dark"] .inventory-toolbar>input{background:#20372c;color:#e2edce}body[data-theme="dark"] .theme-option{background:#314a37;color:#dfedce}
 /* Upright, aligned terminal. The card starts above its physical slot. */
@@ -916,11 +916,11 @@ body[data-theme="dark"] .rush-upgrade-hint{background:#3e3528;color:#f5d9b2;bord
 .store-atmosphere .beam-one{left:32%}.store-atmosphere .beam-two{left:70%;width:12%;animation-delay:-4s;opacity:.8}
 .store-atmosphere .dust{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffdfa0;box-shadow:0 0 9px #ffdb8e80;animation:dustFloat 8s linear infinite}
 .store-atmosphere .mote-one{top:72%;left:18%}.store-atmosphere .mote-two{top:36%;left:73%;animation-delay:-3s}.store-atmosphere .mote-three{top:64%;left:49%;animation-delay:-6s}
-
-
-
-
-
+body.store-golden-hour:not([data-theme="dark"]) .store-atmosphere{opacity:1}
+body.store-golden-hour:not([data-theme="dark"]) .store-scene{box-shadow:inset 0 0 55px #ffdb8733,0 10px 35px #b67b3924;background-color:#f0e2be}
+body.store-evening:not([data-theme="dark"]) .store-scene{filter:saturate(.91);box-shadow:inset 0 0 55px #4d537328}
+.atmosphere-label{position:absolute;top:18px;right:13px;padding:4px 8px;border-radius:30px;background:#593e28d9;color:#ffeac8;font-size:8px;font-weight:800;letter-spacing:.09em;z-index:12;pointer-events:none}
+.atmosphere-label[hidden]{display:none!important}
 @keyframes goldenShimmer{from{opacity:.48;filter:blur(10px)}to{opacity:1;filter:blur(5px)}}
 @keyframes dustFloat{0%{transform:translateY(15px) translateX(-5px);opacity:0}25%{opacity:.95}85%{opacity:.75}100%{transform:translateY(-55px) translateX(25px);opacity:0}}
 /* Rush Hour gives effective LEVEL 5 conveyor, scanner and scale (not purchased levels). */
@@ -933,7 +933,7 @@ body.rush-machine-max .scanner .station-label::after,body.rush-machine-max .scal
 .dev-money-reset button,.dev-data-reset button{white-space:nowrap;flex:none;border-color:#d4d9cf;color:#6b7d73;font-size:11px;background:#fff}
 .dev-data-reset{margin:18px 0;background:#fafaf6;border-color:#dfe4d9}
 .dev-reset-error{color:#aa483c;font-size:11px;line-height:1.6;min-height:0}
-@media(max-width:540px){.dev-money-reset,.dev-data-reset{flex-direction:column;align-items:stretch}.dev-money-reset button,.dev-data-reset button{width:100%}}
+@media(max-width:540px){.dev-money-reset,.dev-data-reset{flex-direction:column;align-items:stretch}.dev-money-reset button,.dev-data-reset button{width:100%}.atmosphere-label{font-size:7px;top:8px;right:8px}}
 body.reduced-motion .store-atmosphere *,body.reduced-motion .store-atmosphere{animation:none!important;transition:none!important}
 
 
@@ -1057,7 +1057,7 @@ body.store-rush-active .rush-hour-heading>strong{color:#fff0a6;text-shadow:0 0 1
 body.store-rush-active .rush-timer-track{background:#4d1c2870}
 body.store-rush-active .rush-timer-track i{background:linear-gradient(90deg,#ffe58e,#fffef2);box-shadow:0 0 10px #fff1b6}
 body.store-rush-active .day-pill{box-shadow:0 0 0 1px #f0c56f,0 0 20px #ffbc4d55}
-body.store-rush-active .store-scene 
+body.store-rush-active .store-scene .atmosphere-label{border:1px solid #fff3ae;background:linear-gradient(110deg,#9b421c,#e39a30);color:#fffbed;box-shadow:0 0 17px #ffcc7faa}
 body.store-rush-active .scanner,body.store-rush-active .scale{box-shadow:inset 0 0 0 2px #efcf76,0 0 22px #ffb84a6b,0 0 40px #fbd76436;animation:rushStationGlow 3s ease-in-out infinite}
 body.store-rush-active .conveyor{box-shadow:0 0 0 2px #ffe0a1,0 0 26px #ffd07166,0 4px 14px #bb782a40}
 body.store-rush-active .customer-info{box-shadow:0 -1px 0 rgba(255,251,217,.6),0 0 19px #ffd58955}
@@ -1162,6 +1162,35 @@ body.store-rush-active .payment-sheet>*{position:relative;z-index:1}
 .payment-overlay[data-method=qr] .qr-instructions{margin:0;padding:12px 14px;border-radius:14px;background:#f0eee4;text-align:center;font-weight:650;line-height:1.45}
 .payment-overlay[data-method=qr] .payment-sheet-footer{flex:0 0 auto}
 @media(max-height:640px){.payment-overlay[data-method=qr] .qr-scene{height:clamp(160px,35dvh,240px)}.payment-overlay[data-method=qr] .qr-instructions{padding:7px 10px;font-size:11px}.payment-overlay[data-method=qr] .payment-sheet-footer{padding:7px 12px}}
+
+/* v21 — Evening 18:00–18:59; night begins 19:00 (game clock). */
+body.store-evening:not([data-theme="dark"]) .store-scene{
+ background-color:#d5adad;
+ filter:saturate(.95);
+ box-shadow:inset 0 0 65px rgba(153,80,112,.27),0 10px 35px rgba(78,55,95,.12);
+}
+body.store-evening:not([data-theme="dark"]) .store-atmosphere{opacity:.5}
+body.store-evening:not([data-theme="dark"]) .store-atmosphere .sunbeam{
+ background:linear-gradient(90deg,transparent,rgba(255,135,91,.17),rgba(182,118,187,.12),transparent)
+}
+body.store-night:not([data-theme="dark"]) .store-scene{
+ background-color:#8999b2;
+ filter:saturate(.86);
+ box-shadow:inset 0 0 85px rgba(35,50,101,.32),0 10px 35px rgba(20,31,64,.2);
+}
+body.store-night:not([data-theme="dark"]) .store-atmosphere{opacity:.75}
+body.store-night:not([data-theme="dark"]) .store-atmosphere .sunbeam{
+ background:linear-gradient(90deg,transparent,rgba(255,225,151,.10),rgba(255,238,181,.15),transparent);
+ filter:blur(14px);
+}
+body.store-night:not([data-theme="dark"]) .store-atmosphere .dust{
+ background:#ffe6a6;box-shadow:0 0 12px rgba(255,222,146,.8)
+}
+body.store-night .atmosphere-label{background:#25395ddf;color:#ffebba}
+@media(prefers-reduced-motion:reduce){
+ body.store-evening .store-atmosphere .sunbeam,
+ body.store-night .store-atmosphere .sunbeam{animation:none}
+}
 
 /* v25 — POS dashboard reference layout */
 @media (min-width: 761px){
@@ -1634,43 +1663,5 @@ body[data-theme="dark"] .kf-timer{background:#1d362a;border-color:#456a50}body[d
 #devAuditResult{margin-top:10px;padding:10px;border-radius:9px;background:#eef3ee;color:#254c3d;font-size:11px;line-height:1.6;overflow-wrap:anywhere}
 @media(max-width:420px){.dev-controls-grid{grid-template-columns:1fr 1fr}.dev-controls-grid button{font-size:11px;padding:8px!important}.dev-stock-row{flex-wrap:wrap}.dev-stock-row input{flex:1 1 80px}.dev-stock-row button{flex:1 1 120px}}
 
-/* V32 — QR phone centred in the payment scene, physical sizes proportionate. */
-.payment-overlay[data-method="qr"] .qr-balanced{position:relative;overflow:hidden;isolation:isolate}
-.payment-overlay[data-method="qr"] .qr-balanced .customer-phone{
- left:50%!important;top:50%!important;right:auto!important;
- width:auto!important;height:min(238px,calc(100% - 20px))!important;
- aspect-ratio: .65;box-sizing:border-box;transform:translate(-50%,-50%)!important;
- scale:1!important;animation:none!important;translate:none!important;
- padding:clamp(7px,1.5vh,14px) 9px 6px;
- border-width:5px;border-radius:19px;display:flex;flex-direction:column;
- align-items:center;justify-content:center;gap:3px;overflow:hidden;
-}
-.payment-overlay[data-method="qr"] .qr-balanced .phone-camera{left:calc(50% - 12px);top:0}
-.payment-overlay[data-method="qr"] .qr-balanced .customer-phone b{margin:2px 0 4px;font-size:clamp(8px,1.5vh,11px)}
-.payment-overlay[data-method="qr"] .qr-balanced .customer-phone small{font-size:clamp(5px,1vh,8px)}
-.payment-overlay[data-method="qr"] .qr-balanced .customer-phone>span{margin:3px 0;font-size:clamp(11px,2vh,16px)}
-.payment-overlay[data-method="qr"] .qr-balanced .phone-qr{
- flex:0 1 auto;width:min(100%,108px);height:auto;aspect-ratio:1;
- min-height:0;margin:2px auto;overflow:hidden;
-}
-.payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner{
- width:83px;height:68px;right:max(8px,calc(11% - 22px));bottom:18%;
- left:auto;scale:1!important;transform:rotate(-18deg);border-radius:17px 17px 10px 10px;
-}
-.payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner svg{width:52px;height:41px;padding:5px}
-.payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner:after{left:23px;top:59px;width:30px;height:50px}
-.payment-overlay[data-method="qr"] .qr-balanced.stage-processing .qr-hand-scanner{
- left:calc(50% + 6px);right:auto;bottom:20%;transform:rotate(-22deg);
-}
-@media(max-width:600px){
- .payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner{width:72px;height:60px;right:6%;bottom:17%}
- .payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner svg{width:46px;height:35px}
- .payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner:after{left:18px;top:51px;width:28px;height:42px}
- .payment-overlay[data-method="qr"] .qr-balanced.stage-processing .qr-hand-scanner{left:calc(50% + 12px);bottom:16%}
-}
-@media(max-height:660px){
- .payment-overlay[data-method="qr"] .qr-balanced .customer-phone{height:min(198px,calc(100% - 14px))!important}
- .payment-overlay[data-method="qr"] .qr-balanced .phone-qr{width:min(100%,75px)}
-}
-
-/* V33: Quick supply button removed; inventory remains via Urus Kedai. */
+.footer-tip:empty{display:none}
+.receipt-title p:empty{display:none}
