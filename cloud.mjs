@@ -98,6 +98,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   };
   const hide = () => {if(overlay.open)overlay.close();document.body.classList.remove('account-locked')};
   const showRegion = region => {
+    overlay.dataset.region=region;
     ui.authFields.hidden=region!=='auth'; ui.overview.hidden=region!=='overview'; ui.choice.hidden=region!=='choice';
     ui.controls.hidden=region==='loading'; ui.guest.hidden=region==='overview'||region==='choice'||(region==='error'&&!!user);
     ui.close.hidden=region!=='overview'; ui.logout.hidden=region!=='overview'&&region!=='error';
@@ -138,7 +139,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     if(approved)approved.hidden=!developerSandbox;
   };
   const setMode = selected => {
-    mode=selected; ui.login.classList.toggle('active',selected==='login');
+    mode=selected; ui.title.textContent=selected==='register'?'Mulakan cerita kedai anda':'Selamat kembali!'; ui.login.classList.toggle('active',selected==='login');
     ui.register.classList.toggle('active',selected==='register');
     ui.submit.textContent=selected==='register'?'Daftar akaun':'Log masuk';
     ui.password.autocomplete=selected==='register'?'new-password':'current-password';
