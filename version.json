@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-19-v29-rider-studio",
-  "label": "Delivery Rider Studio — Rak & Imbas",
-  "notes": "Rider SVG animasi, cari sendiri barang pada rak, imbas ke beg, pengesahan kod, simpanan pesanan, inventori, rak upgrade dan UI responsif"
+  "version": "2026-10-19-v30-kita-food-counter",
+  "label": "Kita Food — Rider Datang ke Kaunter",
+  "notes": "Kita Food menggantikan platform penghantaran lain; rider muncul dalam aliran pelanggan biasa, popup senarai barang, cari di rak, bungkus, kod pengambilan, rating, resit bonus, simpan progres dan stok."
 }
