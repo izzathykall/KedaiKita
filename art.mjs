@@ -1,3 +1,5 @@
+import {PRODUCTS} from './engine.mjs?v=2026-10-19-v31-firebase-catalog-devlab';
+const CATALOG_LOOKUP=new Map(PRODUCTS.map(p=>[p.id,p]));
 // Original vector illustrations. Shapes animate in CSS; no emoji or remote assets.
 export function productArt(id,extra=''){
  const label=(a,b)=>`<text x="50" y="51" text-anchor="middle" fill="#244c40" font-family="sans-serif" font-weight="800" font-size="10">${a}</text><text x="50" y="62" text-anchor="middle" fill="#577362" font-family="sans-serif" font-size="5">${b}</text>`;
@@ -29,7 +31,7 @@ export function productArt(id,extra=''){
  cucumber:`<g transform="rotate(35 50 50)"><rect x="32" y="12" width="34" height="77" rx="17" fill="#78a47c"/><path d="M42 21v58m9-60v62m8-56v49" stroke="#a9c999" stroke-width="3" stroke-linecap="round"/><path d="M36 30h3m19 10h3M35 61h3m19 8h3" stroke="#517c61" stroke-width="3"/></g>`,
  nasi:`<path d="m14 75 36-60 37 60-38 13Z" fill="#81a177"/><path d="M50 15 49 88 14 75Z" fill="#6c8c69"/><path d="m24 61 45-13M21 69l53-14M33 47l30-11" stroke="#a0b387" opacity=".5"/><path d="M21 65h59v13H21Z" fill="#dbceaa"/><text x="50" y="74" text-anchor="middle" font-size="6" fill="#55705c" font-family="sans-serif">NASI LEMAK</text>`
  };
- return `<svg class="product-art ${extra}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><ellipse class="art-shadow" cx="50" cy="89" rx="30" ry="5" fill="#233f35" opacity=".1"/><g class="art-object">${art[id]||expandedProductArt(id)||localProductArt(id)||packet('#bdc9a0','KITA','PILIHAN KELUARGA')}</g></svg>`;
+ return `<svg class="product-art ${extra}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><ellipse class="art-shadow" cx="50" cy="89" rx="30" ry="5" fill="#233f35" opacity=".1"/><g class="art-object">${art[id]||expandedProductArt(id)||localProductArt(id)||catalogProductArt(id)||packet('#bdc9a0','KITA','PILIHAN KELUARGA')}</g></svg>`;
 }
 
 function localProductArt(id){
@@ -135,4 +137,21 @@ function expandedProductArt(id){
  const appliances=['ricecooker','kettle','fan','iron','blender','toaster','dryer','led'];
  if(appliances.includes(id)){const base=localProductArt(id);const details={ricecooker:'<path d="M23 52v18" stroke="#fff" stroke-width="4" opacity=".6"/><circle cx="44" cy="71" r="1.5" fill="#dc8569"/><circle cx="56" cy="71" r="1.5" fill="#86c382"/><path d="M28 47h44" stroke="#7f9c96" stroke-width="1"/>',kettle:'<path d="M48 43h9m-9 8h9m-9 8h9" stroke="#78989c" stroke-width="1.5"/><rect x="64" y="73" width="6" height="4" rx="2" fill="#d4936f"/>',fan:'<g stroke="#567d7c" opacity=".6" fill="none">'+[12,18,25].map(r=>`<circle cx="50" cy="38" r="${r}" stroke-width=".7"/>`).join('')+'<path d="M50 9v58M21 38h58M30 18l40 40M30 58l40-40" stroke-width=".6"/></g>',iron:'<path d="M23 74h55" stroke="#d3e2dc" stroke-width="2"/><path d="M29 69h3m5 0h3m5 0h3" stroke="#546d74" stroke-width="1.5"/>',blender:'<path d="M56 28h8m-8 8h7m-7 8h6M44 54l12 3m-10 2 8-6" stroke="#739697" stroke-width="1.3"/><path d="M37 81h25" stroke="#527c80" stroke-width="3"/>',toaster:'<path d="M24 75h28m-28-5h28m-28-5h28" stroke="#829da3" stroke-width="1"/><circle cx="60" cy="66" r="2" fill="#d9c391"/>',dryer:'<path d="M53 67h7" stroke="#e9d8df" stroke-width="3"/><path d="M85 36v17m3-17v17" stroke="#bfb4cf" stroke-width="1"/>',led:'<path d="M34 33q0-11 12-14" stroke="#fffae0" stroke-width="5" fill="none" stroke-linecap="round"/>'};return `<g>${base}${details[id]}</g>`;}
  return '';
+}
+
+// Every new product gets an individual label and a category-specific package.
+// SVG is generated locally; images never depend on external servers or emoji.
+function catalogProductArt(id){
+ const p=CATALOG_LOOKUP.get(id);if(!p)return '';
+ const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const words=p.name.split(/\s+/);let a='',b='';for(const word of words){if((a+' '+word).trim().length<=14)a=(a+' '+word).trim();else b=(b+' '+word).trim();}
+ if(!b&&a.length>13){b=a.slice(13);a=a.slice(0,13)}
+ a=escape(a.slice(0,18).toUpperCase());b=escape(b.slice(0,20).toUpperCase());
+ const palettes={fresh:['#90b68c','#d7e3af'],beverages:['#66b4c1','#bbd9dc'],pantry:['#d1ab6d','#ede2ba'],personal:['#b8a0cf','#e9d6ee'],hardware:['#869d9d','#d3dfda'],accessories:['#839fc8','#d6e3ee'],clothing:['#bfa98f','#e9dbcb'],baby:['#dfabb8','#f4e1e7'],frozen:['#86c1d6','#d5ecf1'],health:['#8fbcb0','#d9eae5'],electrical:['#9ba8c1','#dce3f0'],bakery:['#d9ac75','#f6e6cc'],garden:['#86ad85','#d7e4c6'],pets:['#c8ad78','#e9debf'],stationery:['#aa9bcf','#e7e2f5'],meals:['#c4a276','#eadac4'],snacks:['#d0b873','#f2e7c1'],household:['#86b0ad','#dcebe6']};
+ const [c,d]=palettes[p.category]||['#a8bd9f','#e7e8d7'];
+ const markings=`<rect x="31" y="38" width="38" height="32" rx="3" fill="#fff8e9"/><text x="50" y="49" fill="#335449" font-size="6.3" font-family="sans-serif" font-weight="800" text-anchor="middle" textLength="${Math.min(32,Math.max(10,a.length*4))}" lengthAdjust="spacingAndGlyphs">${a}</text><text x="50" y="59" fill="#698177" font-size="5.2" font-family="sans-serif" text-anchor="middle" textLength="${Math.min(31,Math.max(6,b.length*3))}" lengthAdjust="spacingAndGlyphs">${b}</text>`;
+ if(p.weighted||p.category==='fresh')return `<path d="M26 47q-5-20 15-27 16-8 29 6 15 11 6 33-4 18-24 21-17 2-25-14Z" fill="${c}"/><path d="M51 27q-1-17 11-21m-9 21q10-17 26-10-8 18-26 10Z" fill="${d}" stroke="#649575" stroke-width="2"/><path d="M33 57q-5-18 9-24" fill="none" stroke="#fff" opacity=".55" stroke-width="5" stroke-linecap="round"/><rect x="20" y="66" width="60" height="14" rx="6" fill="#faf6e4"/><text x="50" y="75" text-anchor="middle" fill="#43604a" font-family="sans-serif" font-size="6.5" font-weight="bold">${a}</text>`;
+ if(['beverages','personal'].includes(p.category))return `<path d="M42 14h16v12l9 12v43q-17 8-34 0V38l9-12Z" fill="${c}"/><rect x="40" y="11" width="20" height="11" rx="3" fill="${d}"/><path d="M35 37h30v35H35Z" fill="${d}"/>${markings}<path d="M38 30v45" stroke="#fff" stroke-width="4" opacity=".4"/>`;
+ if(p.category==='clothing')return `<path d="M14 47 42 29h43v30L57 78H14Z" fill="${c}"/><path d="m14 47 43 4 28-22H42Z" fill="${d}"/><path d="M18 58h39m-39 8h39" stroke="#fff" stroke-width="3" opacity=".45"/><rect x="30" y="44" width="49" height="27" rx="3" fill="#fff8e9"/><text x="54" y="57" text-anchor="middle" font-size="7" fill="#43604a" font-weight="bold">${a}</text><text x="54" y="66" text-anchor="middle" font-size="5" fill="#43604a">${b}</text>`;
+ return `<path d="M22 20h56l-5 15 4 46H23l4-46Z" fill="${c}"/><path d="M22 20h56v7H22zm1 54h54v7H23" fill="${d}"/><rect x="28" y="33" width="44" height="42" rx="3" fill="${d}"/>${markings}<path d="M72 32v43" stroke="#fff" stroke-width="4" opacity=".28"/>`;
 }

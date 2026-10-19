@@ -12,7 +12,7 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   {name:'Faris',skin:'#d09d78',hair:'#292d2f',shirt:'#27785d',scarf:false}
  ];
  const pmap=new Map(products.map(x=>[x.id,x]));
- const foodCategories=new Set(['essentials','snacks','meals','bakery','frozen']);
+ const foodCategories=new Set(['essentials','snacks','meals','bakery','frozen','beverages','pantry','kuih']);
  const statsDefault=()=>({completed:0,cancelled:0,revenue:0,bonus:0,late:0,starsTotal:0});
  let activeId=null,stage='list',search='',filter='all',lastPicked=null,clockHandle=null,lastClock=0,resultPending=null;
  const timeLimit=day=>Math.max(65,135-Math.max(0,day-3)*5);
@@ -169,5 +169,5 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   render(o?.id||null);
  }
  function resumeOrder(id){activeId=null;open(id)}
- return {open,ensure,maybeArrive,personFor,resumeOrder,stopClock};
+ return {open,ensure,maybeArrive,personFor,resumeOrder,stopClock,spawnTestOrder:newOrder};
 }

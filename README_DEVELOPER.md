@@ -1,11 +1,17 @@
-# Panduan Developer Mode — Kedai Kita
+# KedaiKita V31 — Developer Lab
 
-1. Tiada lagi butang pendaftaran atau DEV SETUP dalam game. Akses Developer hanya untuk UID yang dibenarkan. Pastikan `developer-config.js` mengandungi Firebase Authentication UID anda **tanpa simbol komen `//`** dan anda log masuk menggunakan akaun dengan UID itu.
-2. Tekan **DEV TEST** untuk membuka panel. Label **Duit Kedai** adalah nilai yang sama seperti Duit Kedai di bahagian atas game.
-3. Isi amaun RM dan tekan **+ Tambah** / **− Tolak**. Tunggu pengesahan Firebase sebelum meneruskan.
-4. **Reset duit** (bahagian tersendiri) menetapkan duit kepada **RM0.00**, tetapi mengekalkan hari, stok dan upgrade. Pengesahan diperlukan.
-5. **Reset data ujian** (zon berasingan, di bawah panel) memerlukan jawapan soalan darab diikuti persetujuan akhir sebelum mengembalikan sandbox ke Hari 1. Akaun log masuk dan progres biasa tidak dipadam.
-6. Ketika Firebase gagal atau offline, reset tidak menukar data semasa dalam memori. Mesej kesilapan akan muncul supaya pemain boleh cuba semula. Periksa Realtime Database Rules jika gagal disimpan.
-7. Simpanan ujian menggunakan `users/<UID>/games/kedai-kita/developerSandbox`, bukan progres biasa pada `users/<UID>/games/kedai-kita/state`. Akses satu sesi menggunakan `activeSessions/<UID>`.
+Untuk mengaktifkan **DEV TEST**, masukkan Firebase Authentication UID anda (bukan e-mel) ke dalam senarai `window.KEDAI_DEVELOPER_UIDS` pada `developer-config.js`, kemudian log masuk semula.
 
-> UID Developer dalam fail JS hanyalah kawalan UI; ia bukan akses pentadbir Firebase. Jangan jadikan Realtime Database boleh dibaca atau ditulis oleh umum.
+Developer Lab menggunakan `users/<UID>/games/kedai-kita/developerSandbox/state`, berasingan daripada `users/<UID>/games/kedai-kita/state` kerjaya. Progres pengguna biasa tidak dipadam oleh ujian Developer. UID dalam Javascript **bukan** peranan administrator Firebase; ia hanya menyembunyikan/menunjukkan panel. Lindungi pangkalan data dengan Realtime Database Rules yang sesuai.
+
+## Apa yang boleh diuji
+
+- Duit Kedai: tambah, tolak dan reset RM dengan pengesahan tulis ke Firebase sebelum angka UI ditukar.
+- Senario segera: tunai, kad dan PIN, kad ditolak, QR, barcode rosak, VIP, refund sah/palsu, Kita Food biasa dan lewat, Rush Hour mula/tamat, stok rendah, stok habis, resit habis, terminal rosak, semua upgrade.
+- Kawalan inventori: penuhkan stok, masukkan bilangan stok bagi produk individu, buka/kunci kategori, baiki terminal/tambah resit.
+- Kawalan upgrade dan hari: tetapkan semua upgrade maksimum, reset upgrade, lompat ke Hari 1–60.
+- Audit Firebase: tekan **Simpan & semak Firebase** untuk memaksa upload progres dan baca semula rekod simpanan bagi memastikan versi akaun di Firebase sepadan dengan versi tempatan.
+
+**Reset data ujian** kini tidak akan mengubah memori/peranti apabila write ke Firebase gagal. Ini mengelakkan keadaan game reset tetapi data pelayan masih kekal. Mesej ralat menerangkan jika sambungan / Rules menghalang reset.
+
+Rujuk `README_FIREBASE_V31.md` untuk pemasangan, contoh rules dan struktur simpanan. Pastikan UID Developer anda benar-benar di dalam `developer-config.js`, bukan hanya di dalam komen.

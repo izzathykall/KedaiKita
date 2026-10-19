@@ -54,7 +54,7 @@ const diagnostic = (stage,err) => {try {console.error('[KedaiKita Cloud]', stage
 
 const readLocal = key => {try {return JSON.parse(localStorage.getItem(key)||'null')} catch {return null}};
 const writeLocal = (key, state) => {try {localStorage.setItem(key, JSON.stringify(state));return true} catch {return false}};
-const isMeaningful = data => !!(data && (data?.progress?.day > 1 || data?.progress?.served > 0 || data?.progress?.wallet > 0 || data?.session));
+const isMeaningful = data => !!(data && (data?.progress?.day > 1 || data?.progress?.served > 0 || data?.progress?.wallet > 0 || data?.session || data?.practiceRun?.session));
 
 export function createCloudSync({capture, hydrate, pauseForAccount, report, onDeveloperChanged=()=>{}}) {
   const overlay = byId('accountOverlay');
@@ -152,8 +152,12 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   const snapshotRef = uid => api.ref(db,`users/${uid}/games/kedai-kita`);
   // Developer wallet and testing progress use a distinct Firebase branch under
   // the same account-owned game path, never the regular career `state`.
-  const developerSnapshotRef = uid => api.ref(db,`users/${uid}/games/developerSandbox`);
-  const currentSnapshotRef = uid => developerSandbox?developerSnapshotRef(uid):snapshotRef(uid);
+  const developerSnapshotRef = uid => api.ref(db,`users/${uid}/games/kedai-kita/developerSandbox`);
+  const legacyDeveloperSnapshotRef = uid => api.ref(db,`users/${uid}/games/developerSandbox`);
+  const currentSnapshotRef = uid => snapshotRef(uid);
+  const cloudPayload = (value, token) => developerSandbox
+    ? {developerSandbox:{version:1,state:value,sessionToken:token,updatedAt:api.serverTimestamp()},sessionToken:token,updatedAt:api.serverTimestamp()}
+    : {version:1,state:value,sessionToken:token,updatedAt:api.serverTimestamp()};
   async function sessionReplaced(uid){
     if(kickingOut||!user||user.uid!==uid)return;
     kickingOut=true;kickedForOtherDevice=true;ready=false;queued=null;syncError=null;
@@ -208,6 +212,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     queued=clone(state);delete queued._cloudPending;
     setStatus('Menyimpan progres…');if(!timer)timer=setTimeout(flush,3000);
   };
+  window.addEventListener('online',()=>{if(queued&&!writing&&ready&&user&&activeSessionToken){syncError=null;flush().catch(()=>{})}});
   async function flush() {
     if(timer){clearTimeout(timer);timer=null}
     if(writing){if(writesPending)await writesPending;return queued?flush():true;}
@@ -215,7 +220,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     const uid=user.uid, value=queued;queued=null;writing=true;
     try {
       if(!activeSessionToken){throw new Error('Sesi akaun tidak aktif')}
-      writesPending=api.set(currentSnapshotRef(uid),{version:1,state:value,sessionToken:activeSessionToken,updatedAt:api.serverTimestamp()});
+      writesPending=api.update(currentSnapshotRef(uid),cloudPayload(value,activeSessionToken));
       await writesPending;
       if(user?.uid===uid){
         const key=developerSandbox?DEV_KEY(uid):ACCOUNT_KEY(uid);
@@ -249,7 +254,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
       const pendingBefore=queued;queued=null;
       try{
         const uid=user.uid, token=activeSessionToken;
-        await withTimeout(api.set(currentSnapshotRef(uid),{version:1,state:fresh,sessionToken:token,updatedAt:api.serverTimestamp()}),DATA_TIMEOUT_MS,'reset progres akaun');
+        await withTimeout(api.update(currentSnapshotRef(uid),cloudPayload(fresh,token)),DATA_TIMEOUT_MS,'reset progres akaun');
         if(user?.uid!==uid||activeSessionToken!==token)throw new Error('Sesi akaun telah berubah semasa reset.');
         writeLocal(currentKey,fresh);
         syncError=null;setStatus(developerSandbox?'🧪 Data ujian direset dan disimpan dalam Firebase':'✓ Progres direset dan disimpan');
@@ -292,11 +297,12 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
       const result=await withTimeout(api.get(currentSnapshotRef(next.uid)),DATA_TIMEOUT_MS,'membaca progres');
       if(token!==epoch||user?.uid!==next.uid)return;
       if(developerSandbox){
-        const remote=result.exists()?result.val()?.state:null;
+        let remote=result.exists()?result.val()?.developerSandbox?.state:null;
+        if(!remote){try{const oldDev=await withTimeout(api.get(legacyDeveloperSnapshotRef(next.uid)),DATA_TIMEOUT_MS,'migrasi sandbox lama');remote=oldDev.val()?.state||null}catch(err){diagnostic('sandbox lama tidak dapat dibaca',err)}}
         const local=readLocal(DEV_KEY(next.uid));
         const state=local?._cloudPending&&local?.progress?local:remote?.progress?remote:local?.progress?local:null;
         await finishAccount(state);
-        if(!remote?.progress||(local?._cloudPending&&local?.progress))queueSave(capture());
+        if(!result.val()?.developerSandbox?.state||(local?._cloudPending&&local?.progress))queueSave(capture());
         else setStatus('🧪 Sandbox Developer disimpan dalam Firebase');
         return;
       }
@@ -475,5 +481,17 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
       if(!bootStalled)showStartupError('memulakan sistem akaun',err);
     }
   }
-  return {start, queueSave, flush, resetProgress, openAccount, getStorageKey:()=>currentKey, getUser:()=>user, isDeveloper:()=>developerSandbox, isSavedRemotely:()=>!!user&&ready&&!queued&&!writing&&!syncError&&!!activeSessionToken};
+
+  async function verifyFirebase(){
+    if(!user||!ready||!activeSessionToken)throw new Error('Log masuk akaun Firebase dahulu.');
+    if(queued||writing)await withTimeout(flush(),DATA_TIMEOUT_MS,'menyegerakkan data ujian');
+    if(queued||writing||syncError)throw new Error('Masih ada data belum berjaya disimpan dalam Firebase.');
+    const result=await withTimeout(api.get(snapshotRef(user.uid)),DATA_TIMEOUT_MS,'mengesahkan simpanan Firebase');
+    const saved=developerSandbox?result.val()?.developerSandbox?.state:result.val()?.state;
+    if(!saved?.progress)throw new Error('Firebase tidak memulangkan data progres.');
+    const local=readLocal(currentKey);
+    if(local?._clientStamp&&saved._clientStamp!==local._clientStamp)throw new Error('Versi Firebase belum sama dengan versi semasa.');
+    return {day:saved.progress.day,wallet:saved.progress.wallet,items:Object.keys(saved.progress.inventory||{}).length,categories:saved.progress.unlocked?.length||0,upgrades:Object.keys(saved.progress.upgrades||{}).length,delivery:saved.progress.delivery?.orders?.length||0,developer:developerSandbox};
+  }
+  return {start, queueSave, flush, resetProgress, verifyFirebase, openAccount, getStorageKey:()=>currentKey, getUser:()=>user, isDeveloper:()=>developerSandbox, isSavedRemotely:()=>!!user&&ready&&!queued&&!writing&&!syncError&&!!activeSessionToken};
 }

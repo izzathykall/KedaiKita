@@ -1,7 +1,7 @@
-import {createDelivery} from './delivery.mjs?v=2026-10-19-kita-food-v30';
-import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-18-golden-rush-refundoff-v5';
-import {productArt,moneyArt} from './art.mjs';
-import {createCloudSync} from './cloud.mjs?v=2026-10-18-golden-rush-refundoff-v5';
+import {createDelivery} from './delivery.mjs?v=2026-10-19-v31-firebase-catalog-devlab';
+import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-19-v31-firebase-catalog-devlab';
+import {productArt,moneyArt} from './art.mjs?v=2026-10-19-v31-firebase-catalog-devlab';
+import {createCloudSync} from './cloud.mjs?v=2026-10-19-v31-firebase-catalog-devlab';
 
 const $=id=>document.getElementById(id);
 const ICONS={basket:'M3 9h18l-2 11H5L3 9ZM8 9l4-7 4 7M8 13v3m4-3v3m4-3v3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5',shop:'M3 10V5h18v5M4 10v11h16V10M2 10a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0M9 21v-7h6v7',volume:'M11 4 6 8H2v8h4l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14',mute:'M11 4 6 8H2v8h4l5 4V4Zm5 5 6 6m0-6-6 6',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',pause:'M8 4v16m8-16v16',scan:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M6 12h12M7 9v6m3-6v6m4-6v6m3-6v6',scale:'M6 7h12l3 14H3L6 7Zm3 0V5a3 3 0 0 1 6 0v2m-3 4v5m-2-2h4',arrow:'M4 12h16m-6-6 6 6-6 6',heart:'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',flag:'M5 21V3m0 0c5-3 9 3 14 0v10c-5 3-9-3-14 0',receipt:'M5 3h14v19l-3-2-4 2-4-2-3 2V3Zm3 5h8m-8 4h8m-8 4h5',lock:'M6 10h12v11H6V10Zm3 0V6a3 3 0 0 1 6 0v4',card:'M2 5h20v14H2V5Zm0 5h20M6 15h4',qr:'M3 3h6v6H3V3Zm12 0h6v6h-6V3ZM3 15h6v6H3v-6Zm12 0h3v3h3v3h-6v-6Zm6-3v3M12 3v3m0 6v3M3 12h6m3 6v3',cash:'M2 5h20v14H2V5Zm10 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM5 8h1m12 8h1',check:'M5 12l4 4L19 6',close:'M6 6l12 12M6 18 18 6',play:'m8 4 12 8-12 8V4Z',snow:'M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4m13 9-4 1 1 4M4 14l4 1-1 4m13-9-4-1 1-4',delivery:'M7 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM9 19h7l2-5-2-5h-4l-3 5H5l-2 5h2m5-5h5m-5-5h4M5 7h4m-6 3h6',spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z',undo:'M8 4 3 9l5 5M3 9h10a7 7 0 0 1 0 14',reset:'M4 8a9 9 0 1 1-1 8M4 3v5h5',help:'M9 8a3 3 0 1 1 5 2c-1 1-2 1-2 4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z'};
@@ -17,24 +17,31 @@ let paymentMinimized=false,musicUnlocked=false,musicLevel=0,musicTarget=-1,music
 let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=null,musicSource=null,chaChingBuffer=null,chaChingPromise=null,chaChingSource=null;
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-19-v30-kita-food-counter';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-19-v31-firebase-catalog-devlab';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
-try{const raw=JSON.parse(localStorage.getItem(STORAGE)||'null');if(raw){progress=restoreProgress(JSON.stringify(raw.progress));sound=raw.sound!==false;if((raw.session?.customer?.items?.length||['waiting','supply','delivery'].includes(raw.session?.phase))&&raw.session.day===progress.day&&raw.session.mode==='career'){session=raw.session;customer=session.customer;phase=['scan','offer','change','success','lost','end','waiting','supply','delivery'].includes(session.phase)?session.phase:'scan';combo=session.combo||0;cashPicked=Array.isArray(session.cashPicked)?session.cashPicked:[];lastTip=session.lastTip||0;lastEarned=session.lastEarned||0}}}catch{storageOK=false}
-let cloud=null,delivery=null;
+let cloud=null,delivery=null,careerSessionCache=null,practiceRunCache=null;
+try{const raw=JSON.parse(localStorage.getItem(STORAGE)||'null');if(raw){progress=restoreProgress(JSON.stringify(raw.progress));sound=raw.sound!==false;practiceRunCache=raw.practiceRun?.session?.mode==='practice'?raw.practiceRun:null;careerSessionCache=raw.session||null;if((raw.session?.customer?.items?.length||['waiting','supply','delivery'].includes(raw.session?.phase))&&raw.session.day===progress.day&&raw.session.mode==='career'){session=raw.session;customer=session.customer;phase=['scan','offer','change','success','lost','end','waiting','supply','delivery'].includes(session.phase)?session.phase:'scan';combo=session.combo||0;cashPicked=Array.isArray(session.cashPicked)?session.cashPicked:[];lastTip=session.lastTip||0;lastEarned=session.lastEarned||0}}}catch{storageOK=false}
 const freshOperations=ensureOperations(progress);ensureShift(session);ensureStyle();if(session&&!session.dayStart)session.dayStart=JSON.parse(JSON.stringify(progress));if(freshOperations&&customer&&!customer.paid){const need={};for(const p of customer.items)need[p.id]=(need[p.id]||0)+stockUnits(p);for(const [id,n] of Object.entries(need))progress.inventory[id]=Math.max(progress.inventory[id],n)}
 
 function captureGame(){
- if(session&&mode==='career'){
+ if(session){
   session.customer=customer;session.phase=phase;session.combo=combo;
   session.cashPicked=cashPicked;session.lastTip=lastTip;session.lastEarned=lastEarned;
  }
- return {progress,session:mode==='practice'?null:session,sound};
+ if(mode==='practice'){
+  practiceRunCache=session?{session:JSON.parse(JSON.stringify(session)),store:practiceStore?JSON.parse(JSON.stringify(practiceStore)):null}:null;
+  return {progress,session:careerSessionCache,practiceRun:practiceRunCache,sound};
+ }
+ careerSessionCache=session;
+ return {progress,session,practiceRun:practiceRunCache,sound};
 }
+
 function hydrateGame(data){
  scanToken++;busy=false;advancePending=false;practiceStore=null;paymentMinimized=false;
  mode='career';progress=restoreProgress(JSON.stringify(data?.progress||createProgress()));
+ practiceRunCache=data?.practiceRun?.session?.mode==='practice'?data.practiceRun:null;careerSessionCache=data?.session||null;
  sound=data?.sound!==false;session=null;customer=null;phase='scan';combo=0;
  cashPicked=[];lastTip=0;lastEarned=0;renderedBasket=null;renderedSceneCustomer=undefined;
  const saved=data?.session;
@@ -51,7 +58,6 @@ function hydrateGame(data){
  initIllustrations();render();modalKind=null;showIntro();
 }
 function save(){
- if(mode==='practice')return;
  try{
   const data=captureGame();
   if(cloud)cloud.queueSave(data);
@@ -96,7 +102,7 @@ function showRushEnd(){
  $('rushEventContinue').onclick=()=>{session.rushReportPending=false;session.rushReportShown=true;save();closeModal();if(['success','lost'].includes(phase))advance();else if(['waiting','supply'].includes(phase)&&dayFinished(session,progress.day))showSummary()};
  return true;
 }
-function newSession(selectedMode='career'){mode=selectedMode;if(mode==='practice')practiceStore=null;session={dayStart:JSON.parse(JSON.stringify(progress)),day:progress.day,mode,served:0,lost:0,totalSales:0,tips:0,earned:0,mistakes:0,index:0,bestCombo:0,weighed:0,scans:0,perfectCash:0,claimedMissions:[],seenPeople:[],rushStarted:false,rushCompleted:false,rushSecondsRemaining:0,rushBonus:0,rushSales:0,rushServed:0,rushLost:0,rushRevenue:0,rushEarned:0,rushReportPending:false,rushReportShown:false};ensureShift(session);combo=0;initIllustrations();newCustomer()}
+function newSession(selectedMode='career'){if(selectedMode==='practice'&&mode==='career'){const current=captureGame();careerSessionCache=current.session?JSON.parse(JSON.stringify(current.session)):null;}mode=selectedMode;if(mode==='practice')practiceStore=null;session={dayStart:JSON.parse(JSON.stringify(progress)),day:progress.day,mode,served:0,lost:0,totalSales:0,tips:0,earned:0,mistakes:0,index:0,bestCombo:0,weighed:0,scans:0,perfectCash:0,claimedMissions:[],seenPeople:[],rushStarted:false,rushCompleted:false,rushSecondsRemaining:0,rushBonus:0,rushSales:0,rushServed:0,rushLost:0,rushRevenue:0,rushEarned:0,rushReportPending:false,rushReportShown:false};ensureShift(session);combo=0;initIllustrations();newCustomer()}
 function newCustomer(){
  ensureShift(session);
  // Kita Food is a true counter visitor: it occupies the regular customer scene
@@ -248,9 +254,15 @@ function floatingTip(amount){if(!amount)return;const r=$('walletLabel').getBound
 function confetti(count=45){for(let i=0;i<count;i++){const e=document.createElement('i');e.className='confetti';e.style.left=Math.random()*100+'vw';e.style.background=['#a2bd85','#edaf72','#e1cc91','#709988'][i%4];e.style.setProperty('--drift',(Math.random()-.5)*250+'px');e.style.animationDelay=Math.random()*.5+'s';$('fxLayer').append(e);setTimeout(()=>e.remove(),3000)}}
 function openModal(kind,html){if(modalKind==='stars-empty'&&kind!=='stars-empty')return;$('modal').dataset.kind=kind;document.body.classList.toggle('style-preview',kind==='style-preview');if(kind!=='style-preview'){previewTheme=null;applySettings()}cancelCalculatorDrag();cancelDrag();cancelBankCardDrag();paused=true;document.body.classList.add('paused');modalKind=kind;if(kind==='pause'){explicitPause=true;stopScaleSound()};syncBackgroundMusic();$('modalContent').innerHTML=html;icons($('modalContent'));if(!$('modal').open)$('modal').showModal()}
 function closeModal(){if(modalKind==='delivery')delivery?.stopClock();if(modalKind==='style-preview'){showStyles(previewTheme);return}if(['intro','summary','stars-empty'].includes(modalKind))return;previewTheme=null;applySettings();if(phase==='end'){showSummary();return}$('modal').close();paused=false;explicitPause=false;document.body.classList.remove('paused');modalKind=null;syncBackgroundMusic()}
-function startPlay(selected){explicitPause=false;musicUnlocked=true;paymentMinimized=false;beep('start');prepareChaChing();prepareScaleSound();if(selected==='resume'&&session){mode='career';normalizeSession();if(phase==='end'){showSummary();return}render();setMobileView(['offer','change','success','lost'].includes(phase)?'payment':'counter')}else newSession(selected||'career');$('modal').close();paused=false;document.body.classList.remove('paused');modalKind=null;if(customer?.paymentChanged){toast('Tunai sahaja buat masa ini. Buka kad dan QR melalui Upgrade.');delete customer.paymentChanged;save()}if(!storageOK)toast('Simpanan automatik tidak tersedia dalam pelayar ini.');if(mode==='career'&&session.stars===0)showStarRecovery();else if(['success','lost'].includes(phase))advance();else if(phase==='delivery'&&customer?.kind==='kitafood')delivery.resumeOrder(customer.orderId);save();syncBackgroundMusic()}
-function showIntro(){explicitPause=true;closeCalculator();let selected='career';openModal('intro',`<div class="modal-pad"><div class="intro-layout"><div><div class="modal-kicker"><span class="live-dot"></span> SELAMAT DATANG KE KEDAI KITA</div><h1>Kedai kecil.<br><em>Seronok besar.</em></h1><p>Jadi cashier paling mesra di taman. Scan barang, kira baki dan buat pelanggan tersenyum.</p><div class="intro-features"><span>${icon('scan')} Scan & timbang</span><span>${icon('cash')} Ringgit Malaysia</span><span>${icon('shop')} Naik taraf kedai</span></div></div><div class="intro-art">${avatar(PEOPLE[0])}<div class="intro-counter"><span>${icon('basket')}</span><b>kita.</b></div><div class="intro-sticker">DIBUKA<br>DENGAN<br>SENYUMAN</div></div></div><div class="mode-options"><button class="mode-choice active" id="careerMode"><b>✦ Mod kerjaya</b><small>Cabaran harian, combo & naik taraf</small></button><button class="mode-choice" id="practiceMode"><b>Mod santai</b><small>Latihan tanpa masa dan tanpa tekanan</small></button></div><div class="intro-bottom"><button class="primary-btn" id="startBtn">${session?'Sambung syif · Hari '+progress.day:'Buka kedai · Hari '+progress.day} ${icon('arrow')}</button><small>Tekan atau seret barang.<br>Mesra telefon, tablet & komputer.</small></div>${session?'<p class="muted" style="margin-bottom:0">Kemajuan syif anda sudah disimpan.</p>':''}</div>`);$('careerMode').onclick=()=>{selected='career';$('careerMode').classList.add('active');$('practiceMode').classList.remove('active');$('startBtn').innerHTML=(session?'Sambung syif · Hari ':'Buka kedai · Hari ')+progress.day+' '+icon('arrow')};$('practiceMode').onclick=()=>{selected='practice';$('practiceMode').classList.add('active');$('careerMode').classList.remove('active');$('startBtn').innerHTML='Mula latihan santai '+icon('arrow')};$('startBtn').onclick=()=>startPlay(selected==='career'&&session?'resume':selected)}
-function showPause(){if(modalKind==='intro'||modalKind==='summary')return;openModal('pause',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">REHAT SEKEJAP</div><h2>Kaunter dijeda.</h2></div><button class="icon-btn" id="closeModal" aria-label="Tutup">${icon('close')}</button></div><p>Pelanggan boleh tunggu. Masa berhenti semasa anda berehat.</p><div class="help-grid"><div class="help-card"><span>${icon('scan')}</span><b>1. Scan barang</b><p>Tekan barang untuk scan automatik, atau seret barang berbungkus ke scanner.</p></div><div class="help-card"><span>${icon('scale')}</span><b>2. Timbang hasil segar</b><p>Tekan atau seret buah, sayur dan ikan ke penimbang. Kelajuan timbang mengikut upgrade penimbang.</p></div><div class="help-card"><span>${icon('cash')}</span><b>3. Terima bayaran</b><p>Ambil duit, kemudian pilih wang kertas dan syiling untuk pulangkan baki tepat.</p></div><div class="help-card"><span>${icon('shop')}</span><b>4. Besarkan kedai</b><p>Urus stok, resit dan peralatan. Jualan menambah duit kedai; stok dibeli pada harga borong. Selesaikan misi harian untuk bonus RM5.</p></div></div><p class="muted">Kad dan QR diproses di terminal. Tunai dibundarkan kepada 5 sen terdekat. Mod santai tidak mengubah duit kerjaya.<br>Kategori baharu dibuka melalui Upgrade kedai. Pelanggan bertukar automatik selepas pembayaran.<br>Pintasan: 1–9 untuk scan barang · P atau Esc untuk jeda.</p><div class="pause-actions"><button class="primary-btn" id="resumeBtn">Sambung bermain ${icon('play')}</button><button class="secondary-btn" id="homeBtn">Menu utama</button></div></div>`);$('closeModal').onclick=closeModal;$('resumeBtn').onclick=closeModal;$('homeBtn').onclick=()=>{if(mode==='career')save();else restoreCareer();showIntro()}}
+function startPlay(selected){explicitPause=false;musicUnlocked=true;paymentMinimized=false;beep('start');prepareChaChing();prepareScaleSound();if(selected==='resume'&&session){mode='career';normalizeSession();if(phase==='end'){showSummary();return}render();setMobileView(['offer','change','success','lost'].includes(phase)?'payment':'counter')}else if(selected==='practice'&&practiceRunCache?.session?.mode==='practice'){
+   mode='practice';session=JSON.parse(JSON.stringify(practiceRunCache.session));practiceStore=practiceRunCache.store?JSON.parse(JSON.stringify(practiceRunCache.store)):null;
+   customer=session.customer||null;phase=session.phase||'scan';combo=session.combo||0;cashPicked=Array.isArray(session.cashPicked)?session.cashPicked:[];
+   lastTip=session.lastTip||0;lastEarned=session.lastEarned||0;ensureShift(session);if(practiceStore)ensureOperations(practiceStore);
+   scanToken++;busy=false;renderedBasket=null;renderedSceneCustomer=undefined;initIllustrations();resetStations();render();setMobileView('counter');
+  }
+  else newSession(selected||'career');$('modal').close();paused=false;document.body.classList.remove('paused');modalKind=null;if(customer?.paymentChanged){toast('Tunai sahaja buat masa ini. Buka kad dan QR melalui Upgrade.');delete customer.paymentChanged;save()}if(!storageOK)toast('Simpanan automatik tidak tersedia dalam pelayar ini.');if(mode==='career'&&session.stars===0)showStarRecovery();else if(['success','lost'].includes(phase))advance();else if(phase==='delivery'&&customer?.kind==='kitafood')delivery.resumeOrder(customer.orderId);save();syncBackgroundMusic()}
+function showIntro(){explicitPause=true;closeCalculator();let selected='career';openModal('intro',`<div class="modal-pad"><div class="intro-layout"><div><div class="modal-kicker"><span class="live-dot"></span> SELAMAT DATANG KE KEDAI KITA</div><h1>Kedai kecil.<br><em>Seronok besar.</em></h1><p>Jadi cashier paling mesra di taman. Scan barang, kira baki dan buat pelanggan tersenyum.</p><div class="intro-features"><span>${icon('scan')} Scan & timbang</span><span>${icon('cash')} Ringgit Malaysia</span><span>${icon('shop')} Naik taraf kedai</span></div></div><div class="intro-art">${avatar(PEOPLE[0])}<div class="intro-counter"><span>${icon('basket')}</span><b>kita.</b></div><div class="intro-sticker">DIBUKA<br>DENGAN<br>SENYUMAN</div></div></div><div class="mode-options"><button class="mode-choice active" id="careerMode"><b>✦ Mod kerjaya</b><small>Cabaran harian, combo & naik taraf</small></button><button class="mode-choice" id="practiceMode"><b>Mod santai</b><small>Latihan tanpa masa dan tanpa tekanan</small></button></div><div class="intro-bottom"><button class="primary-btn" id="startBtn">${session?'Sambung syif · Hari '+progress.day:'Buka kedai · Hari '+progress.day} ${icon('arrow')}</button><small>Tekan atau seret barang.<br>Mesra telefon, tablet & komputer.</small></div>${session?'<p class="muted" style="margin-bottom:0">Kemajuan syif anda sudah disimpan.</p>':''}</div>`);$('careerMode').onclick=()=>{selected='career';$('careerMode').classList.add('active');$('practiceMode').classList.remove('active');$('startBtn').innerHTML=(session?'Sambung syif · Hari ':'Buka kedai · Hari ')+progress.day+' '+icon('arrow')};$('practiceMode').onclick=()=>{selected='practice';$('practiceMode').classList.add('active');$('careerMode').classList.remove('active');$('startBtn').innerHTML=(practiceRunCache?'Sambung latihan santai ':'Mula latihan santai ')+icon('arrow')};$('startBtn').onclick=()=>startPlay(selected==='career'&&session?'resume':selected)}
+function showPause(){if(modalKind==='intro'||modalKind==='summary')return;openModal('pause',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">REHAT SEKEJAP</div><h2>Kaunter dijeda.</h2></div><button class="icon-btn" id="closeModal" aria-label="Tutup">${icon('close')}</button></div><p>Pelanggan boleh tunggu. Masa berhenti semasa anda berehat.</p><div class="help-grid"><div class="help-card"><span>${icon('scan')}</span><b>1. Scan barang</b><p>Tekan barang untuk scan automatik, atau seret barang berbungkus ke scanner.</p></div><div class="help-card"><span>${icon('scale')}</span><b>2. Timbang hasil segar</b><p>Tekan atau seret buah, sayur dan ikan ke penimbang. Kelajuan timbang mengikut upgrade penimbang.</p></div><div class="help-card"><span>${icon('cash')}</span><b>3. Terima bayaran</b><p>Ambil duit, kemudian pilih wang kertas dan syiling untuk pulangkan baki tepat.</p></div><div class="help-card"><span>${icon('shop')}</span><b>4. Besarkan kedai</b><p>Urus stok, resit dan peralatan. Jualan menambah duit kedai; stok dibeli pada harga borong. Selesaikan misi harian untuk bonus RM5.</p></div></div><p class="muted">Kad dan QR diproses di terminal. Tunai dibundarkan kepada 5 sen terdekat. Mod santai tidak mengubah duit kerjaya.<br>Kategori baharu dibuka melalui Upgrade kedai. Pelanggan bertukar automatik selepas pembayaran.<br>Pintasan: 1–9 untuk scan barang · P atau Esc untuk jeda.</p><div class="pause-actions"><button class="primary-btn" id="resumeBtn">Sambung bermain ${icon('play')}</button><button class="secondary-btn" id="homeBtn">Menu utama</button></div></div>`);$('closeModal').onclick=closeModal;$('resumeBtn').onclick=closeModal;$('homeBtn').onclick=()=>{if(mode==='career')save();else {save();restoreCareer()}showIntro()}}
 function restoreCareer(){practiceStore=null;scanToken++;busy=false;advancePending=false;mode='career';try{const raw=JSON.parse(localStorage.getItem(cloud?.getStorageKey()||STORAGE)||'null');session=raw?.session||null;if(session){customer=session.customer;phase=session.phase;combo=session.combo||0;cashPicked=session.cashPicked||[];lastTip=session.lastTip||0;lastEarned=session.lastEarned||0}else{customer=null;phase='scan';combo=0}}catch{session=null;customer=null}normalizeSession();initIllustrations();render()}
 function showShop(returnTo='game'){
  if(mode==='practice'){toast('Semua kategori dibuka untuk latihan. Upgrade tersedia dalam kerjaya.');return}
@@ -301,13 +313,14 @@ function prepareDeveloperProfile(day=7){
 }
 function runDeveloperScenario(key,requestedDay=7){
  if(!assertDeveloper())return;
- const day=key==='barcode'?4:key==='rush'?7:key==='decline'?11:key==='pin'?6:key==='refundValid'||key==='refundInvalid'?4:key==='vip'?8:key==='qr'?8:key==='cash'?1:requestedDay;
+ const day=key==='barcode'?4:key==='rush'?7:key==='decline'?11:key==='pin'?6:key==='refundValid'||key==='refundInvalid'?4:key==='vip'?8:key==='qr'?8:key==='cash'?1:key==='kitafood'||key==='kitafoodLate'?7:key==='rushEnd'?9:requestedDay;
  prepareDeveloperProfile(day);
  if(key==='full'){
   for(const u of UPGRADES)progress.upgrades[u.id]=u.max;
   for(const item of PRODUCTS)progress.inventory[item.id]=stockTarget(item,progress);
  }
  newSession('career');
+ if(key==='rushEnd'){session.rushStarted=true;session.rushCompleted=true;session.rushSecondsRemaining=0;session.rushServed=4;session.rushRevenue=9800;session.rushEarned=2300;session.rushBonus=1150;session.rushReportPending=true;session.rushReportShown=false;}
  if(key==='rush'){
   session.index=1;session.clockMinutes=750;session.seenPeople=[];session.rushStarted=true;session.rushCompleted=false;session.rushSecondsRemaining=RUSH_DURATION_SECONDS;session.rushReportPending=false;session.rushReportShown=false;newCustomer();
  }
@@ -326,6 +339,10 @@ function runDeveloperScenario(key,requestedDay=7){
   customer.qrArmed=false;customer.qrScanned=false;
  }
  if(key==='vip')customer.kind='vip';
+ if(key==='noPaper')progress.paper=0;
+ if(key==='terminalBroken'){progress.cardBroken=true;progress.cardHealth=0;}
+ if(key==='lowStock'){for(const p of PRODUCTS)if(progress.unlocked.includes(p.category))progress.inventory[p.id]=p.weighted?1000:1;}
+ if(key==='outOfStock'){for(const p of PRODUCTS)if(progress.unlocked.includes(p.category))progress.inventory[p.id]=0;}
  if(key==='refundValid'||key==='refundInvalid'){
   const item=PRODUCTS.find(x=>x.id==='tissue')||PRODUCTS.find(x=>!!returnPolicy(x));
   const sale={id:'dev-sale',receipt:'KK-00001',day:progress.day-1,productId:item.id,grams:1000,paid:item.price,cost:Math.max(1,Math.floor(item.price*.6)),returned:false};
@@ -340,12 +357,18 @@ function runDeveloperScenario(key,requestedDay=7){
  }
  customer.elapsed=0;customer.paid=false;
  phase='scan';busy=false;advancePending=false;paymentMinimized=false;
+ if(['kitafood','kitafoodLate'].includes(key)){
+  const o=delivery?.spawnTestOrder();
+  if(o){if(key==='kitafoodLate')o.elapsedSeconds=o.timeLimit;customer={kind:'kitafood',person:delivery.personFor(o),orderId:o.id,items:[],elapsed:0,patience:99999};phase='delivery';}
+ }
  scanToken++;renderedBasket=null;renderedSceneCustomer=undefined;
  resetStations();render();save();
  if($('modal').open)$('modal').close();
  paused=false;explicitPause=false;modalKind=null;document.body.classList.remove('paused');
  setMobileView('counter');syncBackgroundMusic();
- const labels={rush:'Rush Hour',barcode:'Barcode tidak dibaca',decline:'Kad ditolak',pin:'PIN kad',cash:'Bayaran tunai',qr:'Bayaran QR',vip:'Pelanggan VIP',refundValid:'Refund sah',refundInvalid:'Refund tidak sah',full:'Semua upgrade'};
+ if(phase==='delivery'&&customer?.kind==='kitafood')delivery.resumeOrder(customer.orderId);
+ else if(key==='rushEnd')showRushEnd();
+ const labels={rush:'Rush Hour',barcode:'Barcode tidak dibaca',decline:'Kad ditolak',pin:'PIN kad',cash:'Bayaran tunai',qr:'Bayaran QR',vip:'Pelanggan VIP',refundValid:'Refund sah',refundInvalid:'Refund tidak sah',full:'Semua upgrade',kitafood:'Kita Food',kitafoodLate:'Kita Food lewat',lowStock:'Stok hampir habis',outOfStock:'Stok kosong',noPaper:'Resit habis',terminalBroken:'Terminal rosak',rushEnd:'Rush Hour tamat'};
  toast('Ujian: '+(labels[key]||'Hari '+day)+' · data sandbox sahaja');
 }
 function showDeveloperPanel(){
@@ -363,7 +386,26 @@ function showDeveloperPanel(){
  <button data-dev-scenario="refundInvalid">⚠ <b>Refund salah</b><small>Resit tidak sepadan</small></button>
  <button data-dev-scenario="vip">★ <b>Pelanggan VIP</b><small>Cabaran tip</small></button>
  <button data-dev-scenario="full">🧰 <b>Semua upgrade</b><small>Inventori & peralatan penuh</small></button>
- </div><h3>Ujian hari permainan</h3><div class="dev-day-input"><label for="developerDay">Hari (1–60)</label><input id="developerDay" type="number" min="1" max="60" value="${progress.day}"><button id="devRunDay" class="primary-btn">Buka hari</button></div><section class="dev-data-reset" aria-label="Reset keseluruhan data ujian"><div><b>Reset semua data ujian</b><small>Padam progres ujian sahaja termasuk hari, inventori, upgrade dan duit kedai. Akaun Firebase kekal.</small></div><button type="button" class="secondary-btn" id="devClearSandbox">Reset data ujian</button></section><p id="devResetError" class="dev-reset-error" role="alert" aria-live="polite"></p><div class="dev-panel-footer"><button class="primary-btn" id="devBack">Kembali ke game</button></div></div>`);
+ <button data-dev-scenario="kitafood">🛵 <b>Kita Food</b><small>Rider tiba di kaunter</small></button>
+ <button data-dev-scenario="kitafoodLate">⏳ <b>Pesanan lewat</b><small>Uji tanpa bonus</small></button>
+ <button data-dev-scenario="lowStock">📦 <b>Stok rendah</b><small>Tinggal 1 unit / 1 kg</small></button>
+ <button data-dev-scenario="outOfStock">🚫 <b>Stok kosong</b><small>Uji inventori habis</small></button>
+ <button data-dev-scenario="noPaper">🧾 <b>Resit habis</b><small>Uji kertas kosong</small></button>
+ <button data-dev-scenario="terminalBroken">🔧 <b>Terminal rosak</b><small>Uji pembaikan kad</small></button>
+ <button data-dev-scenario="rushEnd">🏁 <b>Rush Hour tamat</b><small>Uji laporan khas</small></button>
+ </div>
+ <h3>Kawalan inventori & tahap kedai</h3>
+ <div class="dev-controls-grid">
+  <button class="secondary-btn" id="devUnlockAll">Buka semua 20 kategori</button>
+  <button class="secondary-btn" id="devLockCategories">Kunci kategori tambahan</button>
+  <button class="secondary-btn" id="devMaxUpgrades">Maksimumkan upgrade</button>
+  <button class="secondary-btn" id="devResetUpgrades">Reset semua upgrade</button>
+  <button class="secondary-btn" id="devRefillAll">Penuhkan semua stok</button>
+  <button class="secondary-btn" id="devRepairAll">Baiki terminal & tambah resit</button>
+ </div>
+ <div class="dev-stock-tool"><label for="devStockProduct">Uji stok mengikut produk</label><select id="devStockProduct" aria-label="Pilih produk untuk ubah stok">${CATEGORIES.map(c=>`<optgroup label="${c.name}">${PRODUCTS.filter(p=>p.category===c.id).map(p=>`<option value="${p.id}">${p.name}${p.weighted?' (kg)':''}</option>`).join('')}</optgroup>`).join('')}</select><div class="dev-stock-row"><input id="devStockAmount" type="number" min="0" max="1000" step="1" value="5" inputmode="numeric" aria-label="Jumlah stok (unit atau kg)"><button type="button" class="primary-btn" id="devSetStock">Tetapkan stok</button></div><small>Untuk hasil segar, nilai stok dikira dalam kilogram. Tindakan mengubah sandbox sahaja.</small></div>
+ <h3>Audit Firebase</h3><div class="dev-audit"><p>Semak simpanan sebenar melalui bacaan semula Realtime Database. Data ujian tidak akan bercampur dengan progres kerjaya.</p><button id="devVerifyFirebase" class="primary-btn">Simpan & semak Firebase</button><div id="devAuditResult" role="status" aria-live="polite">Belum diuji pada sesi ini.</div></div>
+ <h3>Ujian hari permainan</h3><div class="dev-day-input"><label for="developerDay">Hari (1–60)</label><input id="developerDay" type="number" min="1" max="60" value="${progress.day}"><button id="devRunDay" class="primary-btn">Buka hari</button></div><section class="dev-data-reset" aria-label="Reset keseluruhan data ujian"><div><b>Reset semua data ujian</b><small>Padam progres ujian sahaja termasuk hari, inventori, upgrade dan duit kedai. Akaun Firebase kekal.</small></div><button type="button" class="secondary-btn" id="devClearSandbox">Reset data ujian</button></section><p id="devResetError" class="dev-reset-error" role="alert" aria-live="polite"></p><div class="dev-panel-footer"><button class="primary-btn" id="devBack">Kembali ke game</button></div></div>`);
  $('closeDeveloperPanel').onclick=closeModal;$('devBack').onclick=closeModal;
  async function storeDeveloperWallet(next,action){
   if(!assertDeveloper())return;
@@ -383,13 +425,6 @@ function showDeveloperPanel(){
    toast('Tidak dapat menyimpan duit kedai. Cuba semula.',true);
   }finally{controls.forEach(x=>x.disabled=false)}
  }
- function writeDeveloperSandboxLocal(state){
-  const key=cloud?.getStorageKey?.();
-  if(!key)throw new Error('Ruang simpanan Developer belum sedia.');
-  const payload={...state,_cloudPending:true,_clientStamp:`dev-reset-${Date.now()}`};
-  localStorage.setItem(key,JSON.stringify(payload));
-  return payload;
- }
  for(const [buttonId,sign] of [['devAddMoney',1],['devSubtractMoney',-1]]){
   $(buttonId).onclick=async()=>{
    if(!assertDeveloper())return;
@@ -408,6 +443,27 @@ function showDeveloperPanel(){
  };
  $('modalContent').querySelectorAll('[data-dev-scenario]').forEach(btn=>btn.onclick=()=>runDeveloperScenario(btn.dataset.devScenario));
  $('devRunDay').onclick=()=>runDeveloperScenario('day',Number($('developerDay').value));
+ function developerEdit(change,description){
+  if(!assertDeveloper())return;
+  change();ensureOperations(progress);render();save();toast(description+' · menyimpan sandbox Firebase');
+ }
+ $('devUnlockAll').onclick=()=>developerEdit(()=>{progress.unlocked=CATEGORIES.map(c=>c.id);for(const p of PRODUCTS)if(!progress.inventory[p.id])progress.inventory[p.id]=stockTarget(p,progress)},'Semua kategori dibuka');
+ $('devLockCategories').onclick=()=>developerEdit(()=>{progress.unlocked=['essentials']},'Kategori tambahan dikunci');
+ $('devMaxUpgrades').onclick=()=>developerEdit(()=>{for(const u of UPGRADES)progress.upgrades[u.id]=u.max;},'Upgrade dimaksimumkan');
+ $('devResetUpgrades').onclick=()=>developerEdit(()=>{for(const u of UPGRADES)progress.upgrades[u.id]=0;},'Upgrade direset');
+ $('devRefillAll').onclick=()=>developerEdit(()=>{for(const p of PRODUCTS)progress.inventory[p.id]=stockTarget(p,progress)},'Semua stok penuh');
+ $('devRepairAll').onclick=()=>developerEdit(()=>{progress.paper=120;progress.cardHealth=100;progress.cardBroken=false;},'Bekalan dan terminal dipulihkan');
+ $('devSetStock').onclick=()=>{
+  const id=$('devStockProduct').value,p=PRODUCTS.find(p=>p.id===id),raw=$('devStockAmount').value;
+  if(!p||!/^\d{1,4}$/.test(raw)||Number(raw)>1000){toast('Masukkan kuantiti sah antara 0–1000.',true);return;}
+  developerEdit(()=>{progress.inventory[p.id]=Number(raw)*(p.weighted?1000:1)},p.name+' · '+raw+(p.weighted?' kg':' unit'));
+ };
+ $('devVerifyFirebase').onclick=async()=>{
+  const button=$('devVerifyFirebase'),out=$('devAuditResult');button.disabled=true;out.textContent='Menyimpan kemudian membaca data dari Firebase…';
+  try{save();await cloud.flush();const result=await cloud.verifyFirebase();out.textContent=`✓ Disahkan Firebase · Hari ${result.day} · Duit ${money(result.wallet)} · ${result.items} rekod inventori · ${result.categories} kategori dibuka · ${result.upgrades} jenis upgrade · ${result.delivery} pesanan Kita Food · ${result.developer?'Sandbox ujian':'Kerjaya'}`;toast('Bacaan semula Firebase berjaya.');}
+  catch(err){out.textContent='⚠ Pengesahan gagal: '+String(err?.message||'Tidak dapat mencapai Firebase.');toast('Simpanan Firebase belum dapat disahkan.',true)}
+  finally{button.disabled=false;}
+ };
  $('devClearSandbox').onclick=async()=>{
   if(!assertDeveloper())return;
   const controls=[$('devAddMoney'),$('devSubtractMoney'),$('devResetMoney'),$('devClearSandbox')];
@@ -415,19 +471,12 @@ function showDeveloperPanel(){
   const error=$('devResetError');if(error)error.textContent='';
   const fresh={progress:createProgress(),session:null,sound};
   try{
-   let hydrated=false;
-   try{
-    await cloud.resetProgress(fresh);
-    hydrated=true;
-   }catch(remoteError){
-    writeDeveloperSandboxLocal(fresh);
-    if(error)error.textContent='Firebase tidak membenarkan reset automatik. Sandbox Developer direset pada peranti ini dan akan cuba disimpan semula kemudian.';
-   }
+   await cloud.resetProgress(fresh);
    scanToken++;clearTimeout(resultTimer);stopScannerSound();stopScaleSound();stopDrawerSound();stopChaChing();
    explicitPause=true;hydrateGame(fresh);render();save();
    // hydrateGame() has already opened the fresh Day 1 intro. Do not reopen the
    // developer panel here: it can leave the newly reset game paused behind a modal.
-   toast(hydrated?'Data ujian berjaya direset. Tekan Buka kedai untuk Hari 1.':'Data ujian direset pada peranti ini.');
+   toast('Data ujian disahkan reset dalam Firebase. Buka kedai untuk Hari 1.');
   }catch(error){
    if($('devResetError'))$('devResetError').textContent='Reset data ujian gagal. '+String(error?.message||'Cuba semula.');
    toast('Reset data ujian gagal.',true);
@@ -457,7 +506,7 @@ $('soundBtn').onclick=()=>{sound=!sound;if(!sound){stopScannerSound();stopChaChi
 $('scannerZone').onclick=()=>{if(paused)return;toast('Tekan barang berbungkus atau seret ke scanner.')};$('scaleZone').onclick=()=>{if(paused)return;toast('Tekan hasil segar atau seret ke penimbang.')};
 $('modal').addEventListener('cancel',e=>{e.preventDefault();if(!['intro','summary','rush-start','rush-end'].includes(modalKind))closeModal()});
 document.addEventListener('keydown',e=>{if(handleCalculatorKey(e)||handlePaymentOverlayKey(e))return;if(e.key==='Escape'||e.key.toLowerCase()==='p'){if($('modal').open){if(!['intro','summary','rush-start','rush-end'].includes(modalKind))closeModal()}else showPause();return}if(!paused&&phase==='offer'&&customer?.cardStage==='pin'&&(/^\d$/.test(e.key)||['Backspace','Enter'].includes(e.key))){e.preventDefault();pressPin(e.key==='Backspace'?'⌫':e.key==='Enter'?'OK':e.key);return}if(!paused&&/^[1-9]$/.test(e.key)&&customer){const p=customer.items.filter(p=>!p.scanned)[+e.key-1];if(p)processItem(p.uid)}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){save();if(!paused)showPause()}syncBackgroundMusic()});window.addEventListener('pagehide',()=>{save();musicUnlocked=false;musicFade=null;musicTarget=0;writeMusicLevel(0);$('backgroundMusic').pause();stopScannerSound();stopChaChing();stopScaleSound();stopDrawerSound()});window.addEventListener('pageshow',()=>{if(session&&modalKind!=='intro'){musicUnlocked=true;syncBackgroundMusic()}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){save();cloud?.flush?.().catch(()=>{});if(!paused)showPause()}syncBackgroundMusic()});window.addEventListener('pagehide',()=>{save();cloud?.flush?.().catch(()=>{});musicUnlocked=false;musicFade=null;musicTarget=0;writeMusicLevel(0);$('backgroundMusic').pause();stopScannerSound();stopChaChing();stopScaleSound();stopDrawerSound()});window.addEventListener('pageshow',()=>{if(session&&modalKind!=='intro'){musicUnlocked=true;syncBackgroundMusic()}});
 let lastTick=performance.now(),sinceSave=0;function loop(now){const dt=Math.min((now-lastTick)/1000,.1);lastTick=now;if(!paused&&!document.hidden&&session&&phase!=='end'){
  if(mode!=='practice'){session.clockMinutes=Math.min(1320,(session.clockMinutes||480)+dt*.35);renderOperations();sinceSave+=dt;if(sinceSave>5){save();sinceSave=0}}
  if(mode==='career'&&tickRushHour(session,dt)){
