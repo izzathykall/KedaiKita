@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#173f37"><meta name="description" content="Jaga kaunter pasar mini anda. Scan barang, timbang hasil segar, kira baki dan bina Kedai Kita!">
 <title>Kedai Kita — Cashier Simulator</title>
-<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-20-v33-kitafood-daily-count-keyfix">
+<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-20-v34-file8-clean-catalog-art">
 </head>
 <body>
 <div class="app" id="gameApp">
@@ -46,16 +46,16 @@
         <div class="conveyor"><div class="belt-lines"></div><div id="products" class="products"></div><span class="belt-arrow" data-icon="arrow"></span></div>
       </div>
       <div class="stations">
-        <button class="station scanner" id="scannerZone" aria-label="Scanner barcode, seret barang berbungkus ke sini"><span class="station-label"><span data-icon="scan"></span> BARCODE SCANNER <i id="scannerLight"></i></span><div class="scanner-glass"><span class="scan-line"></span><span class="barcode-mark">▥▥▥▥</span></div><small id="scannerStatus">Sedia untuk scan</small><span class="drop-hint">Barang berbungkus</span></button>
-        <button class="station scale" id="scaleZone" aria-label="Penimbang, seret barang segar ke sini"><span class="station-label"><span data-icon="scale"></span> PENIMBANG DIGITAL<i></i></span><div class="scale-platform"><span id="scaleItem"></span><div class="scale-rings"></div></div><div class="scale-screen"><span id="weightDisplay">0.000</span><small>kg</small><b id="scaleState">READY</b></div><div class="weight-progress"><i id="weightProgress"></i></div><small class="scale-caption" id="scaleCaption">Hasil segar · timbang 1 saat</small></button>
+        <button class="station scanner" id="scannerZone" aria-label="Scanner barcode, seret barang berbungkus ke sini"><span class="station-label"><span data-icon="scan"></span> BARCODE SCANNER <i id="scannerLight"></i></span><div class="scanner-glass"><span class="scan-line"></span><span class="barcode-mark">▥▥▥▥</span></div><small id="scannerStatus">Sedia untuk scan</small></button>
+        <button class="station scale" id="scaleZone" aria-label="Penimbang, seret barang segar ke sini"><span class="station-label"><span data-icon="scale"></span> PENIMBANG DIGITAL<i></i></span><div class="scale-platform"><span id="scaleItem"></span><div class="scale-rings"></div></div><div class="scale-screen"><span id="weightDisplay">0.000</span><small>kg</small><b id="scaleState">READY</b></div><div class="weight-progress"><i id="weightProgress"></i></div><small class="scale-caption" id="scaleCaption"></small></button>
         <button class="bag-zone" id="bagZone" aria-label="Lihat barang dalam beg"><span class="bag-art"><i>kita.</i></span><b id="bagCount">0 barang</b><small>Tekan untuk semak</small></button>
       </div>
-      <footer class="shift-footer"><div><span data-icon="flag"></span><span><small>MISI HARI INI</small><b id="missionText">Layan 5 pelanggan</b></span></div><div class="mission-progress"><i id="missionProgress"></i></div><b id="servedLabel">0 / 5</b><span class="footer-tip" id="footerTip">Setiap sen, satu senyuman.</span></footer>
+      <footer class="shift-footer"><div><span data-icon="flag"></span><span><small>MISI HARI INI</small><b id="missionText">Layan 5 pelanggan</b></span></div><div class="mission-progress"><i id="missionProgress"></i></div><b id="servedLabel">0 / 5</b></footer>
     </section>
     <aside class="pos-panel" aria-label="Terminal bayaran">
       <div class="pos-top"><div><span class="status-dot"></span> TERMINAL JURUWANG</div><span id="receiptNo">#0001</span></div>
       <div id="paymentAvailability" class="payment-availability" aria-label="Kaedah bayaran kedai"></div>
-      <div class="receipt-title"><div class="step-no">02</div><div><h2>Resit belian</h2><p id="receiptSub">Semua yang baik, di satu kaunter.</p></div><span data-icon="receipt"></span></div>
+      <div class="receipt-title"><div class="step-no">02</div><div><h2>Resit belian</h2><p id="receiptSub"></p></div><span data-icon="receipt"></span></div>
       <div class="receipt-list" id="receiptList"><div class="receipt-empty"><span data-icon="basket"></span><b>Barang belum discan</b><small>Tekan barang di conveyor untuk mula.</small></div></div>
       <div class="receipt-total"><div><span>Subtotal <small id="receiptQuantity">(0 barang)</small></span><b id="subtotal">RM 0.00</b></div><div class="grand-total"><span>Jumlah</span><strong id="total">RM 0<span>.00</span></strong></div></div>
       <div id="paymentHome"><div class="payment-area" id="paymentArea"></div></div><button id="resumePayment" class="secondary-btn resume-payment" hidden>Sambung pembayaran</button>
@@ -122,7 +122,7 @@
 <script type="module">
 // Versioned loader: the currently published version.json controls the actual CSS and app version.
 // Each release only requires updating version.json after publishing the changed files.
-const fallbackBuild = '2026-10-20-v33-kitafood-daily-count-keyfix';
+const fallbackBuild = '2026-10-20-v34-file8-clean-catalog-art';
 let activeBuild = fallbackBuild;
 try {
   const response = await fetch('./version.json?init=' + Date.now(), {cache:'no-store'});
