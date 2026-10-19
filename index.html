@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#173f37"><meta name="description" content="Jaga kaunter pasar mini anda. Scan barang, timbang hasil segar, kira baki dan bina Kedai Kita!">
 <title>Kedai Kita — Cashier Simulator</title>
-<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-19-v32-kitafood-rider-qr-rush">
+<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-20-v33-kitafood-daily-count-keyfix">
 </head>
 <body>
 <div class="app" id="gameApp">
@@ -19,26 +19,24 @@
     <button id="missionBtn"><span data-icon="flag"></span><span>Misi</span><i></i></button>
     <button id="calcBtn"><span data-icon="calculator"></span><span>Kalkulator</span></button>
     <button id="inventoryBtn"><span data-icon="basket"></span><span>Inventori</span></button><button id="catalogueBtn"><span data-icon="book"></span><span>Katalog</span></button>
-    <button id="deliveryBtn" type="button"><span data-icon="delivery"></span><span>Kita Food</span></button><button id="settingsBtn"><span data-icon="settings"></span><span>Tetapan</span></button>
+    <button id="deliveryBtn" type="button"><span data-icon="delivery"></span><span>KitaFood</span></button><button id="settingsBtn"><span data-icon="settings"></span><span>Tetapan</span></button>
     <button id="nightBtn" aria-label="Tukar mod gelap" aria-pressed="false"><span data-icon="moon"></span><span id="nightLabel">Gelap</span></button>
     <button id="developerPanelBtn" class="dev-test-button" type="button" hidden aria-label="Panel ujian developer">🛠️ <span>DEV TEST</span></button>
     <span id="activityStatus" class="activity-status" hidden aria-live="off"></span>
 
   </nav>
-  <div class="operations-bar"><div class="ops-status"><span id="storeClock">08:00</span><span id="storeStars" aria-label="Bintang servis">★ ★ ★</span><div id="rushHourBanner" class="rush-hour-banner" role="status" aria-label="Rush Hour aktif" hidden><div class="rush-hour-heading"><strong>⚡ RUSH HOUR</strong><span>Kesabaran 10s · Mesin MAX · Untung <b id="rushMultiplier">×2.0</b></span><b class="rush-countdown" id="rushClock">60s</b></div><div class="rush-timer-track"><i id="rushBar" style="width:100%"></i></div></div></div><div class="ops-actions"><button id="operationsBtn">Bekalan</button><span id="supplyStatus">Resit 12</span><div id="mobileControlsSlot" class="mobile-controls-slot" aria-label="Kawalan permainan"><button id="mobileControlsToggle" type="button" class="mobile-controls-toggle" aria-controls="gameTools" aria-expanded="false"><span data-icon="settings"></span><b>Kawalan</b><span class="mobile-chevron" aria-hidden="true">▾</span></button></div></div></div>
+  <div class="operations-bar"><div class="ops-status"><span id="storeClock">08:00</span><span id="storeStars" aria-label="Bintang servis">★ ★ ★</span><div id="rushHourBanner" class="rush-hour-banner" role="status" aria-label="Rush Hour aktif" hidden><div class="rush-hour-heading"><strong>⚡ RUSH HOUR</strong><span>Kesabaran 10s · Mesin MAX · Untung <b id="rushMultiplier">×2.0</b></span><b class="rush-countdown" id="rushClock">60s</b></div><div class="rush-timer-track"><i id="rushBar" style="width:100%"></i></div></div></div><div class="ops-actions"><span id="supplyStatus">Resit 12</span><div id="mobileControlsSlot" class="mobile-controls-slot" aria-label="Kawalan permainan"><button id="mobileControlsToggle" type="button" class="mobile-controls-toggle" aria-controls="gameTools" aria-expanded="false"><span data-icon="settings"></span><b>Kawalan</b><span class="mobile-chevron" aria-hidden="true">▾</span></button></div></div></div>
   <div class="mobile-tabs" role="tablist" aria-label="Paparan kaunter"><button id="counterTab" class="mobile-tab active" role="tab" aria-selected="true">Kaunter <span data-icon="scan"></span></button><button id="paymentTab" class="mobile-tab" role="tab" aria-selected="false">Resit & bayaran <b id="mobileCount">0</b></button></div>
   <main class="game-grid">
     <section class="work-area" aria-label="Kaunter juruwang">
       <div class="store-scene">
-        <div class="store-atmosphere" aria-hidden="true"><span class="sunbeam beam-one"></span><span class="sunbeam beam-two"></span><span class="dust mote-one"></span><span class="dust mote-two"></span><span class="dust mote-three"></span></div>
         <div class="rush-crowd" aria-hidden="true"><i class="rush-crowd-person" style="--px:7%;--size:37px;--shirt:#b05e43;--skin:#eec9a6;--shift:0.00s"></i><i class="rush-crowd-person" style="--px:18%;--size:41px;--shirt:#7d9954;--skin:#deb08e;--shift:0.27s"></i><i class="rush-crowd-person" style="--px:30%;--size:33px;--shirt:#b47d73;--skin:#d7ac8a;--shift:0.54s"></i><i class="rush-crowd-person" style="--px:69%;--size:37px;--shirt:#91a887;--skin:#f0d0ac;--shift:0.81s"></i><i class="rush-crowd-person" style="--px:78%;--size:46px;--shirt:#a98b4d;--skin:#dfac87;--shift:1.08s"></i><i class="rush-crowd-person" style="--px:90%;--size:39px;--shirt:#708c79;--skin:#f0bf96;--shift:1.35s"></i></div>
         <div class="rush-scene-fx" aria-hidden="true"><i class="rush-gold-flood"></i><i class="rush-gold-sweep"></i><i class="rush-gold-ray ray-a"></i><i class="rush-gold-ray ray-b"></i><i class="rush-glitter-field"></i></div>
-        <span id="atmosphereLabel" class="atmosphere-label" hidden></span>
         <div id="shelfLeft" class="shelf shelf-left"></div>
         <div class="store-sign"><span>kita</span><small>SEDIKIT DEKAT. BANYAK HEMAT.</small></div>
         <div id="shelfRight" class="shelf shelf-right"></div>
         <div class="window"><span></span></div><div class="store-plant"><i></i><i></i><i></i><b></b></div>
-        <div class="scene-kicker"><span class="live-dot"></span> KAUNTER 01 <b>•</b> <span id="dayMood">Pagi yang ceria</span></div>
+        <div class="scene-kicker"><span class="live-dot"></span> KAUNTER 01</div>
         <div class="speech" id="speech">Hai! Jom buka kedai hari ini.<span></span></div>
         <div class="customer" id="customerArt" aria-hidden="true"></div>
         <div class="customer-info" id="customerInfo"><div class="mini-avatar" id="customerBadge">A</div><div><strong id="customerName">Selamat datang!</strong><span id="customerOccupation" class="customer-occupation" hidden></span><span id="customerVipBadge" class="customer-vip-badge" hidden>👑 Pelanggan VIP</span><span id="customerVipTip" class="customer-vip-tip" hidden>✦ Tip ×1.5 aktif!</span><small id="customerRole">Pelanggan pertama dah sampai</small></div><div class="patience-wrap"><span id="patienceIcon" data-icon="heart"></span><div class="patience-track"><i id="patienceBar"></i></div><small id="patienceText">Sabar</small></div></div>
@@ -106,7 +104,6 @@
     <div id="accountOverview" hidden>
       <div class="account-current"><span>✦</span><div><small>AKAUN AKTIF</small><strong id="accountCurrent"></strong></div></div>
       <p class="account-sync-small" id="accountSyncLabel">Simpanan akaun tersedia</p>
-      <p id="developerAccessEnabled" class="developer-approved-label" hidden>🛠️ Developer Mode aktif · Data ujian disimpan secara berasingan.</p>
     </div>
     <div class="account-actions" id="accountControls">
       <button type="button" id="accountGuest" class="account-secondary">Main sebagai tetamu (offline)</button>
@@ -125,7 +122,7 @@
 <script type="module">
 // Versioned loader: the currently published version.json controls the actual CSS and app version.
 // Each release only requires updating version.json after publishing the changed files.
-const fallbackBuild = '2026-10-19-v32-kitafood-rider-qr-rush';
+const fallbackBuild = '2026-10-20-v33-kitafood-daily-count-keyfix';
 let activeBuild = fallbackBuild;
 try {
   const response = await fetch('./version.json?init=' + Date.now(), {cache:'no-store'});

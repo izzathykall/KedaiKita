@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-19-v32-kitafood-rider-qr-rush",
-  "label": "Kita Food Rider Arrival · Rush Hour 2 Hari · QR & Songkok",
-  "notes": "Rider dipaparkan sebelum senarai Kita Food; songkok menutup rambut; Rush Hour Hari 2,4,6,...; paparan QR seimbang; keterangan panjang dibuang; data pelanggan lama disahkan."
+  "version": "2026-10-20-v33-kitafood-daily-count-keyfix",
+  "label": "KitaFood V33 · Kiraan Rider & Shortcut P",
+  "notes": "P tidak membuka carian KitaFood; rider berjaya dikira sebagai pelanggan harian; butang Bekalan, label Developer dan teks di sebelah Kaunter dibuang; suasana automatik dinyahaktif; branding KitaFood."
 }
