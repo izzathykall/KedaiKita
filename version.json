@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-19-v27-cloud-save-logout-guard",
+  "version": "2026-10-19-v28-delivery-professional",
   "label": "Laporan penutupan syif profesional",
-  "notes": "Fix Firebase upgrade persistence: retry pending writes, show errors, prevent logout before save succeeds"
+  "notes": "Delivery Control Center with rider orders, code, stock, wallet, reports and cloud state"
 }

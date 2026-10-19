@@ -1239,3 +1239,27 @@ body.store-night .atmosphere-label{background:#25395ddf;color:#ffebba}
 @media(max-height:800px){.account-store-art{height:104px;margin-bottom:9px;transform:scale(.88);transform-origin:center bottom}
  .account-panel{padding:20px 25px}.account-logo{margin-bottom:8px}.account-panel h2{margin:8px 0}}
 @media(max-width:520px){.account-store-art{height:115px}.account-panel{border-radius:21px;padding:19px}}
+
+/* v28 Professional Delivery Rider Event */
+.utility-bar #deliveryBtn{color:#236a52;font-weight:800}
+.delivery-ui{width:min(100%,740px)}
+.delivery-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:17px 0}
+.delivery-metrics>div{background:#edf3e9;border:1px solid #dce9da;border-radius:13px;padding:12px;display:grid;gap:5px}
+.delivery-metrics small{font-size:10px;color:#70897b;letter-spacing:.5px}.delivery-metrics b{font-size:clamp(15px,2vw,22px);color:#184e3e}
+.delivery-actions,.delivery-verify{display:flex;gap:10px;align-items:center}.delivery-actions>*{flex:1}
+.delivery-notice{background:#fff2db;border:1px solid #e5d1a5;border-radius:12px;padding:14px}
+.delivery-tabs{display:flex;gap:8px;overflow-x:auto;padding:13px 0}.delivery-tabs button{white-space:nowrap}.delivery-tabs button.selected{background:#dcefe4;border-color:#88bba2}
+.delivery-order{border:1px solid #dfe8dc;border-radius:17px;padding:15px;background:#fffefb}
+.delivery-rider{display:flex;align-items:center;gap:13px;background:#f4f7ef;padding:10px;border-radius:13px;margin-bottom:15px}
+.delivery-rider-info{display:grid;gap:4px;flex:1;min-width:0}.delivery-rider-info small{font-size:11px;color:#6b8074}
+.delivery-avatar{width:60px;height:74px;border-radius:12px;background:linear-gradient(#e7f5f0,#d3e6d8);display:flex;flex-direction:column;align-items:center;overflow:hidden;flex:none}
+.delivery-helmet{font-size:23px}.delivery-face{font-size:20px;color:#b98054}.delivery-shirt{font-size:22px;background:var(--rider-color);border-radius:13px 13px 0 0;width:48px;text-align:center}
+.delivery-time{background:#fff1d8;color:#8a5d26;padding:7px;border-radius:10px;white-space:nowrap}
+.delivery-order h3{margin:12px 0}.delivery-items{display:grid;gap:8px}
+.delivery-item{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:#f8f9f5;border:1px solid #e4e9df;border-radius:10px;padding:12px;color:#244c3d}
+.delivery-item span:nth-child(2){flex:1}.delivery-item.packed{background:#e4f3e7;color:#37775c}
+.delivery-total{display:flex;justify-content:space-between;border-top:1px dashed #c9d6c7;margin:16px 0;padding-top:13px}
+.delivery-verify{margin:8px 0}.delivery-verify input{flex:1;min-width:0;height:46px;padding:10px;border:1px solid #d2dfd1;border-radius:10px;font-size:18px;letter-spacing:4px}
+.delivery-cancel{display:block;margin:16px auto 0;border:0;background:transparent;text-decoration:underline;color:#a75c55}
+.delivery-note{font-size:11px;color:#7c8d80;margin:16px 0 0}
+@media(max-width:760px){.delivery-ui{padding:14px}.delivery-actions{flex-wrap:wrap}.delivery-actions>*{min-width:130px}.delivery-verify{flex-wrap:wrap}.delivery-verify button{width:100%}}
