@@ -1662,3 +1662,42 @@ body[data-theme="dark"] .kf-timer{background:#1d362a;border-color:#456a50}body[d
 .dev-audit button{width:100%;min-height:42px}
 #devAuditResult{margin-top:10px;padding:10px;border-radius:9px;background:#eef3ee;color:#254c3d;font-size:11px;line-height:1.6;overflow-wrap:anywhere}
 @media(max-width:420px){.dev-controls-grid{grid-template-columns:1fr 1fr}.dev-controls-grid button{font-size:11px;padding:8px!important}.dev-stock-row{flex-wrap:wrap}.dev-stock-row input{flex:1 1 80px}.dev-stock-row button{flex:1 1 120px}}
+
+/* V32 — QR phone centred in the payment scene, physical sizes proportionate. */
+.payment-overlay[data-method="qr"] .qr-balanced{position:relative;overflow:hidden;isolation:isolate}
+.payment-overlay[data-method="qr"] .qr-balanced .customer-phone{
+ left:50%!important;top:50%!important;right:auto!important;
+ width:auto!important;height:min(238px,calc(100% - 20px))!important;
+ aspect-ratio: .65;box-sizing:border-box;transform:translate(-50%,-50%)!important;
+ scale:1!important;animation:none!important;translate:none!important;
+ padding:clamp(7px,1.5vh,14px) 9px 6px;
+ border-width:5px;border-radius:19px;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;gap:3px;overflow:hidden;
+}
+.payment-overlay[data-method="qr"] .qr-balanced .phone-camera{left:calc(50% - 12px);top:0}
+.payment-overlay[data-method="qr"] .qr-balanced .customer-phone b{margin:2px 0 4px;font-size:clamp(8px,1.5vh,11px)}
+.payment-overlay[data-method="qr"] .qr-balanced .customer-phone small{font-size:clamp(5px,1vh,8px)}
+.payment-overlay[data-method="qr"] .qr-balanced .customer-phone>span{margin:3px 0;font-size:clamp(11px,2vh,16px)}
+.payment-overlay[data-method="qr"] .qr-balanced .phone-qr{
+ flex:0 1 auto;width:min(100%,108px);height:auto;aspect-ratio:1;
+ min-height:0;margin:2px auto;overflow:hidden;
+}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner{
+ width:83px;height:68px;right:max(8px,calc(11% - 22px));bottom:18%;
+ left:auto;scale:1!important;transform:rotate(-18deg);border-radius:17px 17px 10px 10px;
+}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner svg{width:52px;height:41px;padding:5px}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner:after{left:23px;top:59px;width:30px;height:50px}
+.payment-overlay[data-method="qr"] .qr-balanced.stage-processing .qr-hand-scanner{
+ left:calc(50% + 6px);right:auto;bottom:20%;transform:rotate(-22deg);
+}
+@media(max-width:600px){
+ .payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner{width:72px;height:60px;right:6%;bottom:17%}
+ .payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner svg{width:46px;height:35px}
+ .payment-overlay[data-method="qr"] .qr-balanced .qr-hand-scanner:after{left:18px;top:51px;width:28px;height:42px}
+ .payment-overlay[data-method="qr"] .qr-balanced.stage-processing .qr-hand-scanner{left:calc(50% + 12px);bottom:16%}
+}
+@media(max-height:660px){
+ .payment-overlay[data-method="qr"] .qr-balanced .customer-phone{height:min(198px,calc(100% - 14px))!important}
+ .payment-overlay[data-method="qr"] .qr-balanced .phone-qr{width:min(100%,75px)}
+}
