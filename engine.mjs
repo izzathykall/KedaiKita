@@ -703,7 +703,7 @@ export function netTotal(customer){return Math.max(0,customer.total-(customer.di
 export function amountDue(customer){const total=netTotal(customer);return customer.method==='cash'&&customer.kind!=='return'?Math.round(total/5)*5:total}
 export function tenderFor(total){return [500,1000,2000,5000,10000,20000].find(v=>v>=total)||Math.ceil(total/10000)*10000}
 export function changeParts(cents){const parts=[];for(const value of DENOMS){const count=Math.floor(cents/value);if(count)parts.push({value,count});cents%=value}return {parts,remainder:cents}}
-// One 60-second Rush Hour per career shift, measured in active REAL seconds.
+// One 60-second Rush Hour every two game days (2,4,6...), measured in active REAL seconds.
 // Pause and backgrounding do not consume the countdown; state is persisted in session.
 export const RUSH_DURATION_SECONDS=60;
 export const RUSH_PATIENCE_SECONDS=10;
@@ -721,7 +721,7 @@ export function rushHourProfitBonus(marginCents,upgrades={},active=false){
  return active?Math.round(Math.max(0,marginCents)*(rushHourMultiplier(upgrades)-1)):0;
 }
 export function shouldStartRushHour(session,day){
- return !!session&&Number(day)>=1&&!session.rushStarted&&!session.rushCompleted&&
+ return !!session&&Number(day)>=2&&Number(day)%2===0&&!session.rushStarted&&!session.rushCompleted&&
    (normalCustomerCount(session)>=Math.min(5,Math.max(1,Math.ceil(dayTarget(day)*.55)))||Number(session.clockMinutes)>=900);
 }
 export function startRushHour(session,day){

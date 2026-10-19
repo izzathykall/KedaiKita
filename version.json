@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-19-v31-firebase-catalog-devlab",
-  "label": "224 Produk · 20 Kategori · Developer Lab · Firebase Sync",
-  "notes": "Katalog 224 produk / 20 kategori (minimum 10 barang), 6 kategori baharu, Kita Food dari kaunter, Firebase career dan Developer sandbox disimpan secara berasingan dalam root games/kedai-kita, audit sync dan 17+ senario/kawalan developer."
+  "version": "2026-10-20-v33-kitafood-daily-count-keyfix",
+  "label": "KitaFood V33 · Kiraan Rider & Shortcut P",
+  "notes": "P tidak membuka carian KitaFood; rider berjaya dikira sebagai pelanggan harian; butang Bekalan, label Developer dan teks di sebelah Kaunter dibuang; suasana automatik dinyahaktif; branding KitaFood."
 }
