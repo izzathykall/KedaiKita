@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-20-v35-fullscreen-store",
-  "label": "KedaiKita V35 · Halaman Kedai Penuh",
-  "notes": "Sedia untuk ditimbang; nota Rush Hour inventori dibuang; Inventori Kedai, Katalog Kedai dan Upgrade & Kategori menggunakan dialog skrin penuh."
+  "version": "2026-10-20-v36-category-preview-inventory",
+  "label": "KedaiKita V36 · Popup Barangan & Inventori",
+  "notes": "Popup kategori baharu; label scanner dan penimbang sebaris; gambar barang dalam inventori dibesarkan."
 }
