@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-19-v28-delivery-professional",
-  "label": "Laporan penutupan syif profesional",
-  "notes": "Delivery Control Center with rider orders, code, stock, wallet, reports and cloud state"
+  "version": "2026-10-19-v29-rider-studio",
+  "label": "Delivery Rider Studio — Rak & Imbas",
+  "notes": "Rider SVG animasi, cari sendiri barang pada rak, imbas ke beg, pengesahan kod, simpanan pesanan, inventori, rak upgrade dan UI responsif"
 }

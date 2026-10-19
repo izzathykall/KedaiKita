@@ -1,25 +1,27 @@
-# Kedai Kita — Golden Rush V5 (18 Oktober 2026)
+# KedaiKita — Delivery Rider Studio V29 (19 Oktober 2026)
 
-## Perubahan
-- Pemulangan barang (refund) tidak muncul ketika Rush Hour sedang aktif.
-- Jika pelanggan refund sedang dilayan tepat ketika Rush Hour sepatutnya bermula, acara menunggu sehingga urusan selesai, kemudian memaparkan popup permulaan.
-- Selepas Rush Hour, pelanggan refund berfungsi seperti biasa.
-- Latar kedai lebih meriah dengan efek Golden Rush: sinaran emas bergerak, bintang bercahaya, kilauan kaunter, glow scanner & penimbang dan pelanggan latar hiasan.
-- Animasi tidak menghalang klik/touch; mod kurangkan animasi atau reduced motion dipatuhi.
-- Popup permulaan/tamat Rush Hour, sasaran pelanggan harian, sistem keuntungan, UID Developer dan Firebase kekal.
+## Naik taraf bahagian Rider
+- Watak rider direka semula sebagai **ilustrasi SVG beranimasi** (bukan emoji), dengan motosikal dan seragam mengikut platform penghantaran.
+- Panel Delivery Rider Studio baharu: statistik, barisan pesanan, status penyediaan, masa baki, jumlah bayaran, beg dan serahan.
+- **Barang tidak boleh ditanda siap di senarai pesanan.** Pemain wajib cari barangan sendiri melalui rak kedai digital dan sentuh produk tepat untuk mengimbasnya. Rak boleh ditapis ikut kategori atau dicari mengikut nama.
+- Barang salah tidak dimasukkan ke beg. Barang dalam beg boleh dikeluarkan semula.
+- Hanya pesanan yang lengkap boleh diserahkan kepada rider selepas memasukkan kod 4 digit pada telefon rider.
+- Stok tidak dipotong dua kali: pemotongan inventori, keuntungan, bonus, laporan dan statistik hanya dikira sekali selepas pengesahan.
+- Naik taraf rak (maksimum 3 pesanan serentak) dan progres pesanan kekal dalam `progress.delivery` untuk simpanan akaun.
+- Reka bentuk untuk telefon, iPad dan desktop; mod gelap serta animasi dikurangkan disokong.
+- Kekalkan gameplay asal kaunter, pembayaran, rush hour, upgrade lain dan integrasi akaun/Firebase.
 
-## Kemas kini GitHub Pages
+## Cara bermain
+1. Mulakan **Mod Kerjaya** dan capai **Hari 3** untuk membuka Delivery.
+2. Tekan **Rider** > **Terima pesanan baharu**.
+3. Rujuk senarai pembelian, kemudian **cari & sentuh barang pada rak** untuk imbas ke dalam beg.
+4. Apabila lengkap, baca kod rider pada telefon yang dipaparkan, taip kod dan tekan **Sahkan & serah pesanan**.
+5. Naik taraf rak pesanan di panel Rider sekiranya perlu.
 
-Gantikan tepat empat fail daripada ZIP perubahan:
-1. `app.mjs`
-2. `style.css`
-3. `index.html`
-4. `version.json`
+## Pemasangan GitHub Pages
+Muat naik **semua fail** daripada folder `KedaiKita-main` dalam ZIP ini ke repositori GitHub Pages. Fail penting yang berubah: `delivery.mjs`, `app.mjs`, `style.css`, `index.html`, `version.json`. Jangan gantikan Firebase config peribadi yang telah disesuaikan tanpa semakan. Selepas deploy, refresh game untuk memuatkan versi baharu.
 
-Jangan ubah `developer-config.js` yang sedia ada. Selepas Commit, tunggu GitHub Pages selesai deploy dan refresh halaman.
-
-## Ujian
-- Sintaks JavaScript: lulus.
-- Simulasi logik: ketika Rush Hour refund disekat; di luar Rush Hour refund masih muncul; refund sedia ada selesai dahulu: lulus.
-- Semakan lapisan visual CSS di Chromium saiz 390, 768 dan 1474 px: lulus.
-- Belum diuji terhadap Firebase dan Safari sebenar selepas deploy.
+## Semakan
+- Sintaks semua fail JavaScript berjaya diperiksa dengan Node.js.
+- Aliran pesanan, cari/imbas rak, pengesahan kod salah dan betul, pemotongan stok sekali dan paparan saiz 390/768/1440 diuji dalam Chromium melalui ujian modul.
+- Firebase live dan pelayar Safari iOS belum diuji dalam persekitaran peranti sebenar.
