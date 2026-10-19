@@ -1680,3 +1680,69 @@ body[data-theme="dark"] .kf-timer{background:#1d362a;border-color:#456a50}body[d
 .star-recovery>.empty-stars{width:100%;margin-inline:auto;text-align:center;letter-spacing:.12em;}
 .star-recovery .supply-confirm-total{justify-content:center;text-align:center;gap:16px;}
 .receipt-title p:empty,.scale-caption:empty{display:none!important;}
+
+
+/* V35: Inventori, Katalog Kedai, Upgrade & Kategori sebagai halaman penuh.
+   Dialog sedia ada dikekalkan supaya pengurusan focus, Escape dan backdrop
+   terus berfungsi; hanya tiga halaman ini yang mendapat layout penuh. */
+#modal:is([data-kind="inventory"],[data-kind="catalogue"],[data-kind="shop"]){
+  position:fixed;inset:0;margin:0;width:100vw;max-width:none;min-width:0;
+  height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;
+  border:0;border-radius:0;box-shadow:none;overflow-x:hidden;overflow-y:auto;
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  background:var(--cream);color:var(--ink);
+}
+#modal:is([data-kind="inventory"],[data-kind="catalogue"],[data-kind="shop"])::backdrop{
+  background:#153b3388;backdrop-filter:blur(3px);
+}
+#modal:is([data-kind="inventory"],[data-kind="catalogue"],[data-kind="shop"]) #modalContent{
+  width:100%;max-width:none;min-height:100%;overflow:visible;
+}
+#modal:is([data-kind="inventory"],[data-kind="catalogue"],[data-kind="shop"]) .modal-pad{
+  width:min(1480px,100%);min-height:100vh;min-height:100dvh;max-width:none;
+  margin:0 auto;padding:calc(22px + env(safe-area-inset-top,0px))
+    max(24px,env(safe-area-inset-right,0px))
+    calc(32px + env(safe-area-inset-bottom,0px))
+    max(24px,env(safe-area-inset-left,0px));
+}
+#modal:is([data-kind="inventory"],[data-kind="catalogue"],[data-kind="shop"]) .modal-heading{
+  position:sticky;top:0;z-index:12;display:flex;align-items:center;
+  justify-content:space-between;gap:16px;padding:13px 0 17px;
+  margin: -4px 0 18px;background:var(--cream);border-bottom:1px solid var(--line);
+}
+#modal:is([data-kind="inventory"],[data-kind="catalogue"],[data-kind="shop"]) .modal-heading .icon-btn{
+  flex:none;min-width:42px;min-height:42px;background:var(--white);border:1px solid var(--line);
+}
+#modal[data-kind="inventory"] .inventory-list{max-height:none;overflow:visible;padding-bottom:15px;}
+#modal[data-kind="inventory"] .inventory-panel #restockAll{top:68px;}
+#modal[data-kind="catalogue"] .catalogue-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:14px;max-height:none;overflow:visible;padding:8px 2px 22px;
+}
+#modal[data-kind="catalogue"] .catalogue-filters{gap:8px;margin:14px 0 23px;}
+#modal[data-kind="shop"] .category-shop{
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:16px;
+}
+#modal[data-kind="shop"] .category-card{min-width:0;}
+@media(max-width:700px){
+  #modal:is([data-kind="inventory"],[data-kind="catalogue"],[data-kind="shop"]) .modal-pad{
+    padding:calc(8px + env(safe-area-inset-top,0px))
+      max(12px,env(safe-area-inset-right,0px))
+      calc(22px + env(safe-area-inset-bottom,0px))
+      max(12px,env(safe-area-inset-left,0px));
+  }
+  #modal:is([data-kind="inventory"],[data-kind="catalogue"],[data-kind="shop"]) .modal-heading{
+    padding:11px 2px 14px;margin:0 0 14px;
+  }
+  #modal:is([data-kind="inventory"],[data-kind="catalogue"],[data-kind="shop"]) .modal-heading h2{
+    font-size:clamp(21px,5.5vw,29px);line-height:1.18;
+  }
+  #modal[data-kind="catalogue"] .catalogue-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;
+  }
+  #modal[data-kind="shop"] .category-shop{grid-template-columns:minmax(0,1fr);}
+  #modal[data-kind="inventory"] .inventory-panel #restockAll{top:58px;}
+}
+@media(max-width:380px){
+  #modal[data-kind="catalogue"] .catalogue-grid{gap:7px;}
+}

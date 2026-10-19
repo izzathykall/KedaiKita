@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-20-v34-file8-clean-catalog-art",
-  "label": "KedaiKita V34 · Fail 8 (kemas UI & seni produk)",
-  "notes": "Berdasarkan tepat pada Kod V33 di fail 8; ayat yang dipilih dibuang, katalog dinamakan Katalog Kedai, info bintang dipusatkan dan ilustrasi SVG produk baharu dipertingkat."
+  "version": "2026-10-20-v35-fullscreen-store",
+  "label": "KedaiKita V35 · Halaman Kedai Penuh",
+  "notes": "Sedia untuk ditimbang; nota Rush Hour inventori dibuang; Inventori Kedai, Katalog Kedai dan Upgrade & Kategori menggunakan dialog skrin penuh."
 }
