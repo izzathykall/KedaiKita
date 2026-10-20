@@ -1,5 +1,1 @@
-{
-  "version": "2026-10-20-v46-regular-20-seconds",
-  "title": "Kedai Kita Studio",
-  "notes": "Timer pelanggan biasa 20 saat (0:20) bermula dari kemunculan pelanggan, Rider KitaFood kekal 30 saat, Rush Hour 10 saat, dan naik taraf keselesaan masih menambah masa seperti asal."
-}
+{"version":"2026-10-20-v47-kf-seal-songkok-fix","title":"Kedai Kita Studio","notes":"Ikon pada bahagian barang telah dibungkus dipusatkan semula dan songkok pelanggan direndahkan supaya lebih seimbang."}
