@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-21-v54-music-playlist",
+  "version": "2026-10-21-v55-3-music-options",
   "title": "Kedai Kita Studio",
-  "notes": "Empat pilihan muzik latar dan mod Random: lagu akan bertukar automatik apabila tamat tanpa mengulang trek sebelumnya; tetapan dipelihara dalam akaun."
+  "notes": "Pilihan muzik kini hanya Music 1, Music 2, Music 3 dan Random. Lagu baru yang dihantar oleh pengguna boleh dipilih satu-satu atau dimainkan rawak tanpa ulang lagu sama secara berturut-turut."
 }
