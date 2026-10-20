@@ -1878,3 +1878,6 @@ body[data-theme="dark"] .kf-timer{background:#1d362a;border-color:#456a50}body[d
   padding-bottom:max(16px,env(safe-area-inset-bottom));
  }
 }
+
+/* V45: display the remaining patience countdown as stable mm:ss digits. */
+#patienceText{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700;min-width:38px;text-align:right;}
