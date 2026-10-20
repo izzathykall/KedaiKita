@@ -1015,6 +1015,12 @@ function inventoryStateFor(product,store){
 }
 function bindInventoryControls(){
  const content=$('modalContent');
+ // Fallback to the original inline vector when an SVG data URL fails to decode.
+ content.querySelectorAll('.stock-product-image').forEach(img=>{
+  const fallback=()=>{const id=img.dataset.stockArtId;if(!img.isConnected)return;img.outerHTML=productArt(id)};
+  img.onerror=fallback;
+  if(img.complete&&img.naturalWidth===0)fallback();
+ });
  content.querySelectorAll('[data-restock]').forEach(b=>b.onclick=()=>{
   const input=content.querySelector(`[data-stock-qty="${b.dataset.restock}"]`),amount=Number(input?.value);
   if(!Number.isInteger(amount)||amount<1||amount>MAX_STOCK_PURCHASE){toast('Pilih kuantiti 1–20 sahaja.',true);return}
@@ -1244,6 +1250,19 @@ function previewEffect(id){if(id==='scale')playScaleSound();else if(id==='drawer
 function effectSettingsHTML(){return `<details class="effect-mixer"><summary>Volume setiap bunyi</summary><p>Volume utama × volume bunyi. 0% untuk senyapkan satu bunyi sahaja.</p><div>${effectChoices().map(([id,label])=>`<div class="effect-channel"><label for="effect-${id}">${label} <b id="effect-label-${id}">${Math.round(effectLevel(id)*100)}%</b></label><input type="range" min="0" max="100" step="5" id="effect-${id}" data-effect="${id}" value="${Math.round(effectLevel(id)*100)}"><button class="secondary-btn" data-preview-effect="${id}" aria-label="Cuba bunyi ${label}">${icon('play')}</button></div>`).join('')}</div></details>`}
 function bindEffectSettings(){$('modalContent').querySelectorAll('[data-effect]').forEach(el=>el.oninput=()=>{progress.settings.effects??={};progress.settings.effects[el.dataset.effect]=Number(el.value)/100;$('effect-label-'+el.dataset.effect).textContent=el.value+'%';refreshEffectLevels();save()});$('modalContent').querySelectorAll('[data-preview-effect]').forEach(el=>el.onclick=()=>previewEffect(el.dataset.previewEffect))}
 
+// A standalone SVG data image avoids iOS Safari intermittently dropping
+// in-document SVG product drawings inside scrollable inventory panels.
+// Keep the generated artwork and its labels from the same productArt() source.
+const INVENTORY_IMAGE_CACHE=new Map();
+function inventoryProductArt(product){
+ let image=INVENTORY_IMAGE_CACHE.get(product.id);
+ if(!image){
+  const svg=productArt(product.id);
+  image='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  INVENTORY_IMAGE_CACHE.set(product.id,image);
+ }
+ return `<span class="stock-art-frame"><img class="stock-product-image" src="${image}" alt="Ilustrasi ${product.name.replaceAll('&','&amp;').replaceAll('"','&quot;')}" data-stock-art-id="${product.id}" loading="lazy" decoding="async" draggable="false"></span>`;
+}
 function inventoryGroupsHTML(store){
  const all=PRODUCTS.filter(p=>store.unlocked.includes(p.category));
  return CATEGORIES.filter(c=>store.unlocked.includes(c.id)).map(c=>{
@@ -1256,7 +1275,7 @@ function inventoryGroupsHTML(store){
    const delta=wholesaleChange(p,store.day);
    const trendLabel=store.day<=1?'Harga hari ini':delta>0?'▲ Naik '+delta+'%':delta<0?'▼ Turun '+Math.abs(delta)+'%':'Harga stabil';
    const badge=state==='empty'?'<small class="stock-level empty">Stok habis</small>':state==='low'?'<small class="stock-level low">Stok rendah</small>':'<small class="stock-level good">Stok mencukupi</small>';
-   return `<article class="stock-card ${lowStock?'low-stock':''}" data-stock-name="${p.name.toLowerCase()}" data-state="${state}">${productArt(p.id)}<div><b>${p.name}</b><span>${weighted?(count/1000).toFixed(2)+' kg':count+' unit'} ${badge}</span><small>Jual ${money(p.price)}${weighted?'/kg':''} · Borong ${money(stockCost(p,multiplier,store.day))}/${unitLabel}</small><small class="wholesale-trend ${delta>0?'up':delta<0?'down':'stable'}">${trendLabel}</small></div><meter min="0" max="${stockCapacity(store)}" value="${Math.min(stockCapacity(store),count/multiplier)}" aria-label="Stok ${p.name}"></meter><div class="stock-buy-picker"><span>Kuantiti beli (${unitLabel}) · Baki ${remaining}</span><div class="stock-qty-controls"><button type="button" data-stock-minus="${p.id}" aria-label="Kurangkan kuantiti ${p.name}">−</button><input data-stock-qty="${p.id}" inputmode="numeric" type="number" min="1" max="${MAX_STOCK_PURCHASE}" step="1" value="1" aria-label="Kuantiti untuk ${p.name}"><button type="button" data-stock-plus="${p.id}" aria-label="Tambah kuantiti ${p.name}">+</button></div></div><button type="button" class="secondary-btn stock-buy-action" data-restock="${p.id}" ${mode==='practice'||remaining===0?'disabled':''}>Beli 1 ${unitLabel} · ${money(stockCost(p,multiplier,store.day))}</button></article>`;
+   return `<article class="stock-card ${lowStock?'low-stock':''}" data-stock-name="${p.name.toLowerCase()}" data-state="${state}">${inventoryProductArt(p)}<div><b>${p.name}</b><span>${weighted?(count/1000).toFixed(2)+' kg':count+' unit'} ${badge}</span><small>Jual ${money(p.price)}${weighted?'/kg':''} · Borong ${money(stockCost(p,multiplier,store.day))}/${unitLabel}</small><small class="wholesale-trend ${delta>0?'up':delta<0?'down':'stable'}">${trendLabel}</small></div><meter min="0" max="${stockCapacity(store)}" value="${Math.min(stockCapacity(store),count/multiplier)}" aria-label="Stok ${p.name}"></meter><div class="stock-buy-picker"><span>Kuantiti beli (${unitLabel}) · Baki ${remaining}</span><div class="stock-qty-controls"><button type="button" data-stock-minus="${p.id}" aria-label="Kurangkan kuantiti ${p.name}">−</button><input data-stock-qty="${p.id}" inputmode="numeric" type="number" min="1" max="${MAX_STOCK_PURCHASE}" step="1" value="1" aria-label="Kuantiti untuk ${p.name}"><button type="button" data-stock-plus="${p.id}" aria-label="Tambah kuantiti ${p.name}">+</button></div></div><button type="button" class="secondary-btn stock-buy-action" data-restock="${p.id}" ${mode==='practice'||remaining===0?'disabled':''}>Beli 1 ${unitLabel} · ${money(stockCost(p,multiplier,store.day))}</button></article>`;
   }).join('')}</div></details>`;
  }).join('');
 }

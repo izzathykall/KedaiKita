@@ -9,7 +9,6 @@ body{background:radial-gradient(ellipse at 8% 0%,#e2e9dc,transparent 48%),#f3f1e
 .utility-bar #developerPanelBtn svg{width:17px;height:17px}
 .store-scene{isolation:isolate;background:linear-gradient(0deg,#b89b78 0 4%,transparent 4%),linear-gradient(0deg,#d2d9c6 0 28%,transparent 28%),repeating-linear-gradient(90deg,#f2efe4 0 59px,#e9e5d9 60px 61px)!important;box-shadow:inset 0 1px 22px #99825e14!important}
 .studio-decor{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.wall-arch{position:absolute;left:50%;top:9%;transform:translateX(-50%);width:37%;height:100%;border-radius:140px 140px 0 0;background:linear-gradient(110deg,#e0e6d6,#c7d2bd);border:9px solid #fffaf040;box-shadow:inset 0 0 20px #48634a0d}
 .pendant{position:absolute;top:0;width:1px;height:18%;background:#82775c;z-index:1}
 .pendant:after{content:'';position:absolute;bottom:-10px;left:-22px;width:44px;height:22px;border-radius:40px 40px 4px 4px;background:#446754;box-shadow:0 10px 24px #fff3b780;border-bottom:3px solid #eacb8d}
 .pendant-one{left:26%}.pendant-two{right:26%}
@@ -18,11 +17,9 @@ body{background:radial-gradient(ellipse at 8% 0%,#e2e9dc,transparent 48%),#f3f1e
 .store-sign{background:#f9f5e9!important;border:1px solid #d3c7ac!important;border-radius:8px!important;box-shadow:0 3px 0 #bba58325!important}
 .store-sign>span{color:#335b45!important}.store-sign small{letter-spacing:1.7px!important}
 .shelf{background:linear-gradient(90deg,#b3936b,#d9c2a0,#b3936b)!important;border-color:#bfa987!important;box-shadow:0 7px 12px #62553f16!important}
-.window{background:linear-gradient(140deg,#e4ebd6,#c7ddcf)!important;border-color:#f9f4e8!important;box-shadow:0 0 0 2px #cabd9e!important}
 .stations .station{box-shadow:0 3px 0 #b9c4b52a!important}
 body[data-theme="dark"]{background:#172d28}
 body[data-theme="dark"] .store-scene{background:linear-gradient(0deg,#4a5140 0 28%,transparent 28%),repeating-linear-gradient(90deg,#314b40 0 59px,#294337 60px 61px)!important}
-body[data-theme="dark"] .wall-arch{background:#3e5a48;border-color:#62745b40}
 body[data-theme="dark"] .studio-management{--studio-paper:#203a32;--studio-sage:#344d3f;--studio-line:#456052;--studio-green:#d2e5cb;--studio-muted:#b0bfb3}
 /* Management: clear heading, consistent controls, spacious cards. */
 #modal:is([data-kind="missions"],[data-kind="inventory"],[data-kind="catalogue"],[data-kind="delivery"],[data-kind="shop"],[data-kind="settings"],[data-kind="developer"]){width:min(1120px,calc(100vw - 40px));max-width:1120px;max-height:calc(100dvh - 40px);border-radius:24px;border:1px solid var(--line);background:var(--cream);box-shadow:0 24px 90px #142d2840}
@@ -148,3 +145,27 @@ body.reduced-motion .account-store-plant{animation:none!important}
 @media(max-width:900px){#modal[data-kind="shop"] .category-shop{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){#modal .studio-management .supply-cards{grid-template-columns:1fr}#modal .studio-management .mission-card{grid-template-columns:36px minmax(0,1fr)}#modal .studio-management .mission-card>button{grid-column:2}#modal .studio-management .dev-wallet-form{display:grid;grid-template-columns:1fr 1fr}#modal .studio-management .dev-wallet-form input{grid-column:1/-1}#modal .studio-management .dev-day-input{flex-wrap:wrap}#modal .studio-management .dev-day-input input{width:90px}}
 @media(max-width:650px){#modal[data-kind="developer"] .studio-tabs{display:grid;grid-template-columns:1fr 1fr;overflow:visible}#modal[data-kind="developer"] .studio-tabs button:last-child{grid-column:1/-1}#accountOverlay .account-store-art{right:26px}}
+
+/* V38 — Stable inventory illustrations for iPad Safari, with layout fallback. */
+#modal[data-kind="inventory"] .stock-card>.stock-art-frame{
+ display:flex;align-items:center;justify-content:center;grid-column:auto;
+ width:100px;height:126px;max-width:100%;min-width:0;
+ border-radius:13px;background:linear-gradient(145deg,#f3f5ed,#faf9f3);
+ border:1px solid #e5ebe1;overflow:hidden;
+}
+#modal[data-kind="inventory"] .stock-art-frame>.stock-product-image,
+#modal[data-kind="inventory"] .stock-art-frame>.product-art{
+ display:block!important;flex:none;width:94%!important;height:94%!important;
+ max-width:100%;max-height:100%;object-fit:contain;opacity:1!important;
+ visibility:visible!important;filter:none!important;
+}
+#modal[data-kind="inventory"] .stock-art-frame>.product-art,
+#modal[data-kind="inventory"] .stock-art-frame .art-object{
+ animation:none!important;transform:none!important;overflow:visible!important;
+}
+@media(max-width:700px){
+ #modal[data-kind="inventory"] .stock-card>.stock-art-frame{width:88px;height:110px}
+}
+@media(max-width:360px){
+ #modal[data-kind="inventory"] .stock-card>.stock-art-frame{width:76px;height:100px}
+}
