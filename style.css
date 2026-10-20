@@ -1926,3 +1926,11 @@ body[data-theme="dark"] .shift-report-badge,body[data-theme="dark"] .shift-kpi-c
 body[data-theme="dark"] .shift-report-banner{background:linear-gradient(135deg,#22382f,#26382b);border-color:#476053}
 body[data-theme="dark"] :is(.shift-report-banner span,.shift-kpi-card span,.shift-report-rows span,.shift-report-head p,.shift-report-day small,.shift-kpi-card small,.shift-card-head small){color:#b9cabc}
 body[data-theme="dark"] .shift-report-badge .stars{color:#e1b15a}
+
+
+/* v49: fix mixed happy/angry face layers */
+.customer .customer-angry-brows,.customer .customer-angry-mouth,.customer .customer-anger{display:none}
+.customer.impatient .customer-brows,.customer.impatient .customer-mouth{display:none}
+.customer.impatient .customer-angry-brows,.customer.impatient .customer-angry-mouth,.customer.impatient .customer-anger{display:block}
+.intro-art .customer-brows,.intro-art .customer-mouth{display:block}
+.intro-art .customer-angry-brows,.intro-art .customer-angry-mouth,.intro-art .customer-anger{display:none!important}
