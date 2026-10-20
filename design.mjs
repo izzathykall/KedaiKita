@@ -1,7 +1,7 @@
 // Presentation only: moving existing controls preserves their IDs and event bindings.
 const selectedTabs=new Map();
 function tabbed(root, groups, after, initial=0){
- const key=root.closest('dialog')?.dataset.kind||'menu';initial=Math.min(selectedTabs.get(key)||initial,groups.length-1);
+ const key=root.closest('dialog')?.dataset.kind||'menu';initial=key==='settings'?0:Math.min(selectedTabs.get(key)||initial,groups.length-1);
  const nav=document.createElement('div');nav.className='studio-tabs';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Bahagian menu');
  after.after(nav);
  const panels=groups.map(([name,nodes],i)=>{
@@ -16,6 +16,7 @@ function tabbed(root, groups, after, initial=0){
 }
 export function enhanceManagement(kind,root,icon){
  const supported=['missions','inventory','catalogue','delivery','shop','settings','developer'].includes(kind);
+ fitCategorySelects(root);
  root.classList.toggle('studio-management',supported);if(!supported)return;
  const pad=root.querySelector('.modal-pad');if(!pad)return;
  if(kind==='developer'){
@@ -53,4 +54,22 @@ if(productArea){
    while(size>5&&lines()>2)size-=.25;el.style.setProperty('font-size',size+'px','important');
   });
  })};new ResizeObserver(fit).observe(productArea);new MutationObserver(fit).observe(productArea,{childList:true,subtree:true});
+}
+
+// Fit the selected label after layout and on every category/viewport change.
+let categoryObserver;
+function fitCategorySelects(root){
+ categoryObserver?.disconnect();
+ const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+ const fit=select=>{
+  if(!select.clientWidth||!ctx)return;
+  const cs=getComputedStyle(select),label=select.selectedOptions[0]?.textContent||'';
+  const available=select.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-26;
+  let size=16;ctx.font=`${cs.fontWeight} ${size}px ${cs.fontFamily}`;
+  const width=ctx.measureText(label).width;
+  size=Math.min(size,Math.max(7,Math.floor(size*available/Math.max(1,width)*10)/10));
+  select.style.setProperty('font-size',size+'px','important');
+ };
+ categoryObserver=new ResizeObserver(entries=>entries.forEach(({target})=>fit(target)));
+ root.querySelectorAll('select').forEach(select=>{categoryObserver.observe(select);select.addEventListener('change',()=>fit(select));requestAnimationFrame(()=>fit(select))});
 }

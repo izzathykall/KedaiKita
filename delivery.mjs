@@ -14,12 +14,13 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
  const pmap=new Map(products.map(x=>[x.id,x]));
  const foodCategories=new Set(['essentials','snacks','meals','bakery','frozen','beverages','pantry','kuih']);
  const statsDefault=()=>({completed:0,cancelled:0,revenue:0,bonus:0,late:0,starsTotal:0});
- let activeId=null,stage='list',search='',filter='all',lastPicked=null,clockHandle=null,lastClock=0,resultPending=null;
+ let activeId=null,stage='list',search='',filter='all',lastPicked=null,clockHandle=null,lastSavedAt=0,resultPending=null;
  const timeLimit=day=>Math.max(65,135-Math.max(0,day-3)*5);
  const pending=d=>d.orders.filter(o=>['new','packing','ready'].includes(o.status)&&Array.isArray(o.items));
  const picked=o=>o.items.filter(x=>x.packed).length;
  const ready=o=>!!o.items.length&&o.items.every(x=>x.packed);
- const due=o=>Math.max(0,Math.ceil((o.timeLimit||timeLimit(o.day))-(o.elapsedSeconds||0)));
+ const due=o=>Math.max(0,Math.ceil(Number.isFinite(o.deadlineAt)?(o.deadlineAt-Date.now())/1000:(o.timeLimit||timeLimit(o.day))-(o.elapsedSeconds||0)));
+ const clockText=o=>`${Math.floor(due(o)/60)}:${String(due(o)%60).padStart(2,'0')}`;
  const total=o=>o.items.reduce((n,x)=>n+(Number(x.price)||pmap.get(x.id)?.price||0),0);
  const unlocked=()=>getMode()==='career'&&getProgress().day>=3;
  function ensure(){
@@ -37,10 +38,20 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
    // order IDs, but display the new in-house KitaFood brand everywhere.
    o.platform='KitaFood';o.timeLimit??=timeLimit(o.day||p.day);
    o.elapsedSeconds=Number(o.elapsedSeconds)||0;
+   if(['new','packing','ready'].includes(o.status)){if(!Number.isFinite(o.deadlineAt))o.deadlineAt=Date.now()+Math.max(0,o.timeLimit-o.elapsedSeconds)*1000;o.elapsedSeconds=Math.max(0,(Date.now()-(o.deadlineAt-o.timeLimit*1000))/1000);}
   }
-  updateIndicator(d);return d;
+  updateIndicator(d);if(pending(d).length)startClock();else stopClock();return d;
  }
- function updateIndicator(d){const b=document.getElementById('deliveryBtn');if(!b)return;const n=pending(d).length;b.dataset.pending=String(n);b.classList.toggle('delivery-alert',n>0);b.title=n?`${n} pesanan KitaFood aktif`:'KitaFood'}
+ function updateIndicator(d){
+  const b=document.getElementById('deliveryBtn');if(!b)return;
+  const orders=pending(d),n=orders.length,o=orders.find(x=>x.id===activeId)||orders[0];
+  b.dataset.pending=String(n);b.classList.toggle('delivery-alert',n>0);
+  let timer=b.querySelector('.kf-nav-timer');
+  if(!timer){timer=document.createElement('span');timer.className='kf-nav-timer';timer.setAttribute('aria-hidden','true');b.prepend(timer)}
+  timer.hidden=!o;timer.textContent=o?clockText(o):'';timer.classList.toggle('urgent',!!o&&due(o)<30);
+  b.title=o?`KitaFood · Baki masa ${clockText(o)}`:'KitaFood';
+  b.setAttribute('aria-label',o?`KitaFood, ${n} pesanan aktif, baki masa ${clockText(o)}`:'KitaFood');
+ }
  function personFor(order){const normalized=people.find(x=>x.name===order?.rider)||people[0];return {...normalized,id:'rider-kita-food',role:'KitaFood · Rakan Penghantar'};}
  function newOrder(){
   if(!unlocked())return null;
@@ -53,7 +64,7 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   while(items.length<count&&candidates.length){const i=Math.floor(Math.random()*candidates.length),x=candidates.splice(i,1)[0];items.push({id:x.id,name:x.name,price:x.price,packed:false});}
   const id=d.nextId++,rider=people[id%people.length].name;
   const order={id:`KF-${String(id).padStart(4,'0')}`,platform:'KitaFood',rider,code:String(1000+Math.floor(Math.random()*9000)),items,status:'new',day:p.day,timeLimit:timeLimit(p.day),elapsedSeconds:0,wrongPicks:0};
-  d.orders.push(order);activeId=order.id;stage='list';search='';filter='all';save();updateIndicator(d);
+  order.deadlineAt=Date.now()+order.timeLimit*1000;d.orders.push(order);startClock();activeId=order.id;stage='list';search='';filter='all';save();updateIndicator(d);
   return order;
  }
  function maybeArrive(index){
@@ -66,15 +77,14 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   const order=newOrder();if(order){s.kitaFoodLastSpawn=index;save();}return order;
  }
  function stopClock(){if(clockHandle!==null){clearInterval(clockHandle);clockHandle=null}}
- function startClock(o){
-  stopClock();lastClock=Date.now();
+ function startClock(){
+  if(clockHandle!==null)return;
   clockHandle=setInterval(()=>{
-   if(document.hidden||!document.getElementById('modal')?.open||document.getElementById('modal')?.dataset.kind!=='delivery'||!pending(ensure()).includes(o)){lastClock=Date.now();return}
-   const now=Date.now(),elapsed=Math.min(2,(now-lastClock)/1000);lastClock=now;
-   o.elapsedSeconds+=elapsed;
-   const e=document.getElementById('kfTimer');if(e){e.textContent=`${Math.floor(due(o)/60)}:${String(due(o)%60).padStart(2,'0')}`;e.closest('.kf-timer')?.classList.toggle('urgent',due(o)<30)}
-   if(Math.floor(o.elapsedSeconds)%5===0)save();
-  },1000);
+   const d=ensure(),o=pending(d).find(x=>x.id===activeId);
+   const e=document.getElementById('kfTimer');
+   if(e&&o){e.textContent=clockText(o);e.closest('.kf-timer')?.classList.toggle('urgent',due(o)<30)}
+   if(pending(d).length&&Date.now()-lastSavedAt>=5000){lastSavedAt=Date.now();save()}
+  },250);
  }
  function shelfHTML(o){
   const p=getProgress(),term=search.toLocaleLowerCase('ms');
@@ -89,7 +99,7 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
  function ticket(o){return `<section class="kf-ticket"><div class="kf-section-heading"><div><small>SENARAI BARANGAN</small><h3>Pesanan ${safe(o.id)}</h3></div><b>${picked(o)}/${o.items.length}</b></div><div class="kf-order-rows">${orderRows(o)}</div><div class="kf-ticket-total"><span>DIBAYAR DALAM APLIKASI</span><strong>${money(total(o))}</strong></div></section>`}
  function riderHeader(o){return `<div class="kf-rider"><div class="kf-rider-badge">${icon('delivery')}</div><div class="kf-rider-info"><small>RIDER KITAFOOD DI KAUNTER</small><h3>${safe(o.rider)} <span>· ${safe(o.id)}</span></h3><p>“Hai! Saya datang ambil pesanan pelanggan.”</p></div><div class="kf-timer ${due(o)<30?'urgent':''}"><small>MASA BAKI</small><strong id="kfTimer">${Math.floor(due(o)/60)}:${String(due(o)%60).padStart(2,'0')}</strong></div></div>`}
  function render(id=activeId,{preserve=false}={}){
-  stopClock();const d=ensure(),p=getProgress(),o=pending(d).find(x=>x.id===id)||pending(d)[0]||null;
+  const d=ensure(),p=getProgress(),o=pending(d).find(x=>x.id===id)||pending(d)[0]||null;
   activeId=o?.id||null;
   const dialog=document.getElementById('modal'),oldScroll=preserve?dialog.scrollTop:0,oldShelf=preserve?document.getElementById('kfShelf')?.scrollTop||0:0;
   const s=d.stats;
@@ -99,10 +109,10 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
    `${riderHeader(o)}<nav class="kf-steps" aria-label="Proses pesanan"><span class="done">1. Semak</span><span class="${stage==='pick'||stage==='verify'?'done':''}">2. Cari barang</span><span class="${stage==='verify'?'done':''}">3. Serah</span></nav>
    ${stage==='list'?`<div class="kf-intro-stage">${ticket(o)}<aside class="kf-tip-card"><div class="kf-tip-symbol">${icon('basket')}</div><h3>Cari sendiri barang pesanan</h3><p>Lihat senarai di sebelah. Pilih barang yang betul pada rak kedai dan masukkan ke beg sebelum menyerahkannya kepada rider.</p><div class="kf-tip-note">Bayaran pelanggan sudah diterima melalui KitaFood. Tiada perlu kutip tunai.</div><button class="primary-btn kf-big-button" id="kfStart">Mula Cari Barang ${icon('arrow')}</button></aside></div>`:
    stage==='pick'?`<div class="kf-pick-layout">${ticket(o)}<section class="kf-shop"><div class="kf-section-heading"><div><small>RAK PRODUK KEDAI KITA</small><h3>Pilih barang yang diminta</h3></div><span class="kf-scan-label">${icon('scan')} IMBAS</span></div><div class="kf-filter"><input id="kfSearch" type="search" placeholder="Cari nama produk..." aria-label="Cari barang" autocomplete="off"><select id="kfCategory" aria-label="Kategori barang"><option value="all">Semua kategori</option>${categories.filter(c=>p.unlocked.includes(c.id)&&foodCategories.has(c.id)).map(c=>`<option value="${safe(c.id)}">${safe(c.name)}</option>`).join('')}</select></div><div class="kf-shelf" id="kfShelf">${shelfHTML(o)}</div></section></div><div class="kf-bag"><div class="kf-bag-head">${icon('basket')} <div><small>BEG PESANAN</small><strong>${picked(o)} daripada ${o.items.length} barang</strong></div><div class="kf-progress"><i style="width:${Math.round(100*picked(o)/o.items.length)}%"></i></div></div><div class="kf-packed">${picked(o)?o.items.filter(x=>x.packed).map(x=>`<div class="kf-packed-product">${productArt(x.id)}<span>${safe(x.name)}</span><button data-kf-remove="${safe(x.id)}" type="button">Keluarkan</button></div>`).join(''):'<p>Beg masih kosong. Tekan barang yang betul di rak untuk mengisi beg.</p>'}</div><button class="primary-btn kf-big-button" id="kfDone" ${ready(o)?'':'disabled'}>${ready(o)?'Barang Sudah Siap':'Lengkapkan Semua Barang'} ${icon('check')}</button></div>`:
-   `<div class="kf-verify-stage"><div class="kf-sealed"><span class="kf-seal-art">${icon('basket')}<i>${icon('check')}</i></span><h3>Semua barang telah dibungkus!</h3><p>Beg pesanan <b>${safe(o.id)}</b> telah dimeterai. Pastikan kod pengambilan sepadan sebelum serahkan kepada rider.</p><div class="kf-review-list">${o.items.map(x=>`<span>${icon('check')} ${safe(x.name)}</span>`).join('')}</div><button class="kf-back" id="kfEdit">${icon('undo')} Semak semula beg</button></div><div class="kf-phone"><small>KOD PENGAMBILAN PADA TELEFON RIDER</small><strong>${safe(o.code)}</strong><span>KITAFOOD · ${safe(o.rider)}</span><label for="kfCode">Masukkan kod 4 digit rider</label><input id="kfCode" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="0000" autocomplete="off"><button class="primary-btn kf-big-button" id="kfHandoff">Sahkan & Serah Kepada Rider ${icon('check')}</button></div></div>`}
+   `<div class="kf-verify-stage"><div class="kf-sealed"><span class="kf-seal-art">${icon('basket')}<i>${icon('check')}</i></span><h3>Semua barang telah dibungkus!</h3><p>Beg pesanan <b>${safe(o.id)}</b> telah dimeterai. Pastikan kod pengambilan sepadan sebelum serahkan kepada rider.</p><div class="kf-review-list">${o.items.map(x=>`<span class="kf-review-product">${productArt(x.id)}<b>${safe(x.name)}</b>${icon('check')}</span>`).join('')}</div><button class="kf-back" id="kfEdit">${icon('undo')} Semak semula beg</button></div><div class="kf-phone"><small>KOD PENGAMBILAN PADA TELEFON RIDER</small><strong>${safe(o.code)}</strong><span>KITAFOOD · ${safe(o.rider)}</span><label for="kfCode">Masukkan kod 4 digit rider</label><input id="kfCode" maxlength="4" inputmode="none" readonly placeholder="− − − −" autocomplete="off" aria-describedby="kfCodeError"><div class="kf-keypad" role="group" aria-label="Pad nombor kod rider">${['1','2','3','4','5','6','7','8','9','clear','0','back'].map(key=>`<button type="button" data-kf-key="${key}" aria-label="${key==='clear'?'Kosongkan kod':key==='back'?'Padam digit terakhir':key}">${key==='clear'?'Padam semua':key==='back'?icon('undo'):key}</button>`).join('')}</div><p id="kfCodeError" class="kf-code-error" role="status" aria-live="polite"></p><button class="primary-btn kf-big-button" id="kfHandoff">Sahkan & Serah Kepada Rider ${icon('check')}</button></div></div>`}
    <div class="kf-cancel-line"><button id="kfCancel" class="kf-cancel">Batalkan pesanan</button><div id="kfConfirmCancel" class="kf-cancel-confirm" hidden><p>Batalkan pesanan ${safe(o.id)}? Stok tidak akan ditolak.</p><button type="button" id="kfKeep">Kembali</button><button type="button" id="kfCancelYes">Ya, batalkan</button></div></div>`;
   openModal('delivery',`<div class="modal-pad kf-ui kf-state-${o?stage:'empty'}">${head}${stats}${content}<footer class="kf-footer">KITAFOOD · Hanya stok pesanan yang berjaya diserahkan akan ditolak.</footer></div>`);
-  document.getElementById('kfClose').onclick=()=>{stopClock();closeModal()};
+  document.getElementById('kfClose').onclick=()=>closeModal();
   if(!o)return;
   if(stage==='list')document.getElementById('kfStart').onclick=()=>{stage='pick';render(o.id)};
   if(stage==='pick'){
@@ -115,7 +125,10 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   if(stage==='verify'){
    document.getElementById('kfEdit').onclick=()=>{o.sealed=false;stage='pick';save();render(o.id)};
    document.getElementById('kfHandoff').onclick=()=>handoff(o);
-   document.getElementById('kfCode').onkeydown=e=>{if(e.key==='Enter')handoff(o)};
+   const input=document.getElementById('kfCode');
+   const enterKey=key=>{input.value=key==='clear'?'':key==='back'?input.value.slice(0,-1):(input.value+key).slice(0,4);input.removeAttribute('aria-invalid');document.getElementById('kfCodeError').textContent='';};
+   document.querySelectorAll('[data-kf-key]').forEach(b=>b.onclick=()=>enterKey(b.dataset.kfKey));
+   document.querySelector('.kf-verify-stage').onkeydown=e=>{if(/^[0-9]$/.test(e.key)){e.preventDefault();enterKey(e.key)}else if(e.key==='Backspace'||e.key==='Delete'){e.preventDefault();enterKey(e.key==='Delete'?'clear':'back')}else if(e.key==='Enter'&&e.target===input){e.preventDefault();handoff(o)}};
   }
   document.getElementById('kfCancel').onclick=()=>{document.getElementById('kfConfirmCancel').hidden=false};
   document.getElementById('kfKeep').onclick=()=>{document.getElementById('kfConfirmCancel').hidden=true};
@@ -134,9 +147,10 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
  }
  function removePick(o,id){const x=o.items.find(y=>y.id===id&&y.packed);if(!x)return;x.packed=false;o.status=picked(o)?'packing':'new';o.sealed=false;save();render(o.id,{preserve:true})}
  function handoff(o){
+  if(!pending(ensure()).includes(o))return;
   if(!ready(o)||!o.sealed){notify('Sediakan semua barang dahulu.',true);return}
   const code=document.getElementById('kfCode')?.value.trim();
-  if(code!==String(o.code)){notify('Kod rider tidak sepadan. Semak semula.',true);document.getElementById('kfCode')?.focus();return}
+  if(code!==String(o.code)){notify('Kod rider tidak sepadan. Semak semula.',true);document.getElementById('kfCodeError').textContent='Kod tidak sepadan. Cuba semula.';document.getElementById('kfCode').setAttribute('aria-invalid','true');document.getElementById('kfCode')?.focus();return}
   const p=getProgress(),counts={};for(const x of o.items)counts[x.id]=(counts[x.id]||0)+1;
   if(Object.entries(counts).some(([id,n])=>(p.inventory?.[id]||0)<n)){notify('Stok tidak mencukupi untuk serahan. Semak Inventori.',true);return}
   for(const [id,n]of Object.entries(counts))p.inventory[id]-=n;
@@ -157,7 +171,7 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
  function showResult(o,success){
   resultPending={o,success};stopClock();activeId=null;stage='list';lastPicked=null;search='';filter='all';
   const stars=success?'★'.repeat(o.rating)+'☆'.repeat(5-o.rating):'—';
-  openModal('delivery',`<div class="modal-pad kf-ui kf-result"><div class="kf-result-emblem">${icon(success?'check':'close')}</div><small>KITAFOOD · ${safe(o.id)}</small><h2>${success?'Pesanan berjaya diserahkan!':'Pesanan dibatalkan'}</h2><p>${success?`Terima kasih! Rider ${safe(o.rider)} sudah mengambil beg dan bersedia membuat penghantaran.`:'Rider telah dimaklumkan. Stok kekal dan tiada bayaran direkodkan.'}</p>${success?`<div class="kf-result-stars">${stars} <small>Penilaian perkhidmatan</small></div><div class="kf-result-table"><div>Nilai pesanan <b>${money(total(o))}</b></div><div>Untung kedai <b>${money(o.earned-o.bonus)}</b></div><div>Bonus pantas <b>${money(o.bonus)}</b></div><div class="total">Jumlah diterima <b>${money(o.earned)}</b></div></div>`:''}<button id="kfNext" class="primary-btn kf-big-button">${success?'Rider Beredar · Pelanggan Seterusnya':'Teruskan Layan Pelanggan'} ${icon('arrow')}</button></div>`);
+  openModal('delivery',`<div class="modal-pad kf-ui kf-result"><section class="kf-result-story"><div class="kf-result-emblem">${icon(success?'check':'close')}</div><small>KITAFOOD · ${safe(o.id)}</small><h2>${success?'Pesanan berjaya diserahkan!':'Pesanan dibatalkan'}</h2><p>${success?`Terima kasih! Rider ${safe(o.rider)} sudah mengambil beg dan bersedia membuat penghantaran.`:'Rider telah dimaklumkan. Stok kekal dan tiada bayaran direkodkan.'}</p></section><section class="kf-result-summary">${success?`<div class="kf-result-stars">${stars} <small>Penilaian perkhidmatan</small></div><div class="kf-result-table"><div>Nilai pesanan <b>${money(total(o))}</b></div><div>Untung kedai <b>${money(o.earned-o.bonus)}</b></div><div>Bonus pantas <b>${money(o.bonus)}</b></div><div class="total">Jumlah diterima <b>${money(o.earned)}</b></div></div>`:'<div class="kf-cancel-summary">Tiada stok ditolak.<br>Kaunter sedia untuk pelanggan seterusnya.</div>'}</section><button id="kfNext" class="primary-btn kf-big-button">${success?'Rider Beredar · Pelanggan Seterusnya':'Teruskan Layan Pelanggan'} ${icon('arrow')}</button></div>`);
   document.getElementById('kfNext').onclick=()=>{resultPending=null;closeModal();onFinish(o,success)};
  }
  function open(id){
