@@ -1018,8 +1018,8 @@ body.store-rush-active .rush-screen-fx{opacity:1;visibility:visible}
 .rush-fx-star:nth-of-type(4n){color:#ffc047;transform:rotate(-23deg)}
 /* Little festive crowd behind the main customer, always behind dialogue. */
 .rush-crowd{position:absolute;inset:0;pointer-events:none;z-index:1;opacity:0;transition:opacity .5s ease}
-body.store-rush-active .rush-crowd{opacity:.64}
-.rush-crowd-person{position:absolute;left:var(--px);bottom:27px;width:var(--size);height:calc(var(--size) * 1.65);filter:drop-shadow(0 4px 5px rgba(43,72,45,.13));animation:rushCrowdBob 4.2s ease-in-out var(--shift) infinite}
+body.store-rush-active .rush-crowd{opacity:.82}
+.rush-crowd-person{position:absolute;left:var(--px);bottom:22px;width:calc(var(--size) * 1.38);height:calc(var(--size) * 2.2);filter:drop-shadow(0 5px 7px rgba(43,72,45,.17));opacity:.92;animation:rushCrowdBob 4.2s ease-in-out var(--shift) infinite}
 .rush-crowd-person:before{content:'';position:absolute;left:25%;top:0;width:50%;height:34%;border-radius:50% 50% 45% 45%;background:var(--skin);box-shadow:inset 0 7px 0 #543a2d70}
 .rush-crowd-person:after{content:'';position:absolute;bottom:0;left:0;right:0;height:65%;border-radius:45% 45% 0 0;background:linear-gradient(120deg,var(--shirt),#f5dbaf44)}
 .rush-scene-fx{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:5;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s}
@@ -1074,7 +1074,7 @@ body.store-rush-active .customer-info{box-shadow:0 -1px 0 rgba(255,251,217,.6),0
 /* Dark mode must stay legible, even under the golden decoration. */
 body[data-theme="dark"].store-rush-active .store-scene{background-color:#465848}
 /* Small screens: reduce full-screen compositing and prioritize readable controls. */
-@media(max-width:600px){.rush-fx-star{font-size:13px}.rush-global-rays{opacity:.23}.rush-crowd-person{transform:scale(.85);transform-origin:bottom center}.rush-screen-fx{opacity:0}body.store-rush-active .rush-screen-fx{opacity:.8}}
+@media(max-width:600px){.rush-fx-star{font-size:13px}.rush-global-rays{opacity:.23}.rush-crowd-person{transform:scale(1.02);transform-origin:bottom center}.rush-screen-fx{opacity:0}body.store-rush-active .rush-screen-fx{opacity:.8}}
 /* User animation preference and OS reduced-motion setting: keep a calm static glow. */
 @media(prefers-reduced-motion:reduce){
  body.store-rush-active .rush-screen-fx *,body.store-rush-active .rush-scene-fx *,body.store-rush-active .rush-crowd *,
@@ -1934,3 +1934,7 @@ body[data-theme="dark"] .shift-report-badge .stars{color:#e1b15a}
 .customer.impatient .customer-angry-brows,.customer.impatient .customer-angry-mouth,.customer.impatient .customer-anger{display:block}
 .intro-art .customer-brows,.intro-art .customer-mouth{display:block}
 .intro-art .customer-angry-brows,.intro-art .customer-angry-mouth,.intro-art .customer-anger{display:none!important}
+
+/* v53: bigger rush hour background crowd */
+body.store-rush-active .rush-crowd-person:before{height:36%}
+body.store-rush-active .rush-crowd-person:after{height:67%}
