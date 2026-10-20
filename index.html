@@ -4,9 +4,9 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#173f37"><meta name="description" content="Jaga kaunter pasar mini anda. Scan barang, timbang hasil segar, kira baki dan bina Kedai Kita!">
 <title>Kedai Kita — Cashier Simulator</title>
-<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-20-v52-closing-10pm-clock">
-<link rel="stylesheet" href="design.css?v=2026-10-21-v53-rush-crowd-bigger">
-<script src="./viewport-fit.js?v=2026-10-21-v53-rush-crowd-bigger" defer></script>
+<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-21-v54-music-playlist">
+<link rel="stylesheet" href="design.css?v=2026-10-21-v54-music-playlist">
+<script src="./viewport-fit.js?v=2026-10-21-v54-music-playlist" defer></script>
 </head>
 <body>
 <div class="app" id="gameApp">
@@ -116,7 +116,7 @@
     <div class="account-fineprint">Setiap akaun mempunyai progres permainan masing-masing.</div></div></section>
   </div>
 </dialog>
-<audio id="backgroundMusic" src="./gameplay-music.mp3" preload="metadata" loop></audio>
+<audio id="backgroundMusic" src="./gameplay-music.mp3" preload="metadata"></audio>
 <audio id="chaChingSound" src="./cha-ching.wav" preload="auto"></audio>
 <audio id="scannerSound" src="./scanner-beep.wav" preload="auto"></audio>
 <script src="firebase-config.js"></script>
@@ -124,7 +124,7 @@
 <script type="module">
 // Versioned loader: the currently published version.json controls the actual CSS and app version.
 // Each release only requires updating version.json after publishing the changed files.
-const fallbackBuild = '2026-10-21-v53-rush-crowd-bigger';
+const fallbackBuild = '2026-10-21-v54-music-playlist';
 let activeBuild = fallbackBuild;
 try {
   const response = await fetch('./version.json?init=' + Date.now(), {cache:'no-store'});

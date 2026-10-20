@@ -1938,3 +1938,20 @@ body[data-theme="dark"] .shift-report-badge .stars{color:#e1b15a}
 /* v53: bigger rush hour background crowd */
 body.store-rush-active .rush-crowd-person:before{height:36%}
 body.store-rush-active .rush-crowd-person:after{height:67%}
+
+
+/* V54: independent background music playlist selector */
+.music-track-picker{margin-top:15px;padding:13px 14px;background:#f1f5ee;border:1px solid #dbe6d7;border-radius:13px}
+.music-track-picker>label{display:block;margin:0 0 9px;font-size:11px;font-weight:800;color:var(--ink)}
+.music-track-picker select{display:block;width:100%;min-height:43px;padding:10px 36px 10px 12px;font:700 12px var(--font);color:var(--ink);background:#fffefa;border:1px solid #cddacb;border-radius:10px;cursor:pointer;min-width:0}
+.music-track-picker select:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.music-track-info{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;margin:11px 0 3px}
+.music-track-info>span{font-size:11px;line-height:1.5;font-weight:700;color:var(--green)}
+.music-track-info #musicNext{width:auto;min-height:33px;padding:7px 11px;font-size:10px}
+.music-track-info #musicNext[hidden]{display:none!important}
+.music-track-picker>small{display:block;margin:5px 0 0;font-size:10px;line-height:1.5;color:#708b7c}
+body[data-theme="dark"] .music-track-picker{background:#243a30;border-color:#496654}
+body[data-theme="dark"] .music-track-picker select{background:#172b22;border-color:#56765f;color:#dbe9da}
+body[data-theme="dark"] .music-track-info>span{color:#a8e7b9}
+body[data-theme="dark"] .music-track-picker>small{color:#b4cbbb}
+@media(max-width:580px){.music-track-picker{padding:11px}.music-track-info #musicNext{width:100%}}
