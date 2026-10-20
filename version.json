@@ -1,1 +1,1 @@
-{"version":"2026-10-20-v51-customer-center-fix","title":"Kedai Kita Studio","notes":"Posisi customer di kaunter dibetulkan supaya berada di tengah semula. Kedudukan bubble dialog juga dilaraskan sedikit untuk sepadan dengan pusat kaunter."}
+{"version": "2026-10-20-v52-closing-10pm-clock", "title": "Kedai Kita Studio", "notes": "Jam syif 08:00-22:00 kini diseimbangkan mengikut sasaran pelanggan setiap hari. Pelanggan terakhir diagihkan sebelum 21:45; laporan penutupan syif ditunjukkan pada 22:00. Timer pelanggan biasa, rider dan Rush Hour tidak berubah."}

@@ -1,8 +1,8 @@
-import {enhanceManagement} from './design.mjs?v=2026-10-20-v51-customer-center-fix';
-import {createDelivery} from './delivery.mjs?v=2026-10-20-v51-customer-center-fix';
-import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-20-v51-customer-center-fix';
-import {productArt,productImage,moneyArt} from './art.mjs?v=2026-10-20-v51-customer-center-fix';
-import {createCloudSync} from './cloud.mjs?v=2026-10-20-v51-customer-center-fix';
+import {enhanceManagement} from './design.mjs?v=2026-10-20-v52-closing-10pm-clock';
+import {createDelivery} from './delivery.mjs?v=2026-10-20-v52-closing-10pm-clock';
+import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-20-v52-closing-10pm-clock';
+import {productArt,productImage,moneyArt} from './art.mjs?v=2026-10-20-v52-closing-10pm-clock';
+import {createCloudSync} from './cloud.mjs?v=2026-10-20-v52-closing-10pm-clock';
 
 const $=id=>document.getElementById(id);
 const ICONS={basket:'M3 9h18l-2 11H5L3 9ZM8 9l4-7 4 7M8 13v3m4-3v3m4-3v3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5',shop:'M3 10V5h18v5M4 10v11h16V10M2 10a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0M9 21v-7h6v7',volume:'M11 4 6 8H2v8h4l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14',mute:'M11 4 6 8H2v8h4l5 4V4Zm5 5 6 6m0-6-6 6',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',pause:'M8 4v16m8-16v16',scan:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M6 12h12M7 9v6m3-6v6m4-6v6m3-6v6',scale:'M6 7h12l3 14H3L6 7Zm3 0V5a3 3 0 0 1 6 0v2m-3 4v5m-2-2h4',arrow:'M4 12h16m-6-6 6 6-6 6',heart:'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',flag:'M5 21V3m0 0c5-3 9 3 14 0v10c-5 3-9-3-14 0',receipt:'M5 3h14v19l-3-2-4 2-4-2-3 2V3Zm3 5h8m-8 4h8m-8 4h5',lock:'M6 10h12v11H6V10Zm3 0V6a3 3 0 0 1 6 0v4',card:'M2 5h20v14H2V5Zm0 5h20M6 15h4',qr:'M3 3h6v6H3V3Zm12 0h6v6h-6V3ZM3 15h6v6H3v-6Zm12 0h3v3h3v3h-6v-6Zm6-3v3M12 3v3m0 6v3M3 12h6m3 6v3',cash:'M2 5h20v14H2V5Zm10 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM5 8h1m12 8h1',check:'M5 12l4 4L19 6',close:'M6 6l12 12M6 18 18 6',play:'m8 4 12 8-12 8V4Z',snow:'M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4m13 9-4 1 1 4M4 14l4 1-1 4m13-9-4-1 1-4',delivery:'M7 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM9 19h7l2-5-2-5h-4l-3 5H5l-2 5h2m5-5h5m-5-5h4M5 7h4m-6 3h6',spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z',undo:'M8 4 3 9l5 5M3 9h10a7 7 0 0 1 0 14',reset:'M4 8a9 9 0 1 1-1 8M4 3v5h5',help:'M9 8a3 3 0 1 1 5 2c-1 1-2 1-2 4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z'};
@@ -127,6 +127,34 @@ function showRushEnd(){
  openModal('rush-end',`<div class="modal-pad rush-event-modal"><div class="rush-event-symbol">✦</div><div class="modal-kicker">CABARAN SELESAI</div><h2>Rush Hour tamat!</h2><p>Hebat! Berikut ialah hasil jualan pelanggan semasa Rush Hour hari ini.</p><div class="rush-end-earnings"><small>UNTUNG BERSIH + TIP RUSH HOUR</small><strong>${money(session.rushEarned||0)}</strong></div><div class="rush-event-stats"><span><b>${count}</b><small>Pelanggan dilayan</small></span><span><b>${money(session.rushRevenue||0)}</b><small>Jumlah jualan</small></span><span><b>+${money(session.rushBonus||0)}</b><small>Bonus pengganda</small></span></div>${lost?`<p class="rush-event-hint">${lost} pelanggan Rush Hour tidak sempat dilayan.</p>`:''}<p class="rush-event-hint">Pelanggan Rush Hour tidak menambah sasaran harian. Sambung pelanggan biasa untuk tamat syif.</p><button class="primary-btn rush-event-primary" id="rushEventContinue">Teruskan bermain ${icon('arrow')}</button></div>`);
  $('rushEventContinue').onclick=()=>{session.rushReportPending=false;session.rushReportShown=true;save();closeModal();if(['success','lost'].includes(phase))advance();else if(['waiting','supply'].includes(phase)&&dayFinished(session,progress.day))showSummary()};
  return true;
+}
+// Jadual syif adaptif: setiap pelanggan sasaran diberi satu slot masa.
+// 08:00 → ~21:45 untuk urusan pelanggan; kedai ditutup pada 22:00.
+// Timer kesabaran, KitaFood dan Rush Hour tetap berasaskan saat sebenar.
+const SHIFT_OPEN_MINUTES=8*60;
+const SHIFT_LAST_CUSTOMER_MINUTES=21*60+45;
+const SHIFT_CLOSE_MINUTES=22*60;
+const SHIFT_SECONDS_PER_CUSTOMER=38;
+function shiftSlotMinutes(){return (SHIFT_LAST_CUSTOMER_MINUTES-SHIFT_OPEN_MINUTES)/Math.max(1,dayTarget(progress.day))}
+function shiftQuotaCount(){return Math.min(dayTarget(progress.day),normalCustomerCount(session))}
+function syncShiftClockToCustomerCount(){
+ if(!session||mode!=='career'||phase==='end')return;
+ const milestone=SHIFT_OPEN_MINUTES+shiftQuotaCount()*shiftSlotMinutes();
+ session.clockMinutes=Math.min(SHIFT_CLOSE_MINUTES-1,Math.max(Number(session.clockMinutes)||SHIFT_OPEN_MINUTES,milestone));
+ renderOperations();
+}
+function tickShiftClock(dt){
+ if(!session||mode==='practice')return;
+ if(mode!=='career'){
+  session.clockMinutes=Math.min(SHIFT_CLOSE_MINUTES,(session.clockMinutes||SHIFT_OPEN_MINUTES)+dt*.35);
+  return;
+ }
+ const completed=shiftQuotaCount(),slot=shiftSlotMinutes();
+ const ceiling=completed>=dayTarget(progress.day)
+  ?SHIFT_CLOSE_MINUTES-1
+  :Math.min(SHIFT_CLOSE_MINUTES-1,SHIFT_OPEN_MINUTES+(completed+1)*slot-4);
+ const current=Math.max(SHIFT_OPEN_MINUTES,Number(session.clockMinutes)||SHIFT_OPEN_MINUTES);
+ session.clockMinutes=Math.min(SHIFT_CLOSE_MINUTES-1,Math.max(current,Math.min(ceiling,current+dt*slot/SHIFT_SECONDS_PER_CUSTOMER)));
 }
 function newSession(selectedMode='career'){if(selectedMode==='practice'&&mode==='career'){const current=captureGame();careerSessionCache=current.session?JSON.parse(JSON.stringify(current.session)):null;}mode=selectedMode;if(mode==='practice')practiceStore=null;session={dayStart:JSON.parse(JSON.stringify(progress)),day:progress.day,mode,served:0,lost:0,totalSales:0,tips:0,earned:0,mistakes:0,index:0,bestCombo:0,weighed:0,scans:0,perfectCash:0,claimedMissions:[],seenPeople:[],rushStarted:false,rushCompleted:false,rushSecondsRemaining:0,rushBonus:0,rushSales:0,rushServed:0,rushLost:0,rushRevenue:0,rushEarned:0,rushReportPending:false,rushReportShown:false};ensureShift(session);combo=0;initIllustrations();newCustomer()}
 function newCustomer(){
@@ -289,7 +317,7 @@ function completePayment(transaction=customer){
  if(rushBonus)session.rushSales=(session.rushSales||0)+1;
  session.served++;if(transaction.rushCustomer){session.rushServed=(session.rushServed||0)+1;session.rushRevenue=(session.rushRevenue||0)+amountDue(transaction);session.rushEarned=(session.rushEarned||0)+lastEarned;}if(transaction.method==='cash'&&!transaction.cashMistakes&&!transaction.overpaid)session.perfectCash=(session.perfectCash||0)+1;session.totalSales+=amountDue(transaction);session.tips+=lastTip;session.earned+=lastEarned;session.overpaid+=transaction.overpaid||0;
  if(mode==='career'){if(!rushUnlimited(transaction)){takeStock(progress,transaction.items);progress.paper--;}receiveStoreCash(progress,amountDue(transaction)+lastTip);progress.wallet+=rushBonus;progress.lifetime+=lastEarned;progress.bestCombo=Math.max(progress.bestCombo,combo);recordSale(transaction);if(transaction.method==='card'){progress.cardHealth=Math.max(0,progress.cardHealth-Math.max(4,24-4*Math.max(1,progress.upgrades.card||1)));progress.cardBroken=progress.cardHealth===0}}
- session.clockMinutes=Math.min(1320,session.clockMinutes+90);render();save();if(transaction.method==='cash')playChaChing();else beep('success');floatingTip(lastTip);if(combo%3===0)confetti(24);
+ // Jam kedai akan diselaraskan dengan sasaran pelanggan dalam advance().render();save();if(transaction.method==='cash')playChaChing();else beep('success');floatingTip(lastTip);if(combo%3===0)confetti(24);
  showTransactionResult(lastTip,starLost,reason,transaction.overpaid||0);advance();
 }
 function handleKitaFoodTimeout(){
@@ -301,6 +329,7 @@ function handleKitaFoodTimeout(){
 }
 function advance(){
  if(advancePending||!['success','lost'].includes(phase))return;
+ syncShiftClockToCustomerCount();
  if(mode==='career'&&session.stars===0){showStarRecovery();return}
  // Interstitials must resolve before spawning the next customer or ending a shift.
  if(mode==='career'){
@@ -357,6 +386,7 @@ function showCategoryProducts(categoryId){
 }
 function showShiftClosing(){
  if(!session)return;
+ if(mode==='career'){session.clockMinutes=SHIFT_CLOSE_MINUTES;renderOperations()}
  phase='end';save();
  openModal('shift-closing',`<div class="modal-pad"><div class="modal-kicker">PENUTUPAN SYIF · HARI ${progress.day}</div><h2>Semak sebelum tutup kedai</h2><p>Semua pelanggan harian telah dilayan. Semak laporan sebelum meneruskan.</p><div class="day-summary"><div><small>JUALAN</small><b>${money(session.totalSales||0)}</b></div><div><small>TIP</small><b>${money(session.tips||0)}</b></div><div><small>UNTUNG DIREKOD</small><b>${money(session.earned||0)}</b></div></div><p class="muted">Delivery: ${session.deliveryCompleted||0} pesanan · ${money(session.deliveryRevenue||0)} · Refund: ${money(session.refunds||0)} · Perbelanjaan: ${money(session.expenses||0)} · Pelanggan: ${session.served||0}</p><p class="muted">Laporan ini tidak mengubah baki wang atau mengira caj dua kali.</p><button class="primary-btn" id="confirmShiftClose" style="width:100%">Tutup kedai & lihat laporan</button></div>`);
  $('confirmShiftClose').onclick=()=>showSummary();
@@ -576,6 +606,7 @@ cloud=createCloudSync({
 });
 delivery=createDelivery({getProgress:()=>progress,getSession:()=>session,getMode:()=>mode,save,notify:toast,money,products:PRODUCTS,categories:CATEGORIES,productArt,icon,openModal,closeModal,receiveCash:receiveStoreCash,onFinish:(order,completed)=>{
  if(customer?.kind==='kitafood'&&customer.orderId===order.id){
+  syncShiftClockToCustomerCount();
   scanToken++;customer=null;phase='waiting';renderedSceneCustomer=undefined;renderedBasket=null;
   session.index++;session.waitSeconds=0;
   // Delivery handoff increments session.served in delivery.mjs. Do not count
@@ -613,7 +644,7 @@ document.addEventListener('keydown',e=>{
  }if(!paused&&phase==='offer'&&customer?.cardStage==='pin'&&(/^\d$/.test(e.key)||['Backspace','Enter'].includes(e.key))){e.preventDefault();pressPin(e.key==='Backspace'?'⌫':e.key==='Enter'?'OK':e.key);return}if(!paused&&!editing&&/^[1-9]$/.test(e.key)&&customer){const p=(Array.isArray(customer.items)?customer.items:[]).filter(p=>!p.scanned)[+e.key-1];if(p)processItem(p.uid)}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){save();cloud?.flush?.().catch(()=>{});if(!paused)showPause()}syncBackgroundMusic()});window.addEventListener('pagehide',()=>{save();cloud?.flush?.().catch(()=>{});musicUnlocked=false;musicFade=null;musicTarget=0;writeMusicLevel(0);$('backgroundMusic').pause();stopScannerSound();stopChaChing();stopScaleSound();stopDrawerSound()});window.addEventListener('pageshow',()=>{if(session&&modalKind!=='intro'){musicUnlocked=true;syncBackgroundMusic()}});
 let lastTick=performance.now(),sinceSave=0;function loop(now){const dt=Math.min((now-lastTick)/1000,.1);lastTick=now;if(!paused&&!document.hidden&&session&&phase!=='end'){
- if(mode!=='practice'){session.clockMinutes=Math.min(1320,(session.clockMinutes||480)+dt*.35);renderOperations();sinceSave+=dt;if(sinceSave>5){save();sinceSave=0}}
+ if(mode!=='practice'){tickShiftClock(dt);renderOperations();sinceSave+=dt;if(sinceSave>5){save();sinceSave=0}}
  if(mode==='career'&&tickRushHour(session,dt)){
    restoreRushPatience();applyMachineSpeeds();
    session.rushReportPending=true;
