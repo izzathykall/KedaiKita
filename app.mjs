@@ -1,8 +1,8 @@
-import {enhanceManagement} from './design.mjs?v=2026-10-21-v55-3-music-options';
-import {createDelivery} from './delivery.mjs?v=2026-10-21-v55-3-music-options';
-import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-21-v55-3-music-options';
-import {productArt,productImage,moneyArt} from './art.mjs?v=2026-10-21-v55-3-music-options';
-import {createCloudSync} from './cloud.mjs?v=2026-10-21-v55-3-music-options';
+import {enhanceManagement} from './design.mjs?v=2026-10-21-v56-account-music-selection';
+import {createDelivery} from './delivery.mjs?v=2026-10-21-v56-account-music-selection';
+import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-21-v56-account-music-selection';
+import {productArt,productImage,moneyArt} from './art.mjs?v=2026-10-21-v56-account-music-selection';
+import {createCloudSync} from './cloud.mjs?v=2026-10-21-v56-account-music-selection';
 
 const $=id=>document.getElementById(id);
 const ICONS={basket:'M3 9h18l-2 11H5L3 9ZM8 9l4-7 4 7M8 13v3m4-3v3m4-3v3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5',shop:'M3 10V5h18v5M4 10v11h16V10M2 10a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0M9 21v-7h6v7',volume:'M11 4 6 8H2v8h4l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14',mute:'M11 4 6 8H2v8h4l5 4V4Zm5 5 6 6m0-6-6 6',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',pause:'M8 4v16m8-16v16',scan:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M6 12h12M7 9v6m3-6v6m4-6v6m3-6v6',scale:'M6 7h12l3 14H3L6 7Zm3 0V5a3 3 0 0 1 6 0v2m-3 4v5m-2-2h4',arrow:'M4 12h16m-6-6 6 6-6 6',heart:'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',flag:'M5 21V3m0 0c5-3 9 3 14 0v10c-5 3-9-3-14 0',receipt:'M5 3h14v19l-3-2-4 2-4-2-3 2V3Zm3 5h8m-8 4h8m-8 4h5',lock:'M6 10h12v11H6V10Zm3 0V6a3 3 0 0 1 6 0v4',card:'M2 5h20v14H2V5Zm0 5h20M6 15h4',qr:'M3 3h6v6H3V3Zm12 0h6v6h-6V3ZM3 15h6v6H3v-6Zm12 0h3v3h3v3h-6v-6Zm6-3v3M12 3v3m0 6v3M3 12h6m3 6v3',cash:'M2 5h20v14H2V5Zm10 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM5 8h1m12 8h1',check:'M5 12l4 4L19 6',close:'M6 6l12 12M6 18 18 6',play:'m8 4 12 8-12 8V4Z',snow:'M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4m13 9-4 1 1 4M4 14l4 1-1 4m13-9-4-1 1-4',delivery:'M7 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM9 19h7l2-5-2-5h-4l-3 5H5l-2 5h2m5-5h5m-5-5h4M5 7h4m-6 3h6',spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z',undo:'M8 4 3 9l5 5M3 9h10a7 7 0 0 1 0 14',reset:'M4 8a9 9 0 1 1-1 8M4 3v5h5',help:'M9 8a3 3 0 1 1 5 2c-1 1-2 1-2 4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z'};
@@ -71,6 +71,10 @@ function captureGame(){
 
 function hydrateGame(data){
  scanToken++;busy=false;advancePending=false;practiceStore=null;paymentMinimized=false;
+ // A login/account switch must not inherit the previous account's playing track.
+ ++musicStartToken;musicStarting=false;musicFade=null;musicTarget=-1;
+ musicLoadedChoice=null;musicIndex=-1;musicUnlocked=false;
+ const previousPlayer=$('backgroundMusic');if(previousPlayer){previousPlayer.pause();writeMusicLevel(0)}
  mode='career';progress=restoreProgress(JSON.stringify(data?.progress||createProgress()));
  practiceRunCache=data?.practiceRun?.session?.mode==='practice'?data.practiceRun:null;careerSessionCache=data?.session||null;
  sound=data?.sound!==false;session=null;customer=null;phase='scan';combo=0;
@@ -1010,15 +1014,13 @@ function playScannerSound(){
 }
 
 function scrollChangeTrayEnd(){const tray=$('changeTray');if(tray)tray.scrollLeft=tray.scrollWidth}
-function musicChoice(){const choice=String(progress.settings?.musicTrack??'1');return choice==='4'?'3':(['1','2','3','random'].includes(choice)?choice:'1')}
+function musicChoice(){const choice=String(progress.settings?.musicTrack??'random');return choice==='4'?'3':(['1','2','3','random'].includes(choice)?choice:'random')}
 function randomMusicIndex(previous=-1){
  const others=MUSIC_TRACKS.map((_,i)=>i).filter(i=>i!==previous);
  return others[Math.floor(Math.random()*others.length)];
 }
 function refreshMusicLabel(){
  const label=$('musicNowPlaying');if(label)label.textContent='Sedang dimainkan: '+MUSIC_TRACKS[Math.max(0,musicIndex)].name;
- const hint=$('musicModeHint');if(hint)hint.textContent=musicChoice()==='random'?'Random: lagu lain dimainkan secara automatik selepas lagu tamat.':'Pilihan ini akan berulang sehingga anda tukar muzik.';
- const next=$('musicNext');if(next)next.hidden=musicChoice()!=='random';
 }
 function switchMusicTrack(index,autoplay=false){
  const player=$('backgroundMusic');if(!player||index<0||index>=MUSIC_TRACKS.length)return;
@@ -1101,12 +1103,17 @@ function playTapSound(){
  if(!sound||effectVolume('tap')===0)return;prepareScannerAudio();if(!audioCtx)return;
  try{const node=audioCtx.createOscillator(),gain=audioCtx.createGain(),t=audioCtx.currentTime;node.type='triangle';node.frequency.setValueAtTime(750,t);node.frequency.exponentialRampToValueAtTime(330,t+.035);gain.gain.setValueAtTime(.15*effectVolume('tap'),t);gain.gain.exponentialRampToValueAtTime(.001,t+.04);node.connect(gain);gain.connect(audioCtx.destination);node.start(t);node.stop(t+.045);node.onended=()=>{node.disconnect();gain.disconnect()}}catch{}
 }
-function musicSettingsHTML(){return `<div class="setting-row"><div><b>Muzik latar</b><small>3 pilihan lagu · main ikut pilihan atau secara rawak.</small></div><button class="toggle ${progress.settings.music!==false?'on':''}" id="toggleMusic" aria-label="Muzik latar" aria-pressed="${progress.settings.music!==false}"><i></i></button></div><div class="sound-settings music-settings"><label for="musicVolume">Volume muzik <b id="musicVolumeLabel">${Math.round(musicVolume()*100)}%</b></label><input id="musicVolume" type="range" min="0" max="100" step="5" value="${Math.round(musicVolume()*100)}" aria-label="Volume muzik latar"><div class="music-track-picker"><label for="musicTrack">Pilih lagu latar</label><select id="musicTrack" aria-label="Pilihan muzik latar">${MUSIC_TRACKS.map((track,i)=>`<option value="${i+1}" ${musicChoice()===String(i+1)?'selected':''}>${track.name}</option>`).join('')}<option value="random" ${musicChoice()==='random'?'selected':''}>Random</option></select><div class="music-track-info"><span id="musicNowPlaying" aria-live="polite">Sedang dimainkan: ${MUSIC_TRACKS[Math.max(0,musicIndex)].name}</span><button type="button" class="secondary-btn" id="musicNext" ${musicChoice()==='random'?'':'hidden'}>Lagu seterusnya →</button></div><small id="musicModeHint">${musicChoice()==='random'?'Random: lagu lain dimainkan secara automatik selepas lagu tamat.':'Pilihan ini akan berulang sehingga anda tukar muzik.'}</small></div><span>Muzik terus bermain dalam Tetapan. Tekan Jeda untuk berhenti.</span></div>`}
+function musicSettingsHTML(){return `<div class="setting-row"><div><b>Muzik latar</b><small>3 pilihan lagu · main ikut pilihan atau secara rawak.</small></div><button class="toggle ${progress.settings.music!==false?'on':''}" id="toggleMusic" aria-label="Muzik latar" aria-pressed="${progress.settings.music!==false}"><i></i></button></div><div class="sound-settings music-settings"><label for="musicVolume">Volume muzik <b id="musicVolumeLabel">${Math.round(musicVolume()*100)}%</b></label><input id="musicVolume" type="range" min="0" max="100" step="5" value="${Math.round(musicVolume()*100)}" aria-label="Volume muzik latar"><div class="music-track-picker"><label for="musicTrack">Pilih lagu latar</label><select id="musicTrack" aria-label="Pilihan muzik latar">${MUSIC_TRACKS.map((track,i)=>`<option value="${i+1}" ${musicChoice()===String(i+1)?'selected':''}>${track.name}</option>`).join('')}<option value="random" ${musicChoice()==='random'?'selected':''}>Random</option></select><div class="music-track-info"><span id="musicNowPlaying" aria-live="polite">Sedang dimainkan: ${MUSIC_TRACKS[Math.max(0,musicIndex)].name}</span></div></div><span>Muzik terus bermain dalam Tetapan. Tekan Jeda untuk berhenti.</span></div>`}
 function bindMusicSettings(){
  $('toggleMusic').onclick=()=>{progress.settings.music=progress.settings.music===false;syncBackgroundMusic();save();showSettings()};
  $('musicVolume').oninput=()=>{progress.settings.musicVolume=Number($('musicVolume').value)/100;$('musicVolumeLabel').textContent=Math.round(musicVolume()*100)+'%';syncBackgroundMusic();save()};
- $('musicTrack').onchange=()=>{progress.settings.musicTrack=$('musicTrack').value;musicUnlocked=true;syncBackgroundMusic();save();refreshMusicLabel()};
- $('musicNext').onclick=()=>{if(musicChoice()==='random'){musicUnlocked=true;nextRandomTrack()}};
+ $('musicTrack').onchange=()=>{
+  // Persist the user's explicit choice in the same progress saved per account.
+  progress.settings.musicTrack=$('musicTrack').value;
+  musicUnlocked=true;syncBackgroundMusic();save();refreshMusicLabel();
+  // Do not wait for the normal 3-second Firebase debounce when changing preferences.
+  cloud?.flush?.().catch(()=>{});
+ };
  refreshMusicLabel();
 }
 

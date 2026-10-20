@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-21-v55-3-music-options",
+  "version": "2026-10-21-v56-account-music-selection",
   "title": "Kedai Kita Studio",
-  "notes": "Pilihan muzik kini hanya Music 1, Music 2, Music 3 dan Random. Lagu baru yang dihantar oleh pengguna boleh dipilih satu-satu atau dimainkan rawak tanpa ulang lagu sama secara berturut-turut."
+  "notes": "Tetapan muzik dikemas kini: Music 1–3 dan Random sahaja, tanpa butang lagu seterusnya atau penerangan tambahan. Pengguna baharu bermula dengan Random; pilihan akaun disimpan dan dimainkan semula apabila log masuk."
 }
