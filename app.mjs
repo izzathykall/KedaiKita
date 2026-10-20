@@ -1,7 +1,7 @@
 import {enhanceManagement} from './design.mjs?v=2026-10-20-v39-customer-kitafood';
 import {createDelivery} from './delivery.mjs?v=2026-10-20-v39-customer-kitafood';
 import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-20-v39-customer-kitafood';
-import {productArt,productImage,moneyArt} from './art.mjs?v=2026-10-20-v39-customer-kitafood';
+import {productArt,productImage,moneyArt} from './art.mjs?v=2026-10-20-v40-startup-fix';
 import {createCloudSync} from './cloud.mjs?v=2026-10-20-v39-customer-kitafood';
 
 const $=id=>document.getElementById(id);

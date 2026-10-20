@@ -38,6 +38,18 @@ export function productArt(id,extra=''){
  PRODUCT_ART_CACHE.set(cacheKey,result);return result;
 }
 
+// Standalone image documents avoid inline SVG filter/compositing glitches in
+// scrollable inventory dialogs. The conveyor keeps its animated inline SVG.
+const PRODUCT_IMAGE_CACHE=new Map();
+export function productImage(id){
+ if(PRODUCT_IMAGE_CACHE.has(id))return PRODUCT_IMAGE_CACHE.get(id);
+ const svg=productArt(id).replace('<svg ', '<svg width="100" height="100" ');
+ const name=CATALOG_LOOKUP.get(id)?.name||'Produk';
+ const alt=name.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const result=`<img class="stock-product-image" src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}" alt="${alt}" width="100" height="126" loading="eager" decoding="sync" draggable="false">`;
+ PRODUCT_IMAGE_CACHE.set(id,result);return result;
+}
+
 function localProductArt(id){
  const leaf='<path d="M10 72 26 38 89 52 75 87Z" fill="#8baa75"/><path d="m22 76 56-21m-50 8 39 9" stroke="#c2cf9d" stroke-width="2" opacity=".5"/>';
  const plate='<ellipse cx="50" cy="70" rx="42" ry="18" fill="#d6e1d8"/><ellipse cx="50" cy="66" rx="37" ry="15" fill="#f9f3df"/>';
