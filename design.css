@@ -167,16 +167,11 @@ body.reduced-motion .account-store-plant{animation:none!important}
 .customer.impatient .customer-hands{animation:customer-tap .8s ease-in-out infinite;transform-origin:100px 230px}
 @keyframes customer-angry{0%,100%{transform:rotate(-1deg)}45%,65%{transform:rotate(1deg)}}
 @keyframes customer-tap{0%,45%,100%{transform:translateY(0)}25%{transform:translateY(-5px)}}
-#deliveryBtn{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:8px;row-gap:2px;align-content:center;align-items:center;min-width:122px;padding-inline:10px 12px!important}
-#deliveryBtn>[data-icon]{grid-column:1;grid-row:1 / span 2;align-self:center}
-#deliveryBtn>span:last-child{grid-column:2;grid-row:2;font-weight:700;line-height:1.05}
-#deliveryBtn .kf-nav-timer{grid-column:2;grid-row:1;justify-self:start;display:inline-flex;align-items:center;min-height:18px;padding:2px 8px;border-radius:999px;background:#e7f4ea;border:1px solid #c8dfcf;color:var(--green-dark,#24694f);font:900 12px/1 var(--font);font-variant-numeric:tabular-nums;letter-spacing:.35px;box-shadow:inset 0 1px 0 #fff}
-#deliveryBtn .kf-nav-timer[hidden]{display:none}
-#deliveryBtn .kf-nav-timer.urgent{background:#fff0e8;border-color:#efc8b2;color:#b04c35}
-#deliveryBtn:not(.delivery-alert)>span:last-child{grid-row:1 / span 2;align-self:center}
-@media(max-width:760px){#deliveryBtn{min-width:0;padding-inline:8px!important}#deliveryBtn .kf-nav-timer{font-size:11px;padding:2px 6px;min-height:16px}}
-body[data-theme="dark"] #deliveryBtn .kf-nav-timer{background:#28493a;border-color:#486f57;color:#c8efd6}
-body[data-theme="dark"] #deliveryBtn .kf-nav-timer.urgent{background:#4a332d;border-color:#8d6155;color:#ffd8c9}
+#deliveryBtn{position:relative;display:inline-flex;align-items:center;gap:8px;min-width:0;padding-inline:10px 12px!important}
+#deliveryBtn>[data-icon]{flex:none}
+#deliveryBtn>span:last-child{font-weight:700;line-height:1.05}
+#deliveryBtn .kf-nav-timer{display:none!important}
+@media(max-width:760px){#deliveryBtn{padding-inline:8px!important}}
 #modal[data-kind="delivery"]{min-height:0!important;height:auto!important}
 #modal[data-kind="delivery"] #modalContent{min-height:0;height:auto}
 #modal[data-kind="delivery"] .kf-ui{max-width:none;min-height:0}

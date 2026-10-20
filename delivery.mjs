@@ -15,7 +15,8 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
  const foodCategories=new Set(['essentials','snacks','meals','bakery','frozen','beverages','pantry','kuih']);
  const statsDefault=()=>({completed:0,cancelled:0,revenue:0,bonus:0,late:0,starsTotal:0});
  let activeId=null,stage='list',search='',filter='all',lastPicked=null,clockHandle=null,lastSavedAt=0,resultPending=null;
- const timeLimit=day=>Math.max(65,135-Math.max(0,day-3)*5);
+ const RIDER_TIME_LIMIT=30,URGENT_TIME_LIMIT=10;
+ const timeLimit=day=>RIDER_TIME_LIMIT;
  const pending=d=>d.orders.filter(o=>['new','packing','ready'].includes(o.status)&&Array.isArray(o.items));
  const picked=o=>o.items.filter(x=>x.packed).length;
  const ready=o=>!!o.items.length&&o.items.every(x=>x.packed);
@@ -44,13 +45,11 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
  }
  function updateIndicator(d){
   const b=document.getElementById('deliveryBtn');if(!b)return;
-  const orders=pending(d),n=orders.length,o=orders.find(x=>x.id===activeId)||orders[0];
+  const orders=pending(d),n=orders.length;
   b.dataset.pending=String(n);b.classList.toggle('delivery-alert',n>0);
-  let timer=b.querySelector('.kf-nav-timer');
-  if(!timer){timer=document.createElement('span');timer.className='kf-nav-timer';timer.setAttribute('aria-hidden','true');b.prepend(timer)}
-  timer.hidden=!o;timer.textContent=o?clockText(o):'';timer.classList.toggle('urgent',!!o&&due(o)<30);
-  b.title=o?`KitaFood · Baki masa ${clockText(o)}`:'KitaFood';
-  b.setAttribute('aria-label',o?`KitaFood, ${n} pesanan aktif, baki masa ${clockText(o)}`:'KitaFood');
+  b.querySelector('.kf-nav-timer')?.remove();
+  b.title=n?`KitaFood · ${n} pesanan aktif`:'KitaFood';
+  b.setAttribute('aria-label',n?`KitaFood, ${n} pesanan aktif`:'KitaFood');
  }
  function personFor(order){const normalized=people.find(x=>x.name===order?.rider)||people[0];return {...normalized,id:'rider-kita-food',role:'KitaFood · Rakan Penghantar'};}
  function newOrder(){
@@ -82,7 +81,7 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   clockHandle=setInterval(()=>{
    const d=ensure(),o=pending(d).find(x=>x.id===activeId);
    const e=document.getElementById('kfTimer');
-   if(e&&o){e.textContent=clockText(o);e.closest('.kf-timer')?.classList.toggle('urgent',due(o)<30)}
+   if(e&&o){e.textContent=clockText(o);e.closest('.kf-timer')?.classList.toggle('urgent',due(o)<=URGENT_TIME_LIMIT)}
    if(pending(d).length&&Date.now()-lastSavedAt>=5000){lastSavedAt=Date.now();save()}
   },250);
  }
@@ -97,7 +96,7 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
  }
  function orderRows(o){return o.items.map((x,i)=>`<div class="kf-order-row ${x.packed?'done':''}"><span class="kf-item-number">${x.packed?icon('check'):String(i+1).padStart(2,'0')}</span><div><b>${safe(x.name)}</b><small>1 unit · ${money(x.price)}</small></div><span class="kf-row-status">${x.packed?'Dalam beg':'Belum ambil'}</span></div>`).join('')}
  function ticket(o){return `<section class="kf-ticket"><div class="kf-section-heading"><div><small>SENARAI BARANGAN</small><h3>Pesanan ${safe(o.id)}</h3></div><b>${picked(o)}/${o.items.length}</b></div><div class="kf-order-rows">${orderRows(o)}</div><div class="kf-ticket-total"><span>DIBAYAR DALAM APLIKASI</span><strong>${money(total(o))}</strong></div></section>`}
- function riderHeader(o){return `<div class="kf-rider"><div class="kf-rider-badge">${icon('delivery')}</div><div class="kf-rider-info"><small>RIDER KITAFOOD DI KAUNTER</small><h3>${safe(o.rider)} <span>· ${safe(o.id)}</span></h3><p>“Hai! Saya datang ambil pesanan pelanggan.”</p></div><div class="kf-timer ${due(o)<30?'urgent':''}"><small>MASA BAKI</small><strong id="kfTimer">${Math.floor(due(o)/60)}:${String(due(o)%60).padStart(2,'0')}</strong></div></div>`}
+ function riderHeader(o){return `<div class="kf-rider"><div class="kf-rider-badge">${icon('delivery')}</div><div class="kf-rider-info"><small>RIDER KITAFOOD DI KAUNTER</small><h3>${safe(o.rider)} <span>· ${safe(o.id)}</span></h3><p>“Hai! Saya datang ambil pesanan pelanggan.”</p></div><div class="kf-timer ${due(o)<=URGENT_TIME_LIMIT?'urgent':''}"><small>MASA BAKI</small><strong id="kfTimer">${Math.floor(due(o)/60)}:${String(due(o)%60).padStart(2,'0')}</strong></div></div>`}
  function render(id=activeId,{preserve=false}={}){
   const d=ensure(),p=getProgress(),o=pending(d).find(x=>x.id===id)||pending(d)[0]||null;
   activeId=o?.id||null;
@@ -174,6 +173,11 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   openModal('delivery',`<div class="modal-pad kf-ui kf-result"><section class="kf-result-story"><div class="kf-result-emblem">${icon(success?'check':'close')}</div><small>KITAFOOD · ${safe(o.id)}</small><h2>${success?'Pesanan berjaya diserahkan!':'Pesanan dibatalkan'}</h2><p>${success?`Terima kasih! Rider ${safe(o.rider)} sudah mengambil beg dan bersedia membuat penghantaran.`:'Rider telah dimaklumkan. Stok kekal dan tiada bayaran direkodkan.'}</p></section><section class="kf-result-summary">${success?`<div class="kf-result-stars">${stars} <small>Penilaian perkhidmatan</small></div><div class="kf-result-table"><div>Nilai pesanan <b>${money(total(o))}</b></div><div>Untung kedai <b>${money(o.earned-o.bonus)}</b></div><div>Bonus pantas <b>${money(o.bonus)}</b></div><div class="total">Jumlah diterima <b>${money(o.earned)}</b></div></div>`:'<div class="kf-cancel-summary">Tiada stok ditolak.<br>Kaunter sedia untuk pelanggan seterusnya.</div>'}</section><button id="kfNext" class="primary-btn kf-big-button">${success?'Rider Beredar · Pelanggan Seterusnya':'Teruskan Layan Pelanggan'} ${icon('arrow')}</button></div>`);
   document.getElementById('kfNext').onclick=()=>{resultPending=null;closeModal();onFinish(o,success)};
  }
+ function expireOrder(id){
+  const o=pending(ensure()).find(x=>x.id===id)||pending(ensure())[0];
+  if(!o)return;
+  finish(o,false);
+ }
  function open(id){
   if(resultPending){showResult(resultPending.o,resultPending.success);return}
   const doneOrder=ensure().orders.find(x=>x.id===id&&['completed','cancelled'].includes(x.status));
@@ -183,5 +187,5 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   render(o?.id||null);
  }
  function resumeOrder(id){activeId=null;open(id)}
- return {open,ensure,maybeArrive,personFor,resumeOrder,stopClock,spawnTestOrder:newOrder};
+ return {open,ensure,maybeArrive,personFor,resumeOrder,stopClock,expireOrder,spawnTestOrder:newOrder};
 }
