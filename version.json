@@ -1,1 +1,5 @@
-{"version": "2026-10-20-v45-countdown-values", "title": "Kedai Kita Studio", "notes": "Nilai baki masa mm:ss menggantikan perkataan Timer/Sabar. Tempoh rider 30 saat dan animasi pelanggan yang stabil dikekalkan."}
+{
+  "version": "2026-10-20-v46-regular-20-seconds",
+  "title": "Kedai Kita Studio",
+  "notes": "Timer pelanggan biasa 20 saat (0:20) bermula dari kemunculan pelanggan, Rider KitaFood kekal 30 saat, Rush Hour 10 saat, dan naik taraf keselesaan masih menambah masa seperti asal."
+}

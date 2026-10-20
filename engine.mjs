@@ -768,7 +768,7 @@ export function makeCustomer(day,index,rng=Math.random,options={}){
  const fail=challenges&&method==='card'&&day>=11&&rng()<declineChance;
  const declineRoll=rng();
  const cardDeclineReason=fail?(declineRoll<.45?'insufficient':declineRoll<.75?'technical':'expired'):null;
- return {person,items,method,willTip:rng()<.4,dialogueSeed:Math.floor(rng()*10000),cardFailure:false,cardDeclineReason,cardDeclineHandled:false,total:basketTotal(items),tender:tenderFor(basketTotal(items)),patience:Math.round(Math.max(65,115-day*4)*(kind==='express'?.8:1)),elapsed:0,kind,hasCoupon:index%3===1,couponApplied:false,discount:0,requiresPin:method==='card'&&rng()<.5,cardPin:String(1000+Math.floor(rng()*9000)),cardStage:'ready',pinInput:''};
+ return {person,items,method,willTip:rng()<.4,dialogueSeed:Math.floor(rng()*10000),cardFailure:false,cardDeclineReason,cardDeclineHandled:false,total:basketTotal(items),tender:tenderFor(basketTotal(items)),patience:20,patienceRulesVersion:46,elapsed:0,kind,hasCoupon:index%3===1,couponApplied:false,discount:0,requiresPin:method==='card'&&rng()<.5,cardPin:String(1000+Math.floor(rng()*9000)),cardStage:'ready',pinInput:''};
 }
 export function unlockCategory(progress,id){
  const c=CATEGORIES.find(c=>c.id===id);
