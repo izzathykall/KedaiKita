@@ -259,3 +259,39 @@ body.reduced-motion .customer.impatient,body.reduced-motion .customer.impatient 
 .kf-review-product>.product-art{width:45px;height:50px}.kf-review-product b{font-size:12px;overflow-wrap:anywhere}.kf-review-product>.icon{width:16px;height:16px}
 .payment-overlay[data-method="qr"] .payment-sheet #paymentArea{overflow-y:auto}
 @media(max-width:690px){.kf-review-list{grid-template-columns:1fr 1fr;margin:12px 0}.kf-review-list .kf-review-product{grid-template-columns:30px minmax(0,1fr);padding:7px;gap:5px}.kf-review-product>.product-art{width:30px;height:37px}.kf-review-product b{font-size:10px}.kf-review-product>.icon{display:none}}
+
+
+/* V41: Stable anchored anger pose. Never animate the positioned customer's
+   translateX(-50%): the body stays in precisely the same place in both moods. */
+.store-scene .customer.impatient{animation:breathe 4s ease-in-out infinite;transform-origin:bottom center}
+.store-scene .customer:not(.arrive):not(.leaving) > svg{
+ transform-origin:50% 95%;transform-box:view-box;
+ transition:transform .52s cubic-bezier(.2,.75,.25,1);
+}
+.store-scene .customer.impatient:not(.arrive):not(.leaving) > svg{transform:rotate(-2deg)}
+.store-scene .customer .customer-brows,
+.store-scene .customer .customer-angry-brows,
+.store-scene .customer .customer-mouth,
+.store-scene .customer .customer-angry-mouth{
+ transition:opacity .48s cubic-bezier(.2,.65,.25,1);
+}
+.store-scene .customer .customer-brows,
+.store-scene .customer .customer-mouth{opacity:1}
+.store-scene .customer .customer-angry-brows,
+.store-scene .customer .customer-angry-mouth{opacity:0}
+.store-scene .customer.impatient .customer-brows,
+.store-scene .customer.impatient .customer-mouth{opacity:0}
+.store-scene .customer.impatient .customer-angry-brows,
+.store-scene .customer.impatient .customer-angry-mouth{opacity:1}
+.store-scene .customer .customer-anger{opacity:0;transition:opacity .5s ease}
+.store-scene .customer.impatient .customer-anger{opacity:1}
+.store-scene .customer.impatient .customer-hands{animation:customer-tap .9s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){
+ .store-scene .customer.impatient,.store-scene .customer.impatient .customer-hands{animation:none!important}
+ .store-scene .customer:not(.arrive):not(.leaving) > svg,
+ .store-scene .customer .customer-brows,.store-scene .customer .customer-angry-brows,
+ .store-scene .customer .customer-mouth,.store-scene .customer .customer-angry-mouth{transition:none!important}
+}
+body.reduced-motion .store-scene .customer.impatient,
+body.reduced-motion .store-scene .customer.impatient .customer-hands{animation:none!important}
+body.reduced-motion .store-scene .customer:not(.arrive):not(.leaving) > svg{transition:none!important}

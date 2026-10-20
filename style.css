@@ -1858,3 +1858,23 @@ body[data-theme="dark"] .kf-timer{background:#1d362a;border-color:#456a50}body[d
   #categoryProductDialog .category-product-description b{font-size:11px}
   #categoryProductDialog .category-product-footer{padding:12px;gap:7px;font-size:10px}
 }
+
+
+/* V41: Scale the *existing* game canvas uniformly to the available device
+   viewport, retaining every original desktop/tablet/mobile layout and order. */
+.app.game-viewport-fit{
+ --game-zoom:1;
+ box-sizing:border-box;
+ zoom:var(--game-zoom);
+ width:100%;
+ height:calc(100dvh / var(--game-zoom))!important;
+ min-height:0!important;
+ max-width:calc(1800px / var(--game-zoom));
+}
+@media(max-width:760px){
+ .app.game-viewport-fit{
+  padding-left:max(12px,env(safe-area-inset-left));
+  padding-right:max(12px,env(safe-area-inset-right));
+  padding-bottom:max(16px,env(safe-area-inset-bottom));
+ }
+}
