@@ -293,3 +293,26 @@ body.reduced-motion .customer.impatient,body.reduced-motion .customer.impatient 
 body.reduced-motion .store-scene .customer.impatient,
 body.reduced-motion .store-scene .customer.impatient .customer-hands{animation:none!important}
 body.reduced-motion .store-scene .customer:not(.arrive):not(.leaving) > svg{transition:none!important}
+
+/* V60 — account button opens a centered dialog; initial sign-in stays separate. */
+#accountOverlay.account-compact{
+  inset:0!important;margin:auto!important;
+  width:min(430px,calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important;
+  height:fit-content!important;max-height:calc(100dvh - 32px)!important;
+  padding:0!important;border:0!important;border-radius:24px!important;
+  background:transparent!important;overflow:auto!important;
+  box-shadow:0 24px 80px #071d1540!important;
+}
+#accountOverlay.account-compact[open]{display:block!important}
+#accountOverlay.account-compact .account-panel{
+  display:block!important;width:100%!important;max-width:none!important;
+  min-height:0!important;height:auto!important;max-height:none!important;
+  padding:22px 22px 18px!important;margin:0!important;
+  border:1px solid #d8e5d8!important;border-radius:24px!important;
+  overflow:visible!important;background:linear-gradient(180deg,#fffef9,#eff5ef)!important;
+}
+#accountOverlay.account-compact .account-welcome,
+#accountOverlay.account-compact .account-store-art{display:none!important}
+#accountOverlay.account-compact .account-form-side,
+#accountOverlay.account-compact .account-form-inner{display:block!important;min-height:0!important;min-width:0!important;width:100%!important;padding:0!important;margin:0!important}
+#accountOverlay.account-compact .account-logo{display:flex!important}

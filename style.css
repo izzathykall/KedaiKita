@@ -2155,17 +2155,24 @@ body[data-theme="dark"] .music-track-picker>small{color:#b4cbbb}
 
 
 /* V59 — QR popup parity, professional scanner, stable conveyor, and pause-style account popup. */
-.product{
+/* Preserve slot positioning and vertical centering in every interaction state.
+   Hover changes only the highlight, so touch hover cannot move a belt item. */
+.products > .product{
   animation:none!important;
-  transition:opacity .18s ease, box-shadow .18s ease, filter .18s ease, background-color .18s ease, border-color .18s ease!important;
-  transform:translateZ(0);
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
-  will-change:auto;
+  transform:translate(calc(var(--slot) * (100% + 9px)),-50%);
+  transition:transform var(--item-slide-duration,.58s) cubic-bezier(.22,.8,.25,1),opacity .18s ease,filter .18s ease!important;
 }
-.product:hover{transform:translateY(-3px) rotate(-1.2deg) translateZ(0)}
-.product.scanned,.product.busy{transition:opacity .16s ease, box-shadow .16s ease, filter .16s ease, transform .16s ease!important}
-.products{transform:translateZ(0);backface-visibility:hidden}
+.products > .product:hover{
+  transform:translate(calc(var(--slot) * (100% + 9px)),-50%);
+  filter:brightness(1.04);
+}
+.products > .product.busy{
+  transform:translate(calc(var(--slot) * (100% + 9px)),-50%) scale(.92);
+}
+.products > .product.scanned{
+  transform:translate(calc(var(--slot) * (100% + 9px)),60px) scale(.65);
+  opacity:0;visibility:hidden;pointer-events:none;
+}
 
 .payment-overlay[data-method="qr"] .payment-sheet{width:min(690px,100%)!important}
 .payment-overlay[data-method="qr"] .payment-sheet .payment-scene{height:360px!important}
