@@ -1,8 +1,8 @@
-import {enhanceManagement} from './design.mjs?v=2026-10-21-v58-mobile-ui-qr-cash-account';
-import {createDelivery} from './delivery.mjs?v=2026-10-21-v58-mobile-ui-qr-cash-account';
-import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-21-v58-mobile-ui-qr-cash-account';
-import {productArt,productImage,moneyArt} from './art.mjs?v=2026-10-21-v58-mobile-ui-qr-cash-account';
-import {createCloudSync} from './cloud.mjs?v=2026-10-21-v58-mobile-ui-qr-cash-account';
+import {enhanceManagement} from './design.mjs?v=2026-10-21-v59-qr-cash-account-conveyor';
+import {createDelivery} from './delivery.mjs?v=2026-10-21-v59-qr-cash-account-conveyor';
+import {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS} from './engine.mjs?v=2026-10-21-v59-qr-cash-account-conveyor';
+import {productArt,productImage,moneyArt} from './art.mjs?v=2026-10-21-v59-qr-cash-account-conveyor';
+import {createCloudSync} from './cloud.mjs?v=2026-10-21-v59-qr-cash-account-conveyor';
 
 const $=id=>document.getElementById(id);
 const ICONS={basket:'M3 9h18l-2 11H5L3 9ZM8 9l4-7 4 7M8 13v3m4-3v3m4-3v3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5',shop:'M3 10V5h18v5M4 10v11h16V10M2 10a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0M9 21v-7h6v7',volume:'M11 4 6 8H2v8h4l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14',mute:'M11 4 6 8H2v8h4l5 4V4Zm5 5 6 6m0-6-6 6',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',pause:'M8 4v16m8-16v16',scan:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M6 12h12M7 9v6m3-6v6m4-6v6m3-6v6',scale:'M6 7h12l3 14H3L6 7Zm3 0V5a3 3 0 0 1 6 0v2m-3 4v5m-2-2h4',arrow:'M4 12h16m-6-6 6 6-6 6',heart:'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',flag:'M5 21V3m0 0c5-3 9 3 14 0v10c-5 3-9-3-14 0',receipt:'M5 3h14v19l-3-2-4 2-4-2-3 2V3Zm3 5h8m-8 4h8m-8 4h5',lock:'M6 10h12v11H6V10Zm3 0V6a3 3 0 0 1 6 0v4',card:'M2 5h20v14H2V5Zm0 5h20M6 15h4',qr:'M3 3h6v6H3V3Zm12 0h6v6h-6V3ZM3 15h6v6H3v-6Zm12 0h3v3h3v3h-6v-6Zm6-3v3M12 3v3m0 6v3M3 12h6m3 6v3',cash:'M2 5h20v14H2V5Zm10 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM5 8h1m12 8h1',check:'M5 12l4 4L19 6',close:'M6 6l12 12M6 18 18 6',play:'m8 4 12 8-12 8V4Z',snow:'M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4-1-1-4m13 9-4 1 1 4M4 14l4 1-1 4m13-9-4-1 1-4',delivery:'M7 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM9 19h7l2-5-2-5h-4l-3 5H5l-2 5h2m5-5h5m-5-5h4M5 7h4m-6 3h6',spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z',undo:'M8 4 3 9l5 5M3 9h10a7 7 0 0 1 0 14',reset:'M4 8a9 9 0 1 1-1 8M4 3v5h5',help:'M9 8a3 3 0 1 1 5 2c-1 1-2 1-2 4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z'};
@@ -1110,11 +1110,8 @@ function playChaChing(){
    node.start(0);return true;
   }catch{return false}
  };
- if(playBuffer())return;
- // On Safari, the WAV may still be decoding at the moment cash is confirmed.
- // Request HTML audio within the user gesture, then fall back to synthesized bells.
- const fallback=()=>{
-  if(!audioCtx)return;
+ const synthFallback=()=>{
+  if(!audioCtx)return false;
   try{
    if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
    const now=audioCtx.currentTime;
@@ -1126,17 +1123,36 @@ function playChaChing(){
     osc.connect(gain);gain.connect(audioCtx.destination);
     osc.start(t);osc.stop(t+.28);osc.onended=()=>{osc.disconnect();gain.disconnect()};
    });
-  }catch{}
+   return true;
+  }catch{return false}
  };
- try{
-  const clip=$('chaChingSound');clip.volume=level;clip.currentTime=0;
-  const playing=clip.play();
-  if(playing&&typeof playing.catch==='function')playing.catch(()=>{
-   if(chaChingBuffer)playBuffer();else fallback();
-  });
-  else if(!playing)fallback();
- }catch{fallback()}
+ const playHtmlAudio=clip=>{
+  if(!clip)return false;
+  try{
+   clip.pause();clip.currentTime=0;clip.volume=level;clip.preload='auto';clip.load?.();
+   const playResult=clip.play();
+   if(playResult&&typeof playResult.then==='function'){
+    playResult.catch(()=>{
+      try{
+       const clone=clip.cloneNode(true);
+       clone.volume=level;clone.preload='auto';
+       const clonePlay=clone.play();
+       if(clonePlay&&typeof clonePlay.catch==='function')clonePlay.catch(()=>{if(!playBuffer())synthFallback()});
+      }catch{if(!playBuffer())synthFallback()}
+    });
+   }
+   return true;
+  }catch{return false}
+ };
+ if(playBuffer())return;
+ const clip=$('chaChingSound');
+ if(playHtmlAudio(clip)){
+  if(chaChingPromise)Promise.resolve(chaChingPromise).then(()=>{if(!clip?.paused)return;if(!playBuffer())synthFallback()}).catch(()=>{if(!playBuffer())synthFallback()});
+  return;
+ }
+ if(!playBuffer())synthFallback();
 }
+
 
 function playTapSound(){
  if(!sound||effectVolume('tap')===0)return;prepareScannerAudio();if(!audioCtx)return;

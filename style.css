@@ -2152,3 +2152,72 @@ body[data-theme="dark"] .music-track-picker>small{color:#b4cbbb}
 /* Keep developer/topbar controls out of the mobile game area until moved into Kawalan. */
 @media(max-width:760px){.topbar>.tools{display:none!important}}
 .account-overlay.account-compact #accountClose{display:none!important}
+
+
+/* V59 — QR popup parity, professional scanner, stable conveyor, and pause-style account popup. */
+.product{
+  animation:none!important;
+  transition:opacity .18s ease, box-shadow .18s ease, filter .18s ease, background-color .18s ease, border-color .18s ease!important;
+  transform:translateZ(0);
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  will-change:auto;
+}
+.product:hover{transform:translateY(-3px) rotate(-1.2deg) translateZ(0)}
+.product.scanned,.product.busy{transition:opacity .16s ease, box-shadow .16s ease, filter .16s ease, transform .16s ease!important}
+.products{transform:translateZ(0);backface-visibility:hidden}
+
+.payment-overlay[data-method="qr"] .payment-sheet{width:min(690px,100%)!important}
+.payment-overlay[data-method="qr"] .payment-sheet .payment-scene{height:360px!important}
+.payment-overlay[data-method="qr"] .payment-sheet #paymentArea{padding-top:18px!important;padding-bottom:18px!important}
+.payment-overlay[data-method="qr"] .payment-sheet .payment-hint{margin-top:14px!important;text-align:center}
+.payment-overlay[data-method="qr"] .qr-balanced{border-radius:20px!important;background:radial-gradient(circle at 28% 22%,#f8fbf7 0,#edf4ef 42%,#d6e3dd 100%)!important;box-shadow:inset 0 0 0 1px rgba(125,150,139,.22), inset 0 -22px 42px rgba(40,79,69,.06)!important}
+.payment-overlay[data-method="qr"] .qr-balanced .customer-phone{left:calc(50% - 92px)!important;top:19px!important;width:184px!important;height:308px!important;max-width:none!important;padding:20px 15px 14px!important;border-radius:34px!important;border:7px solid #2f4642!important;background:linear-gradient(180deg,#fcfffd 0,#eaf4ef 100%)!important;box-shadow:0 16px 34px rgba(17,43,33,.16), inset 0 0 0 1px rgba(255,255,255,.72)!important;transform:none!important;animation:none!important}
+.payment-overlay[data-method="qr"] .qr-balanced .iphone18-island{left:calc(50% - 29px)!important;top:8px!important;width:58px!important;height:15px!important;border-radius:11px!important;background:#0f1917!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.payment-overlay[data-method="qr"] .qr-balanced .iphone18-status{padding:2px 2px 0!important;font-size:10px!important;color:#29453c!important}
+.payment-overlay[data-method="qr"] .qr-balanced .iphone18-wallet-head{margin-top:18px!important;padding:8px 10px!important;border-radius:14px!important;background:#eef5f1!important;box-shadow:inset 0 0 0 1px rgba(103,133,119,.12)!important}
+.payment-overlay[data-method="qr"] .qr-balanced .iphone18-paymark{width:28px!important;height:28px!important;border-radius:9px!important;font-size:15px!important}
+.payment-overlay[data-method="qr"] .qr-balanced .iphone18-wallet-head b{font-size:11px!important;max-width:110px!important}
+.payment-overlay[data-method="qr"] .qr-balanced .iphone18-amount-label{margin-top:10px!important;font-size:8px!important;letter-spacing:1.1px!important}
+.payment-overlay[data-method="qr"] .qr-balanced .iphone18-amount{font-size:24px!important;margin:4px 0 0!important}
+.payment-overlay[data-method="qr"] .qr-balanced .phone-qr{width:112px!important;height:112px!important;max-height:none!important;padding:8px!important;margin:12px auto 8px!important;border-radius:18px!important;background:#fff!important;box-shadow:0 10px 20px rgba(33,68,55,.12), inset 0 0 0 1px rgba(78,108,96,.1)!important}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-wallet-status{margin-top:2px!important;font-size:9px!important;color:#527264!important}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-light-cone{right:86px!important;bottom:104px!important;width:126px!important;height:140px!important;background:linear-gradient(38deg,rgba(74,244,196,.23),rgba(74,244,196,0));clip-path:polygon(100% 100%,7% 74%,48% 0);opacity:.7!important;filter:blur(1px)}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner{right:44px!important;bottom:44px!important;width:112px!important;height:88px!important;border:2px solid #738d85!important;border-radius:20px 20px 16px 16px!important;background:linear-gradient(180deg,#4f6460 0,#263936 52%,#192824 100%)!important;box-shadow:0 16px 30px rgba(17,41,34,.28), inset 0 1px 0 rgba(255,255,255,.16)!important;transform:rotate(-17deg)!important;display:block!important;overflow:visible!important}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner::before{content:'';position:absolute;left:12px;right:12px;top:10px;height:16px;border-radius:11px;background:linear-gradient(180deg,#cbd7d3,#6f8680 70%,#455a55);box-shadow:inset 0 0 0 1px rgba(38,55,50,.35)}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner::after{content:'';position:absolute;left:33px!important;top:74px!important;width:40px!important;height:64px!important;border-radius:0 0 16px 16px!important;background:linear-gradient(180deg,#506560,#314541)!important;border:2px solid #6f8881!important;box-shadow:0 11px 18px rgba(17,41,34,.22)!important}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner .qr-pro-lens{position:absolute;left:17px;top:28px;width:56px;height:30px;border-radius:10px;background:linear-gradient(180deg,#0e1618,#24343a)!important;border:1px solid #88a399!important;display:grid;place-items:center;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06), 0 5px 10px rgba(0,0,0,.18)}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner .qr-pro-lens svg{width:34px!important;height:22px!important;padding:0!important;border:0!important;background:none!important;color:#bde7d7!important;filter:none!important}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner .qr-pro-lens i{position:absolute;left:8px;right:8px;top:13px;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(240,110,83,.04),rgba(240,110,83,.9),rgba(240,110,83,.04));box-shadow:0 0 8px rgba(240,110,83,.45)}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner .qr-pro-led{position:absolute;right:13px;top:31px;width:11px;height:11px;border-radius:50%;background:#71e8a3;box-shadow:0 0 0 3px rgba(113,232,163,.18),0 0 10px rgba(113,232,163,.9)}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner>.qr-scanner-label{bottom:8px!important;font-size:8px!important;letter-spacing:1px!important;color:#eff7f2!important;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.payment-overlay[data-method="qr"] .qr-balanced.stage-processing .qr-pro-scanner{left:calc(50% + 2px)!important;right:auto!important;bottom:88px!important;transform:rotate(-14deg)!important}
+.payment-overlay[data-method="qr"] .qr-balanced.stage-processing .qr-light-cone{opacity:1!important;animation:glowLight .75s infinite}
+
+.account-overlay.account-compact{padding:16px!important;align-items:center!important;justify-content:center!important;background:transparent!important}
+.account-overlay.account-compact .account-panel{width:min(430px,calc(100vw - 32px))!important;max-width:430px!important;max-height:min(78dvh,560px)!important;padding:22px 22px 18px!important;border-radius:24px!important;background:linear-gradient(180deg,#fffef9 0,#eff5ef 100%)!important;border:1px solid #d8e5d8!important;box-shadow:0 30px 80px rgba(10,34,27,.24)!important;display:block!important;position:relative!important;overflow:auto!important}
+.account-overlay.account-compact .account-welcome,.account-overlay.account-compact .account-store-art,.account-overlay.account-compact .account-logo small{display:none!important}
+.account-overlay.account-compact .account-form-side,.account-overlay.account-compact .account-form-inner{display:block!important;width:100%!important;min-width:0!important;padding:0!important;margin:0!important}
+.account-overlay.account-compact .account-logo{font-size:15px!important;margin:0 34px 10px 0!important;color:#2a6d55!important}
+.account-overlay.account-compact .account-panel h2{font-size:24px!important;line-height:1.15!important;margin:6px 0 8px!important}
+.account-overlay.account-compact .account-panel p{font-size:12px!important;line-height:1.55!important;margin-bottom:11px!important}
+.account-overlay.account-compact .account-current{margin:10px 0!important;padding:13px 12px!important;border:1px solid #d9e7db!important;background:#edf5ef!important;border-radius:14px!important}
+.account-overlay.account-compact .account-current strong{font-size:14px!important}
+.account-overlay.account-compact .account-actions{display:grid!important;gap:10px!important;margin-top:10px!important}
+.account-overlay.account-compact .account-secondary,.account-overlay.account-compact .primary-btn{min-height:44px!important;border-radius:12px!important}
+.account-overlay.account-compact .account-fineprint{margin-top:13px!important;padding-top:12px!important;font-size:11px!important;text-align:center!important}
+.account-overlay.account-compact .account-compact-close{position:absolute!important;top:14px!important;right:14px!important;float:none!important;display:grid!important;width:34px!important;height:34px!important;border-radius:11px!important;background:#f3f7f3!important;border:1px solid #d4e0d5!important;color:#335d49!important;font-size:24px!important;line-height:1!important;box-shadow:0 2px 8px rgba(28,58,46,.08)!important}
+@media(max-width:700px){
+  .payment-overlay[data-method="qr"] .payment-sheet .payment-scene{height:312px!important}
+  .payment-overlay[data-method="qr"] .qr-balanced .customer-phone{left:calc(50% - 78px)!important;top:15px!important;width:156px!important;height:272px!important;padding:18px 12px 12px!important;border-width:6px!important;border-radius:30px!important}
+  .payment-overlay[data-method="qr"] .qr-balanced .iphone18-wallet-head{margin-top:15px!important;padding:6px 8px!important}
+  .payment-overlay[data-method="qr"] .qr-balanced .iphone18-amount{font-size:20px!important}
+  .payment-overlay[data-method="qr"] .qr-balanced .phone-qr{width:96px!important;height:96px!important;margin-top:10px!important;border-radius:15px!important}
+  .payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner{right:24px!important;bottom:34px!important;width:92px!important;height:72px!important}
+  .payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner::after{left:25px!important;top:60px!important;width:34px!important;height:56px!important}
+  .payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner .qr-pro-lens{left:14px;top:24px;width:48px;height:26px}
+  .payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner .qr-pro-lens svg{width:29px!important;height:19px!important}
+  .payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner>.qr-scanner-label{font-size:7px!important;bottom:7px!important}
+  .payment-overlay[data-method="qr"] .qr-balanced .qr-light-cone{right:58px!important;bottom:86px!important;width:104px!important;height:122px!important}
+  .account-overlay.account-compact .account-panel{width:min(400px,calc(100vw - 22px))!important;max-height:min(82dvh,560px)!important;padding:20px 18px 16px!important}
+}
