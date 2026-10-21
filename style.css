@@ -1860,16 +1860,19 @@ body[data-theme="dark"] .kf-timer{background:#1d362a;border-color:#456a50}body[d
 }
 
 
-/* V41: Scale the *existing* game canvas uniformly to the available device
-   viewport, retaining every original desktop/tablet/mobile layout and order. */
+/* V57: fit the unchanged game canvas to the physical device viewport.
+   Pixel measurements are supplied by viewport-fit.js for iOS Safari/PWA.
+   NO game components, positions or breakpoints are rearranged. */
 .app.game-viewport-fit{
  --game-zoom:1;
+ --game-layout-height:100dvh;
+ --game-max-width:1800px;
  box-sizing:border-box;
  zoom:var(--game-zoom);
  width:100%;
- height:calc(100dvh / var(--game-zoom))!important;
+ height:var(--game-layout-height)!important;
  min-height:0!important;
- max-width:calc(1800px / var(--game-zoom));
+ max-width:var(--game-max-width);
 }
 @media(max-width:760px){
  .app.game-viewport-fit{

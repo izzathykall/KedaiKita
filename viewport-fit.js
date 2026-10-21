@@ -1,59 +1,142 @@
-/* KedaiKita V41: proportionally fit the existing game layout into the
- * physical viewport. Do not reflow/reorder game controls or payment panels. */
+/* KedaiKita V57 — Device viewport fitting.
+ * Scale the EXISTING game (no reordering or layout redesign).
+ * Use measured pixel heights instead of CSS calc(dvh / zoom): this works
+ * reliably on Safari/iOS PWA, Chrome and desktop fullscreen.
+ */
 (()=>{
  'use strict';
  const app=document.getElementById('gameApp');
  if(!app)return;
- app.classList.add('game-viewport-fit');
  const root=document.documentElement;
- let frame=0,previous=1,inFit=false;
- const round=x=>Math.round(x*10000)/10000;
- function fit(){
-  frame=0;
-  if(inFit)return;
-  // Do not downscale an open keyboard overlay: those live outside the game.
-  if(document.activeElement?.matches('input,textarea,[contenteditable="true"]'))return;
-  // Keep the same physical zoom when moving between Kaunter and Resit tabs.
-  if(window.innerWidth<=760&&document.body.classList.contains('view-payment'))return;
-  inFit=true;
-  try{
-   app.style.setProperty('--game-zoom','1');
-   const viewportHeight=root.clientHeight||window.innerHeight;
-   const appBox=app.getBoundingClientRect();
-   // Scroll height reveals clipped children (the counter minimum height,
-   // stations, footer and nav), even when overflow is hidden on body.
-   let contentHeight=Math.max(app.scrollHeight,app.clientHeight);
-   const work=app.querySelector('.work-area');
-   const grid=app.querySelector('.game-grid');
-   if(work&&grid&&getComputedStyle(work).display!=='none'){
-    const wr=work.getBoundingClientRect();
-    contentHeight=Math.max(contentHeight,wr.bottom-appBox.top+(parseFloat(getComputedStyle(app).paddingBottom)||0));
-   }
-   if(grid)contentHeight=Math.max(contentHeight,grid.getBoundingClientRect().bottom-appBox.top+(parseFloat(getComputedStyle(app).paddingBottom)||0));
-   // Keep full sharpness when the canvas already fits. Scale only when
-   // clipping exceeds normal subpixel rounding (typically 1–2px).
-   const target=contentHeight<=viewportHeight+2?1:
-    round(Math.max(0.32,(viewportHeight-1)/Math.max(1,contentHeight))); 
-   if(Math.abs(target-previous)>.001){previous=target}
-   app.style.setProperty('--game-zoom',String(target));
-  }finally{inFit=false}
+ const body=document.body;
+ const visual=window.visualViewport;
+ const MAX_WIDTH=1800;
+ const MIN_SCALE=0.20;
+ const EPSILON=0.003;
+ let pending=0,active=false;
+ let lastBodyClass=body.className;
+ app.classList.add('game-viewport-fit');
+
+ function screen(){
+  // Prefer the layout viewport for stable PWA/fullscreen geometry. When
+  // Safari's visible viewport is shorter (dynamic browser chrome), fit it.
+  const width=Math.max(1,root.clientWidth||window.innerWidth);
+  const layoutH=Math.max(1,root.clientHeight||window.innerHeight);
+  const visH=visual?.height||layoutH;
+  const height=(visual&&visual.scale===1&&visH<layoutH-2)
+   ?Math.max(1,Math.min(layoutH,visH+Math.max(0,visual.offsetTop||0)))
+   :layoutH;
+  return {width,height,layoutH};
  }
- function schedule(){if(!frame)frame=requestAnimationFrame(fit)}
- schedule();
+ function apply(zoom,height){
+  const s=Math.max(MIN_SCALE,Math.min(1,zoom));
+  app.style.setProperty('--game-zoom',String(Math.round(s*10000)/10000));
+  app.style.setProperty('--game-layout-height',Math.max(1,Math.floor((height-0.5)/s))+'px');
+  app.style.setProperty('--game-max-width',Math.round(MAX_WIDTH/s)+'px');
+  return s;
+ }
+ function visible(el){
+  return el&&getComputedStyle(el).display!=='none';
+ }
+ function measure(){
+  const origin=app.getBoundingClientRect().top;
+  const gameStyle=getComputedStyle(app);
+  const bottomPad=parseFloat(gameStyle.paddingBottom)||0;
+  let bottom=Math.max(app.scrollHeight,app.clientHeight);
+  let right=Math.max(app.scrollWidth,app.clientWidth);
+  // Include actual bottom edges: flex and grid descendants can visibly
+  // overflow their parents while document scrolling is disabled.
+  const children=['.topbar','.utility-bar','.operations-bar','.mobile-tabs',
+   '.game-grid','.work-area','.store-scene','.belt-section','.stations',
+   '.shift-footer','.pos-panel','.pos-foot'];
+  for(const selector of children){
+   const el=app.querySelector(selector);
+   if(!visible(el))continue;
+   const rect=el.getBoundingClientRect();
+   const localBottom=rect.bottom-origin;
+   bottom=Math.max(bottom,localBottom+bottomPad);
+   // Only treat horizontal overflow from main structural panels as a limit.
+   if(['.game-grid','.work-area','.pos-panel','.stations'].includes(selector)){
+    const localRight=rect.right-app.getBoundingClientRect().left;
+    right=Math.max(right,localRight);
+   }
+  }
+  return {width:right,height:bottom};
+ }
+ function fit(){
+  pending=0;
+  if(active)return;
+  if(document.activeElement?.matches('input,textarea,[contenteditable="true"]'))return;
+  const viewport=screen();
+  // A keyboard opening is not a change of the game's available layout.
+  if(visual&&visual.height<viewport.layoutH*.64&&document.activeElement?.isContentEditable)return;
+  active=true;
+  const paymentView=body.classList.contains('view-payment')&&viewport.width<=760;
+  try{
+   // Calculate in the counter layout even if the mobile user is looking at
+   // the receipt. The same zoom is then retained across BOTH tabs.
+   if(paymentView)body.classList.remove('view-payment');
+   apply(1,viewport.height);
+   const natural=measure();
+   const heightFactor=(viewport.height-1)/Math.max(1,natural.height);
+   const widthFactor=(viewport.width-1)/Math.max(1,natural.width);
+   let zoom=Math.min(1,heightFactor,widthFactor);
+   if(!Number.isFinite(zoom))zoom=1;
+   zoom=apply(zoom,viewport.height);
+   // Second verification catches flex/grid overflow that changes once the
+   // available unscaled vertical space grows after zooming out.
+   const bottomMargin=1;
+   for(let i=0;i<2;i++){
+    let over=0;
+    const appRect=app.getBoundingClientRect();
+    const selectors=['.shift-footer','.pos-foot','.stations','.game-grid'];
+    for(const selector of selectors){
+     const el=app.querySelector(selector);
+     if(!visible(el))continue;
+     over=Math.max(over,el.getBoundingClientRect().bottom-(viewport.height-bottomMargin));
+    }
+    over=Math.max(over,appRect.bottom-viewport.height);
+    if(over<=1)break;
+    const corrected=Math.max(MIN_SCALE,zoom*((viewport.height-bottomMargin)/(viewport.height+over)));
+    if(zoom-corrected<EPSILON)break;
+    zoom=apply(corrected,viewport.height);
+   }
+  }finally{
+   if(paymentView)body.classList.add('view-payment');
+   active=false;
+  }
+ }
+ function schedule(){if(active)return;if(!pending)pending=requestAnimationFrame(fit)}
+ // Resize of a mobile browser's address bar, split-screen iPad, PWA,
+ // desktop window, or fullscreen should all recompute the physical fit.
  window.addEventListener('resize',schedule,{passive:true});
  window.addEventListener('orientationchange',schedule,{passive:true});
+ window.addEventListener('pageshow',schedule);
  document.addEventListener('fullscreenchange',schedule);
- const observer=typeof ResizeObserver==='function'?new ResizeObserver(schedule):null;
- // Observe natural-height changes due to content loading and available space.
- for(const selector of ['.topbar','.utility-bar','.operations-bar','.mobile-tabs','.stations','.shift-footer']){
-  const el=app.querySelector(selector);if(el)observer?.observe(el);
+ visual?.addEventListener('resize',schedule,{passive:true});
+ visual?.addEventListener('scroll',schedule,{passive:true});
+ document.addEventListener('focusout',()=>setTimeout(schedule,180),{passive:true});
+
+ if(typeof ResizeObserver==='function'){
+  const observer=new ResizeObserver(()=>{if(!active)schedule()});
+  for(const selector of ['.topbar','.utility-bar','.operations-bar',
+    '.mobile-tabs','.stations','.shift-footer','.pos-top']){
+   const el=app.querySelector(selector);if(el)observer.observe(el);
+  }
  }
- document.addEventListener('focusout',()=>setTimeout(schedule,200),{passive:true});
- // The game moves controls into the operations bar after app.mjs loads.
- const watcher=new MutationObserver(schedule);
+ const watcher=new MutationObserver((records)=>{
+  if(active)return;
+  const changed=records.some(r=>{
+   if(r.target!==body)return true;
+   if(body.className===lastBodyClass)return false;
+   lastBodyClass=body.className;return true;
+  });
+  if(changed)schedule();
+ });
  watcher.observe(app,{childList:true,subtree:false});
- watcher.observe(document.body,{attributes:true,attributeFilter:['class']});
+ watcher.observe(body,{attributes:true,attributeFilter:['class']});
+ if(document.fonts?.ready)document.fonts.ready.then(schedule).catch(()=>{});
  window.addEventListener('load',schedule,{once:true});
- setTimeout(schedule,350);
- setTimeout(schedule,1200);
+ // Fonts/icons can arrive after the first layout frame.
+ schedule();setTimeout(schedule,300);setTimeout(schedule,1000);
 })();
