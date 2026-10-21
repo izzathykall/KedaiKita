@@ -96,7 +96,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     if(overlay.open)overlay.close();
     overlay.showModal();document.body.classList.add('account-locked');
   };
-  const hide = () => {if(overlay.open)overlay.close();document.body.classList.remove('account-locked')};
+  const hide = () => {if(overlay.open)overlay.close();overlay.classList.remove('account-compact');document.body.classList.remove('account-locked')};
   const showRegion = region => {
     overlay.dataset.region=region;
     ui.authFields.hidden=region!=='auth'; ui.overview.hidden=region!=='overview'; ui.choice.hidden=region!=='choice';
@@ -373,6 +373,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     else if(guestMode)hide();else showLogin();
   }
   function openAccount() {
+    overlay.classList.add('account-compact');
     pauseForAccount();
     if(user&&ready)showOverview();
     else if(configEnabled)showLogin();
@@ -401,7 +402,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   }
   function initControls() {
     ui.login.onclick=()=>{setMode('login');message('')};ui.register.onclick=()=>{setMode('register');message('')};
-    ui.close.onclick=hide;overlay.addEventListener('cancel',e=>{e.preventDefault()});
+    ui.close.onclick=hide;const compactClose=byId('accountCompactClose');if(compactClose)compactClose.onclick=()=>{if(ready)hide()};overlay.addEventListener('cancel',e=>{if(overlay.classList.contains('account-compact')&&ready){e.preventDefault();hide()}else e.preventDefault()});
     ui.guest.onclick=()=>{if(user)return;guestMode=true;ready=true;hide();setStatus('Disimpan pada peranti · mod tetamu')};
     ui.logout.onclick=logOut;
     const copyDevUid=byId('copyDeveloperUid');

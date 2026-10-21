@@ -1956,3 +1956,199 @@ body[data-theme="dark"] .music-track-picker select{background:#172b22;border-col
 body[data-theme="dark"] .music-track-info>span{color:#a8e7b9}
 body[data-theme="dark"] .music-track-picker>small{color:#b4cbbb}
 @media(max-width:580px){.music-track-picker{padding:11px}}
+
+/* =============================================================
+   KedaiKita V58 — mobile-first game controls.
+   Core game components and payment mechanics remain unchanged.
+   ============================================================= */
+.store-menu-toggle{display:none!important}
+.account-compact-close{display:none}
+@media(max-width:760px){
+  /* A single row of four clear, thumb-sized primary store actions. */
+  .app.game-viewport-fit{padding-inline:max(10px,env(safe-area-inset-left)) max(10px,env(safe-area-inset-right))!important}
+  .topbar{height:62px!important;min-height:62px!important;gap:7px!important}
+  .brand{font-size:clamp(16px,5vw,21px)!important;gap:6px!important;min-width:0}
+  .brand-icon{width:34px!important;height:34px!important;border-radius:10px!important;flex:none}
+  .brand-icon svg{width:23px!important;height:23px!important}
+  .brand small{font-size:6px!important;letter-spacing:.7px!important;margin-top:3px!important}
+  .day-pill{gap:4px!important;padding:6px 7px!important;border-radius:11px!important;margin-left:auto!important;flex:none}
+  .day-pill .sun svg{width:17px!important;height:17px!important}
+  .day-pill small,.top-stats small{font-size:6px!important;letter-spacing:.55px!important}
+  .day-pill b{font-size:11px!important}
+  .day-pill .open-tag{display:none!important}
+  .top-stats{gap:4px!important;margin:0!important;min-width:0}
+  .top-stats b{font-size:clamp(10px,3.5vw,15px)!important;white-space:nowrap}
+  .top-stats .combo-stat{display:none!important}
+  .utility-bar#storeMenu{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;min-height:44px;height:auto!important;margin:0 0 6px!important;padding:0!important;overflow:visible!important;background:transparent!important;box-shadow:none!important;align-content:start}
+  #storeMenu>.utility-heading,#storeMenu>.activity-status{display:none!important}
+  #storeMenu>button{width:100%!important;min-width:0!important;min-height:43px!important;height:43px!important;padding:5px 3px!important;font-size:clamp(8px,2.5vw,11px)!important;font-weight:700!important;line-height:1.2!important;white-space:nowrap!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;border-radius:12px!important;box-shadow:0 2px 0 #2946340b!important}
+  #storeMenu>button svg{width:15px!important;height:15px!important;flex:none}
+  #storeMenu>button[hidden]{display:none!important}
+  #storeMenu.mobile-menu-collapsed>button:not(#missionBtn):not(#inventoryBtn):not(#deliveryBtn):not(#storeMenuToggle){display:none!important}
+  #storeMenu #missionBtn{order:1}
+  #storeMenu #inventoryBtn{order:2}
+  #storeMenu #deliveryBtn{order:3}
+  #storeMenu #storeMenuToggle{order:4;display:flex!important;background:#e3ece2!important;border-color:#c3d6c7!important;color:#1b5844!important}
+  #storeMenu #calcBtn{order:5}
+  #storeMenu #catalogueBtn{order:6}
+  #storeMenu #settingsBtn{order:7}
+  #storeMenu #nightBtn{order:8}
+  #storeMenu #developerPanelBtn{order:9}
+  #storeMenu.mobile-menu-expanded{padding:5px!important;border:1px solid var(--line);border-radius:14px;background:var(--white)!important;box-shadow:0 8px 24px #173c2b16!important}
+  #storeMenu.mobile-menu-expanded #storeMenuToggle{order:10}
+  .operations-bar{margin-bottom:6px!important;min-height:36px!important}
+  .mobile-tabs{gap:7px!important;margin-bottom:5px!important;height:42px!important}
+  .mobile-tab{min-height:42px!important;height:42px!important;padding:6px!important;font-size:clamp(10px,3vw,12px)!important}
+  .mobile-controls-toggle{min-height:36px!important}
+  .store-scene{min-height:155px!important}
+  .scene-kicker{font-size:8px!important}
+  .customer-info{left:8px!important;right:8px!important;padding:7px 9px!important;gap:6px!important}
+  .customer-info strong{font-size:11px!important}
+  .customer-info .customer-occupation{font-size:8px!important}
+  .patience-wrap{gap:5px!important}
+  .patience-track{width:clamp(38px,15vw,75px)!important}
+  .patience-wrap small{font-size:9px!important}
+  .belt-section{padding:9px 8px 9px!important}
+  .section-heading{margin-bottom:7px!important}
+  .conveyor{height:clamp(106px,15dvh,133px)!important}
+  .stations{gap:7px!important;padding:9px 0!important}
+  .station{min-width:0!important}
+  .station-label{white-space:normal!important;overflow-wrap:anywhere}
+  .shift-footer{margin-top:3px!important}
+  body[data-theme="dark"] #storeMenu #storeMenuToggle{background:#325444!important;border-color:#4d7860!important;color:#e1f3dc!important}
+}
+@media(max-width:350px){
+  .topbar{gap:4px!important}
+  .brand{font-size:15px!important}.brand-icon{width:30px!important;height:30px!important}
+  .day-pill .sun{display:none!important}.day-pill{padding:6px!important}
+  #storeMenu>button{gap:3px!important;font-size:8px!important}
+  #storeMenu>button svg{width:13px!important;height:13px!important}
+  .customer-info{padding:5px!important}
+  .customer-info strong{font-size:9px!important}
+  .stations{grid-template-columns:minmax(0,1.14fr) minmax(0,.95fr) minmax(0,.42fr)!important}
+}
+@media(max-width:760px) and (max-height:640px){
+  .topbar{height:53px!important;min-height:53px!important}
+  .store-scene{min-height:124px!important}
+  #storeMenu>button{height:38px!important;min-height:38px!important}
+  .mobile-tabs,.mobile-tab{height:36px!important;min-height:36px!important}
+}
+
+/* =============================================================
+   V58 — compact account popover only when opened from the account
+   button. Initial sign-in can still use its existing guided flow.
+   ============================================================= */
+.account-overlay.account-compact{padding:12px!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
+.account-overlay.account-compact::backdrop{background:#153f3766;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.account-overlay.account-compact .account-panel{position:relative;display:block!important;width:min(390px,calc(100vw - 24px))!important;max-width:390px!important;max-height:min(82dvh,650px)!important;overflow-y:auto!important;padding:22px 23px 18px!important;margin:auto!important;border-radius:19px!important;box-shadow:0 24px 85px #0c342c46!important}
+.account-overlay.account-compact .account-welcome{display:none!important}
+.account-overlay.account-compact .account-form-side,.account-overlay.account-compact .account-form-inner{display:block!important;min-width:0!important;width:100%!important;padding:0!important;margin:0!important}
+.account-overlay.account-compact .account-logo{margin:0 30px 10px 0!important;font-size:16px!important}
+.account-overlay.account-compact .account-panel h2{font-size:23px!important;margin:8px 0!important}
+.account-overlay.account-compact .account-panel p{margin-bottom:9px;font-size:12px}
+.account-overlay.account-compact .account-current{padding:12px;margin:10px 0}
+.account-overlay.account-compact .account-fineprint{margin-top:12px;padding-top:10px}
+.account-overlay.account-compact .account-store-art{display:none!important}
+.account-overlay.account-compact .account-compact-close{display:grid!important;position:sticky;top:0;float:right;z-index:3;place-items:center;width:31px;height:31px;min-height:31px;padding:0;border:1px solid #d6e4d9;border-radius:10px;background:#f3f7f1;color:#365d4b;font-size:24px;line-height:1;cursor:pointer}
+@media(max-height:640px){.account-overlay.account-compact .account-panel{max-height:calc(100dvh - 24px)!important}}
+
+/* =============================================================
+   V58 — modern premium large-screen phone inspired by the
+   requested iPhone 18 Pro Max, custom-drawn without device images.
+   QR is a real interactive target; scanner retains drag/tap input.
+   ============================================================= */
+.payment-overlay[data-method="qr"] .qr-balanced{
+  background:radial-gradient(circle at 50% 12%,#eefaf5 0,#dceae3 47%,#bed0c6 100%)!important;
+  border:1px solid #b9d1c7;isolation:isolate;
+}
+.payment-overlay[data-method="qr"] .qr-balanced::before{
+  content:'';position:absolute;left:15%;right:15%;bottom:6%;height:25px;
+  border-radius:50%;background:#365d4b27;filter:blur(14px);pointer-events:none;
+}
+.payment-overlay[data-method="qr"] .qr-balanced .iphone-pro-pay{
+  left:48%!important;top:49%!important;width:auto!important;
+  height:min(300px,calc(100% - 18px))!important;
+  aspect-ratio:.57!important;
+  padding:17px 10px 13px!important;box-sizing:border-box!important;
+  background:linear-gradient(155deg,#fff,#ecf9f7 62%,#d6e9e5)!important;
+  border:5px solid #292f37!important;border-radius:29px!important;
+  outline:2px solid #9da5a9!important;
+  box-shadow:inset 0 0 0 1px #dfe8e8,0 9px 2px #64757844,0 19px 28px #153e364c!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;
+  justify-content:space-between!important;gap:2px!important;
+}
+.payment-overlay[data-method="qr"] .iphone-pro-pay .iphone18-island{
+  position:absolute!important;left:50%!important;top:4px!important;
+  width:43px!important;height:12px!important;border-radius:20px!important;
+  transform:translateX(-50%)!important;background:#12191c!important;border:1px solid #384146;
+  box-shadow:inset -6px 0 2px #293b40!important;z-index:4;
+}
+.iphone18-sidekey{position:absolute;right:-8px;top:40px;width:3px;height:32px;border-radius:0 4px 4px 0;background:#697a81}
+.payment-overlay[data-method="qr"] .iphone-pro-pay .iphone18-status{
+  width:100%;display:flex;justify-content:space-between;align-items:center;
+  color:#193f39;font:800 9px/1 var(--font);padding:1px 3px 3px;flex:none;
+}
+.payment-overlay[data-method="qr"] .iphone-pro-pay .iphone18-wallet-head{
+  width:100%;display:flex;gap:7px;align-items:center;justify-content:center;
+  background:#ebf4ee;border:1px solid #d4e6dc;border-radius:9px;padding:6px 4px;flex:none;
+}
+.payment-overlay[data-method="qr"] .iphone18-paymark{display:grid;place-items:center;flex:none;width:23px;height:23px;border-radius:7px;background:#1d5e49;color:white;font:900 14px var(--display)}
+.payment-overlay[data-method="qr"] .iphone18-wallet-head>div{min-width:0;text-align:left}
+.payment-overlay[data-method="qr"] .iphone-pro-pay .iphone18-wallet-head small{font:800 7px/1.15 var(--font)!important;letter-spacing:.7px;color:#5c8b78}
+.payment-overlay[data-method="qr"] .iphone-pro-pay .iphone18-wallet-head b{display:block!important;font-size:10px!important;color:#184c3b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:98px}
+.payment-overlay[data-method="qr"] .iphone-pro-pay .iphone18-amount-label{font-size:7px!important;letter-spacing:1px;color:#608675;flex:none}
+.payment-overlay[data-method="qr"] .iphone-pro-pay .iphone18-amount{font:800 clamp(13px,2.6vh,22px)/1 var(--display)!important;color:#195c44!important;white-space:nowrap;margin:0!important;flex:none}
+.payment-overlay[data-method="qr"] .iphone-pro-pay .phone-qr{
+  width:min(91%,112px)!important;aspect-ratio:1!important;height:auto!important;
+  min-height:0!important;flex:1 1 auto!important;max-height:112px!important;
+  margin:3px auto!important;padding:8px!important;background:#fff!important;
+  border:2px solid #dae8e0!important;border-radius:11px!important;
+  box-shadow:0 2px 10px #234b3a1e!important;
+  overflow:hidden;touch-action:manipulation;
+}
+.payment-overlay[data-method="qr"] .iphone-pro-pay .phone-qr>.qr-art{width:100%!important;height:100%!important;object-fit:contain}
+.payment-overlay[data-method="qr"] .iphone-pro-pay .qr-wallet-status{font:600 8px/1.2 var(--font)!important;color:#5c8677;white-space:nowrap;flex:none}
+.iphone18-home{height:4px;width:42%;border-radius:5px;background:#243f39;margin:2px auto -6px;flex:none}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner{
+  width:90px!important;height:70px!important;right:10%!important;left:auto!important;
+  bottom:18%!important;top:auto!important;border:3px solid #364c4d!important;
+  background:linear-gradient(140deg,#718a80,#273f40 34%,#162b2f 75%)!important;
+  border-radius:20px 20px 13px 13px!important;
+  box-shadow:inset 0 3px 1px #b8ccc6b0,inset -3px -3px 5px #061b23aa,0 13px 20px #123d3448!important;
+  transform:rotate(-19deg);z-index:3;
+}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner::after{
+  content:'';position:absolute;left:calc(50% - 17px)!important;top:60px!important;
+  width:34px!important;height:55px!important;border:3px solid #364949!important;
+  border-radius:4px 4px 12px 12px!important;
+  background:repeating-linear-gradient(to bottom,#405e57 0 7px,#243e3b 7px 11px)!important;
+  box-shadow:2px 8px 9px #123d3333!important;
+}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-lens{
+  display:grid;place-items:center;position:absolute;left:12px;top:9px;
+  width:calc(100% - 24px);height:36px;border:1px solid #80b5a9;border-radius:9px;
+  background:linear-gradient(140deg,#102a35,#20535c);box-shadow:inset 0 0 10px #0a1926,0 0 7px #75c4a34f;
+}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-lens svg{width:33px!important;height:26px!important;padding:2px!important;border:0!important;background:transparent!important;color:#9de5c8!important}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-led{position:absolute;right:8px;top:4px;width:5px;height:5px;border-radius:50%;background:#82e8ae;box-shadow:0 0 8px #8ce8b1}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner>.qr-scanner-label{position:absolute;bottom:6px;left:0;right:0;font-size:7px!important;font-weight:800;color:#dfefe7;text-align:center;letter-spacing:.6px}
+.payment-overlay[data-method="qr"] .qr-balanced.stage-processing .qr-pro-scanner{right:auto!important;left:calc(50% + 6px)!important;bottom:22%!important;transform:rotate(-22deg)}
+.payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner:focus-visible{outline:3px solid #65b895;outline-offset:5px}
+.payment-overlay[data-method="qr"] .qr-balanced.qr-armed .qr-pro-lens{box-shadow:inset 0 0 10px #0a1926,0 0 15px #81f3bd}
+@media(max-width:600px){
+ .payment-overlay[data-method="qr"] .qr-balanced .iphone-pro-pay{left:44%!important;height:min(260px,calc(100% - 14px))!important;padding:15px 7px 10px!important}
+ .payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner{right:6%!important;width:74px!important;height:61px!important;bottom:17%!important}
+ .payment-overlay[data-method="qr"] .qr-balanced .qr-pro-lens{left:8px;top:7px;width:calc(100% - 16px);height:31px}
+ .payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner::after{top:51px!important;height:46px!important;width:30px!important;left:calc(50% - 15px)!important}
+ .payment-overlay[data-method="qr"] .qr-balanced .qr-pro-scanner>.qr-scanner-label{bottom:4px;font-size:6px!important}
+}
+@media(max-height:640px){
+ .payment-overlay[data-method="qr"] .qr-balanced .iphone-pro-pay{height:min(209px,calc(100% - 8px))!important;padding:14px 7px 10px!important;border-width:4px!important}
+ .payment-overlay[data-method="qr"] .iphone-pro-pay .phone-qr{max-height:75px!important}
+ .payment-overlay[data-method="qr"] .iphone-pro-pay .iphone18-wallet-head{padding:3px}
+ .payment-overlay[data-method="qr"] .iphone-pro-pay .iphone18-amount-label{display:none!important}
+}
+
+/* Keep developer/topbar controls out of the mobile game area until moved into Kawalan. */
+@media(max-width:760px){.topbar>.tools{display:none!important}}
+.account-overlay.account-compact #accountClose{display:none!important}

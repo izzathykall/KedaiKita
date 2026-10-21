@@ -31,8 +31,8 @@ export function enhanceManagement(kind,root,icon){
   const h=pad.querySelector('.dev-scenario-grid');if(h){const hint=document.createElement('p');hint.className='studio-description';hint.textContent='Pilih senario untuk menguji satu aliran permainan. Progres ujian disimpan berasingan.';h.before(hint)}
  }
  if(kind==='shop'){
-  const head=pad.querySelector('.shop-wallet'),back=pad.querySelector('#backFromShop'),parts=[[],[]];let section=0;
-  let started=false;[...pad.children].forEach(el=>{if(el===head){started=true;return}if(!started||el===back)return;if(el.matches('.payment-upgrade-section')||el.textContent.includes('Peralatan kedai & bonus')||el.matches('.payment-upgrades'))section=1;if(el.matches('h3')&&!el.textContent.includes('Buka kelas'))section=1;parts[section].push(el)});
+  const head=pad.querySelector('.shop-wallet'),parts=[[],[]];let section=0;
+  let started=false;[...pad.children].forEach(el=>{if(el===head){started=true;return}if(!started)return;if(el.matches('.payment-upgrade-section')||el.textContent.includes('Peralatan kedai & bonus')||el.matches('.payment-upgrades'))section=1;if(el.matches('h3')&&!el.textContent.includes('Buka kelas'))section=1;parts[section].push(el)});
   tabbed(pad,[['Kategori produk',parts[0]],['Peralatan & pembayaran',parts[1]]],head);
  }
  if(kind==='settings'){

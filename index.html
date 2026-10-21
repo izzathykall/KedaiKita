@@ -4,9 +4,10 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#173f37"><meta name="description" content="Jaga kaunter pasar mini anda. Scan barang, timbang hasil segar, kira baki dan bina Kedai Kita!">
 <title>Kedai Kita — Cashier Simulator</title>
-<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-21-v57-device-perfect-fit">
-<link rel="stylesheet" href="design.css?v=2026-10-21-v57-device-perfect-fit">
-<script src="./viewport-fit.js?v=2026-10-21-v57-device-perfect-fit" defer></script>
+<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-21-v58-mobile-ui-qr-cash-account">
+<link rel="stylesheet" href="design.css?v=2026-10-21-v58-mobile-ui-qr-cash-account">
+<script src="./viewport-fit.js?v=2026-10-21-v58-mobile-ui-qr-cash-account" defer></script>
+<script src="./mobile-ui.js?v=2026-10-21-v58-mobile-ui-qr-cash-account" defer></script>
 </head>
 <body>
 <div class="app" id="gameApp">
@@ -17,13 +18,14 @@
     <div class="top-stats"><span><small>DUIT KEDAI</small><b id="walletLabel">RM 0.00</b></span><span class="combo-stat"><small>COMBO</small><b id="comboLabel">×0 <span>✦</span></b></span></div>
     <nav class="tools" id="gameTools" aria-label="Kawalan game"><button id="shopBtn" class="icon-btn" title="Naik taraf kedai" aria-label="Naik taraf kedai" data-icon="shop"></button><button id="accountBtn" class="account-nav-btn" title="Log masuk / akaun" aria-label="Akaun dan simpanan permainan"><span data-icon="user"></span><span id="accountBtnText">Akaun</span></button><button id="soundBtn" class="icon-btn" title="Bunyi" aria-label="Bunyi" data-icon="volume"></button><button id="fullBtn" class="icon-btn" title="Skrin penuh" aria-label="Skrin penuh" data-icon="expand"></button><button id="pauseBtn" class="icon-btn" title="Jeda dan bantuan" aria-label="Jeda dan bantuan" data-icon="pause"></button></nav>
   </header>
-  <nav class="utility-bar" aria-label="Fungsi kedai"><span class="utility-heading">URUS KEDAI</span>
+  <nav class="utility-bar mobile-menu-collapsed" id="storeMenu" aria-label="Fungsi kedai"><span class="utility-heading">URUS KEDAI</span>
     <button id="missionBtn"><span data-icon="flag"></span><span>Misi</span><i></i></button>
     <button id="calcBtn"><span data-icon="calculator"></span><span>Kalkulator</span></button>
     <button id="inventoryBtn"><span data-icon="basket"></span><span>Inventori</span></button><button id="catalogueBtn"><span data-icon="book"></span><span>Katalog</span></button>
     <button id="deliveryBtn" type="button"><span data-icon="delivery"></span><span>KitaFood</span></button><button id="settingsBtn"><span data-icon="settings"></span><span>Tetapan</span></button>
     <button id="nightBtn" aria-label="Tukar mod gelap" aria-pressed="false"><span data-icon="moon"></span><span id="nightLabel">Gelap</span></button>
     <button id="developerPanelBtn" class="dev-test-button" type="button" hidden aria-label="Panel ujian developer"><span data-icon="settings"></span><span>Developer</span></button>
+    <button type="button" id="storeMenuToggle" class="store-menu-toggle" aria-controls="storeMenu" aria-expanded="false"><span data-icon="shop"></span><span id="storeMenuText">Lagi</span></button>
     <span id="activityStatus" class="activity-status" hidden aria-live="off"></span>
 
   </nav>
@@ -78,7 +80,7 @@
 <section id="floatingCalculator" class="floating-calculator" role="dialog" aria-modal="false" aria-label="Kalkulator terapung" hidden></section>
 <dialog id="modal"><div id="modalContent"></div></dialog>
 <dialog id="accountOverlay" class="account-overlay" aria-labelledby="accountTitle" aria-modal="true">
-  <div class="account-panel">
+  <div class="account-panel"><button type="button" id="accountCompactClose" class="account-compact-close" aria-label="Tutup akaun">×</button>
 <aside class="account-welcome"><div class="welcome-brand">KedaiKita<span>.</span></div><span class="welcome-eyebrow">PASAR MINI KEJIRANAN ANDA</span><h1>Kedai kecil.<br>Cerita <em>besar.</em></h1><p>Dari pelanggan pertama hingga kedai impian.<br>Setiap syif bermula dengan anda.</p>    <div class="account-store-art" aria-hidden="true">
       <span class="account-store-sparkle sparkle-a">✦</span><span class="account-store-sparkle sparkle-b">✦</span>
       <div class="account-store-roof"></div>
@@ -124,7 +126,7 @@
 <script type="module">
 // Versioned loader: the currently published version.json controls the actual CSS and app version.
 // Each release only requires updating version.json after publishing the changed files.
-const fallbackBuild = '2026-10-21-v57-device-perfect-fit';
+const fallbackBuild = '2026-10-21-v58-mobile-ui-qr-cash-account';
 let activeBuild = fallbackBuild;
 try {
   const response = await fetch('./version.json?init=' + Date.now(), {cache:'no-store'});
