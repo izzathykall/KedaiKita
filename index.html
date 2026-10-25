@@ -3,11 +3,10 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#173f37"><meta name="description" content="Jaga kaunter pasar mini anda. Scan barang, timbang hasil segar, kira baki dan bina Kedai Kita!">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Outfit:wght@400;500;600;700;800&amp;display=swap">
 <title>Kedai Kita — Cashier Simulator</title>
-<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-21-v60-conveyor-cash-account-fix">
-<link rel="stylesheet" href="design.css?v=2026-10-21-v60-conveyor-cash-account-fix">
-<script src="./viewport-fit.js?v=2026-10-21-v60-conveyor-cash-account-fix" defer></script>
-<script src="./mobile-ui.js?v=2026-10-21-v60-conveyor-cash-account-fix" defer></script>
+<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-26-v61-save-display-update">
+<link id="designStyles" rel="stylesheet" href="design.css?v=2026-10-26-v61-save-display-update">
 </head>
 <body>
 <div class="app" id="gameApp">
@@ -121,27 +120,46 @@
 <audio id="backgroundMusic" src="./music-2-tomato-farm.mp3" preload="metadata"></audio>
 <audio id="chaChingSound" src="./cha-ching.wav" preload="auto"></audio>
 <audio id="scannerSound" src="./scanner-beep.wav" preload="auto"></audio>
-<script src="firebase-config.js"></script>
+
 <!-- Developer allowlist is loaded fresh below, before app.mjs. -->
 <script type="module">
-// Versioned loader: the currently published version.json controls the actual CSS and app version.
-// Each release only requires updating version.json after publishing the changed files.
-const fallbackBuild = '2026-10-21-v60-conveyor-cash-account-fix';
-let activeBuild = fallbackBuild;
-try {
-  const response = await fetch('./version.json?init=' + Date.now(), {cache:'no-store'});
-  if (response.ok) {
-    const data = await response.json();
-    if (typeof data.version === 'string' && /^[a-zA-Z0-9._-]{1,100}$/.test(data.version)) activeBuild=data.version;
-  }
-} catch { /* offline: open the bundled fallback version */ }
+// One build identifier for every local script, module and stylesheet.
+const fallbackBuild = '2026-10-26-v61-save-display-update';
+const versionController=new AbortController();
+const versionTimer=setTimeout(()=>versionController.abort(),6000);
+let activeBuild=fallbackBuild;
+try{
+  const response=await fetch('./version.json?init='+Date.now(),{cache:'no-store',signal:versionController.signal});
+  if(response.ok){const data=await response.json();if(/^[a-zA-Z0-9._-]{1,100}$/.test(data.version||''))activeBuild=data.version}
+}catch{}finally{clearTimeout(versionTimer)}
 window.__KEDAI_ACTIVE_VERSION__=activeBuild;
-document.getElementById('gameStyles').href='./style.css?v='+encodeURIComponent(activeBuild);
-const config=document.createElement('script');
-config.src='./developer-config.js?v='+encodeURIComponent(activeBuild);
-config.onload=()=>import('./app.mjs?v='+encodeURIComponent(activeBuild));
-config.onerror=()=>import('./app.mjs?v='+encodeURIComponent(activeBuild));
-document.head.appendChild(config);
+const asset=name=>'./'+name+'?v='+encodeURIComponent(activeBuild);
+function loadAsset(element,url,attribute){
+  return new Promise((resolve,reject)=>{
+    if(attribute==='href'&&element.getAttribute('href')===url&&element.sheet){resolve();return}
+    const timeout=setTimeout(()=>{element.onload=element.onerror=null;reject(new Error('Muat turun terlalu lama'))},12000);
+    element.onload=()=>{clearTimeout(timeout);resolve()};
+    element.onerror=()=>{clearTimeout(timeout);reject(new Error('Fail permainan tidak dapat dimuatkan'))};
+    element[attribute]=url;
+    if(!element.isConnected)document.head.append(element);
+  });
+}
+try{
+  await Promise.all([
+    loadAsset(document.getElementById('gameStyles'),asset('style.css'),'href'),
+    loadAsset(document.getElementById('designStyles'),asset('design.css'),'href'),
+    ...['firebase-config.js','developer-config.js','viewport-fit.js','mobile-ui.js'].map(name=>loadAsset(document.createElement('script'),asset(name),'src'))
+  ]);
+  await import(asset('app.mjs'));
+}catch(error){
+  console.error('[KedaiKita Startup]',error);
+  const panel=document.getElementById('accountOverlay');
+  document.getElementById('accountTitle').textContent='Permainan belum dapat dimuatkan';
+  document.getElementById('accountHint').textContent='Semak sambungan internet dan cuba semula.';
+  for(const id of ['accountAuthFields','accountChoice','accountOverview','accountGuest','accountClose','accountLogout'])document.getElementById(id).hidden=true;
+  const retry=document.getElementById('accountRetry');retry.hidden=false;retry.onclick=()=>location.reload();
+  if(!panel.open)panel.showModal();
+}
 </script>
 <audio id="scaleSound" src="./digital-scale.wav" preload="auto"></audio>
 <audio id="drawerSound" src="./drawer-open.mp3" preload="auto"></audio>

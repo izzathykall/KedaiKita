@@ -1,5 +1,5 @@
-import {detailedProductArt} from './product-details.mjs?v=2026-10-20-v37-studio';
-import {PRODUCTS} from './engine.mjs?v=2026-10-20-v37-studio';
+const {detailedProductArt}=await import(new URL('./product-details.mjs'+new URL(import.meta.url).search,import.meta.url));
+const {PRODUCTS}=await import(new URL('./engine.mjs'+new URL(import.meta.url).search,import.meta.url));
 const PRODUCT_ART_CACHE=new Map();
 const CATALOG_LOOKUP=new Map(PRODUCTS.map(p=>[p.id,p]));
 // Original vector illustrations. Shapes animate in CSS; no emoji or remote assets.

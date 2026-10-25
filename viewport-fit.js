@@ -11,7 +11,7 @@
  const body=document.body;
  const visual=window.visualViewport;
  const MAX_WIDTH=1800;
- const MIN_SCALE=0.20;
+ const MIN_SCALE=0.75;
  const EPSILON=0.003;
  let pending=0,active=false;
  let lastBodyClass=body.className;
@@ -76,8 +76,14 @@
    // Calculate in the counter layout even if the mobile user is looking at
    // the receipt. The same zoom is then retained across BOTH tabs.
    if(paymentView)body.classList.remove('view-payment');
+   app.removeAttribute('data-fit-overflow');
+   app.classList.remove('game-tight');
    apply(1,viewport.height);
-   const natural=measure();
+   let natural=measure();
+   // Compress empty spacing before reducing text/control size.
+   if(Math.min(viewport.height/natural.height,viewport.width/natural.width)<0.9){
+    app.classList.add('game-tight');natural=measure();
+   }
    const heightFactor=(viewport.height-1)/Math.max(1,natural.height);
    const widthFactor=(viewport.width-1)/Math.max(1,natural.width);
    let zoom=Math.min(1,heightFactor,widthFactor);
@@ -101,6 +107,10 @@
     if(zoom-corrected<EPSILON)break;
     zoom=apply(corrected,viewport.height);
    }
+   // On unusually small windows keep controls readable and reachable instead
+   // of shrinking the entire game to 20% or clipping the bottom controls.
+   const overflow=app.scrollHeight>app.clientHeight+2||app.scrollWidth>app.clientWidth+2;
+   app.dataset.fitOverflow=String(overflow&&zoom<=MIN_SCALE+EPSILON);
   }finally{
    if(paymentView)body.classList.add('view-payment');
    active=false;
