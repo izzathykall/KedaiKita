@@ -1,3 +1,5 @@
+const {remainingSeconds}=await import(new URL('./delivery-clock.mjs'+new URL(import.meta.url).search,import.meta.url));
+const {resetDigitalAttempt,recoverInterruptedPayment}=await import(new URL('./payment-state.mjs'+new URL(import.meta.url).search,import.meta.url));
 const {enhanceManagement}=await import(new URL('./design.mjs'+new URL(import.meta.url).search,import.meta.url));
 const {createDelivery}=await import(new URL('./delivery.mjs'+new URL(import.meta.url).search,import.meta.url));
 const {PRODUCTS,PEOPLE,UPGRADES,DENOMS,money,itemPrice,basketTotal,amountDue,dayTarget,normalCustomerCount,createProgress,restoreProgress,makeCustomer,tipFor,buyUpgrade,netTotal,applyCoupon,dailyMissions,claimMission,calculateExpression,CATEGORIES,availableProducts,unlockCategory,randomManualCode,dayFinished,changeParts,machineTimings,effectiveRushMachineUpgrades,availablePaymentMethods,tenderFor,ensureOperations,stockQuote,buyStock,MAX_STOCK_PURCHASE,LOW_STOCK_UNITS,stockForBasket,takeStock,stockUnits,stockTarget,stockCapacity,stockCost,wholesaleChange,payStoreCost,receiveStoreCash,ensureShift,loseStar,settleShift,arrivalWait,clockText,customerLine,PAPER_PACK,PAPER_COST,CARD_REPAIR_COST,cardRepairCost,returnPolicy,returnMatches,rushHourActive,rushHourMultiplier,rushHourProfitBonus,shouldStartRushHour,startRushHour,tickRushHour,RUSH_DURATION_SECONDS,RUSH_PATIENCE_SECONDS}=await import(new URL('./engine.mjs'+new URL(import.meta.url).search,import.meta.url));
@@ -22,9 +24,10 @@ const MUSIC_TRACKS=Object.freeze([
 ]);
 let musicIndex=-1,musicLoadedChoice=null,musicStartToken=0;
 let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=null,musicSource=null,chaChingBuffer=null,chaChingPromise=null,chaChingSource=null;
+let chaChingSequence=0,chaChingFallbackNodes=[];
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-20-v34-file8-clean-catalog-art';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-26-v62-delivery-payment-audio';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
@@ -42,12 +45,7 @@ function kitaFoodOrderState(orderId){
  if(!Array.isArray(orders)||!orderId)return null;
  return orders.find(o=>o&&o.id===orderId)||null;
 }
-function kitaFoodSecondsRemaining(order){
- if(!order)return 0;
- if(Number.isFinite(order.deadlineAt))return Math.max(0,Math.ceil((order.deadlineAt-Date.now())/1000));
- const limit=Number(order.timeLimit)||0,elapsed=Number(order.elapsedSeconds)||0;
- return Math.max(0,Math.ceil(limit-elapsed));
-}
+const kitaFoodSecondsRemaining=remainingSeconds;
 function kitaFoodClock(order){
  const secs=kitaFoodSecondsRemaining(order);
  return `${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}`;
@@ -57,6 +55,7 @@ const freshOperations=ensureOperations(progress);ensureShift(session);ensureStyl
 if(freshOperations&&customer&&!customer.paid){const need={};for(const p of customer.items)need[p.id]=(need[p.id]||0)+stockUnits(p);for(const [id,n] of Object.entries(need))progress.inventory[id]=Math.max(progress.inventory[id],n)}
 
 function captureGame(){
+ delivery?.syncClock();
  if(session){
   session.customer=customer;session.phase=phase;session.combo=combo;
   session.cashPicked=cashPicked;session.lastTip=lastTip;session.lastEarned=lastEarned;
@@ -70,6 +69,7 @@ function captureGame(){
 }
 
 function hydrateGame(data){
+ delivery?.reset();clearTimeout(kitaFoodArrivalTimer);stopChaChing();
  scanToken++;busy=false;advancePending=false;practiceStore=null;paymentMinimized=false;
  // A login/account switch must not inherit the previous account's playing track.
  ++musicStartToken;musicStarting=false;musicFade=null;musicTarget=-1;
@@ -314,7 +314,12 @@ function delayActive(ms,token,onProgress){return new Promise(resolve=>{let elaps
 function fly(productId,from,to){if(!from)return;const a=from.getBoundingClientRect(),b=to.getBoundingClientRect(),el=document.createElement('div');el.className='fly-item';el.innerHTML=productArt(productId);el.style.left=a.left+a.width/2-23+'px';el.style.top=a.top+a.height/2-23+'px';$('fxLayer').append(el);void el.offsetWidth;requestAnimationFrame(()=>{el.style.transform=`translate(${b.left+b.width/2-a.left-a.width/2}px,${b.top+b.height/2-a.top-a.height/2}px) scale(.75)`;el.style.opacity='0'});setTimeout(()=>el.remove(),420)}
 function completePayment(transaction=customer){
  if(!transaction||transaction!==customer||transaction.paid||!['scan','offer','change'].includes(phase)||!transaction.items.every(i=>i.scanned))return;
- if(!ensurePaper())return;if(mode!=='practice'&&!rushUnlimited(transaction)&&!stockForBasket(progress,transaction.items)){showInventory();toast('Stok tidak cukup. Tambah bekalan untuk selesaikan jualan.',true);return}
+ if(!ensurePaper()){
+  busy=false;resetDigitalAttempt(transaction);renderPayment();save();return;
+ }
+ if(mode!=='practice'&&!rushUnlimited(transaction)&&!stockForBasket(progress,transaction.items)){
+  busy=false;resetDigitalAttempt(transaction);renderPayment();save();showInventory();toast('Stok tidak cukup. Tambah bekalan dan cuba bayaran semula.',true);return;
+ }
  ensureShift(session);const missedCoupon=transaction.hasCoupon&&!transaction.couponApplied,reason=missedCoupon?'Kupon diminta tetapi tidak digunakan.':'';
  const starLost=missedCoupon?loseStar(session,reason):0;transaction.paid=true;busy=false;phase='success';combo++;session.bestCombo=Math.max(session.bestCombo,combo);
  lastTip=missedCoupon?0:tipFor(customer,combo,progress.upgrades);
@@ -356,13 +361,13 @@ function advance(){
 function loseCustomer(){if(!['scan','offer','change'].includes(phase))return;scanToken++;busy=false;cancelDrag();phase='lost';session.lost++;if(customer?.rushCustomer)session.rushLost=(session.rushLost||0)+1;const starLost=loseStar(session,'Pelanggan menunggu terlalu lama.');showTransactionResult(0,starLost,'Pelanggan menunggu terlalu lama.');combo=0;resetStations();render();save();toast('Pelanggan hilang sabar. Cuba lagi!',true);advance()}
 function floatingTip(amount){if(!amount)return;const r=$('walletLabel').getBoundingClientRect(),el=document.createElement('div');el.className='floating-tip';el.textContent='+'+money(amount);el.style.left=r.left+'px';el.style.top=r.bottom+18+'px';$('fxLayer').append(el);setTimeout(()=>el.remove(),1850)}
 function confetti(count=45){for(let i=0;i<count;i++){const e=document.createElement('i');e.className='confetti';e.style.left=Math.random()*100+'vw';e.style.background=['#a2bd85','#edaf72','#e1cc91','#709988'][i%4];e.style.setProperty('--drift',(Math.random()-.5)*250+'px');e.style.animationDelay=Math.random()*.5+'s';$('fxLayer').append(e);setTimeout(()=>e.remove(),3000)}}
-function openModal(kind,html){if(modalKind==='stars-empty'&&kind!=='stars-empty')return;$('modal').dataset.kind=kind;document.body.classList.toggle('style-preview',kind==='style-preview');document.body.classList.toggle('intro-screen',kind==='intro');if(kind!=='style-preview'){previewTheme=null;applySettings()}cancelCalculatorDrag();cancelDrag();cancelBankCardDrag();paused=true;document.body.classList.add('paused');modalKind=kind;if(kind==='pause'){explicitPause=true;stopScaleSound()};syncBackgroundMusic();$('modalContent').innerHTML=html;icons($('modalContent'));enhanceManagement(kind,$('modalContent'),icon);if(!$('modal').open)$('modal').showModal()}
-function closeModal(){if(modalKind==='style-preview'){showStyles(previewTheme);return}if(['intro','summary','stars-empty'].includes(modalKind))return;previewTheme=null;applySettings();if(phase==='end'){showSummary();return}$('modal').close();paused=false;explicitPause=false;document.body.classList.remove('paused','intro-screen');modalKind=null;syncBackgroundMusic()}
+function openModal(kind,html){if(modalKind==='stars-empty'&&kind!=='stars-empty')return;$('modal').dataset.kind=kind;document.body.classList.toggle('style-preview',kind==='style-preview');document.body.classList.toggle('intro-screen',kind==='intro');if(kind!=='style-preview'){previewTheme=null;applySettings()}cancelCalculatorDrag();cancelDrag();cancelBankCardDrag();paused=true;document.body.classList.add('paused');modalKind=kind;if(kind==='pause'){explicitPause=true;stopScaleSound()};delivery?.syncClock();syncBackgroundMusic();$('modalContent').innerHTML=html;icons($('modalContent'));enhanceManagement(kind,$('modalContent'),icon);if(!$('modal').open)$('modal').showModal()}
+function closeModal(){if(modalKind==='style-preview'){showStyles(previewTheme);return}if(['intro','summary','stars-empty'].includes(modalKind))return;previewTheme=null;applySettings();if(phase==='end'){showSummary();return}$('modal').close();paused=false;explicitPause=false;document.body.classList.remove('paused','intro-screen');modalKind=null;delivery?.syncClock();syncBackgroundMusic()}
 function startPlay(selected){explicitPause=false;musicUnlocked=true;paymentMinimized=false;beep('start');prepareChaChing();prepareScaleSound();if(selected==='resume'&&session){mode='career';normalizeSession();if(phase==='end'){showSummary();return}render();setMobileView(['offer','change','success','lost'].includes(phase)?'payment':'counter')}else if(selected==='practice'&&practiceRunCache?.session?.mode==='practice'){
    mode='practice';session=JSON.parse(JSON.stringify(practiceRunCache.session));practiceStore=practiceRunCache.store?JSON.parse(JSON.stringify(practiceRunCache.store)):null;
    customer=session.customer||null;phase=session.phase||'scan';combo=session.combo||0;cashPicked=Array.isArray(session.cashPicked)?session.cashPicked:[];
    lastTip=session.lastTip||0;lastEarned=session.lastEarned||0;ensureShift(session);if(practiceStore)ensureOperations(practiceStore);
-   scanToken++;busy=false;renderedBasket=null;renderedSceneCustomer=undefined;initIllustrations();resetStations();render();setMobileView('counter');
+   scanToken++;busy=false;recoverInterruptedPayment(customer);renderedBasket=null;renderedSceneCustomer=undefined;initIllustrations();resetStations();render();setMobileView('counter');
   }
   else newSession(selected||'career');$('modal').close();paused=false;document.body.classList.remove('paused','intro-screen');modalKind=null;if(customer?.paymentChanged){toast('Tunai sahaja buat masa ini. Buka kad dan QR melalui Upgrade.');delete customer.paymentChanged;save()}if(!storageOK)toast('Simpanan automatik tidak tersedia dalam pelayar ini.');if(mode==='career'&&session.stars===0)showStarRecovery();else if(['success','lost'].includes(phase))advance();else if(phase==='delivery'&&customer?.kind==='kitafood')showKitaFoodAfterArrival(customer.orderId,1800);save();syncBackgroundMusic()}
 function showIntro(){explicitPause=true;closeCalculator();let selected='career';openModal('intro',`<div class="modal-pad"><div class="intro-layout"><div><div class="modal-kicker"><span class="live-dot"></span> SELAMAT DATANG KE KEDAI KITA</div><h1>Kedai kecil.<br><em>Seronok besar.</em></h1><p>Jadi cashier paling mesra di taman. Scan barang, kira baki dan buat pelanggan tersenyum.</p><div class="intro-features"><span>${icon('scan')} Scan & timbang</span><span>${icon('cash')} Ringgit Malaysia</span><span>${icon('shop')} Naik taraf kedai</span></div></div><div class="intro-art">${avatar(PEOPLE[0])}<div class="intro-counter"><span>${icon('basket')}</span><b>kita.</b></div><div class="intro-sticker">DIBUKA<br>DENGAN<br>SENYUMAN</div></div></div><div class="mode-options"><button class="mode-choice active" id="careerMode"><b>✦ Mod kerjaya</b><small>Cabaran harian, combo & naik taraf</small></button><button class="mode-choice" id="practiceMode"><b>Mod santai</b><small>Latihan tanpa masa dan tanpa tekanan</small></button></div><div class="intro-bottom"><button class="primary-btn" id="startBtn">${session?'Sambung syif · Hari '+progress.day:'Buka kedai · Hari '+progress.day} ${icon('arrow')}</button><small>Tekan atau seret barang.<br>Mesra telefon, tablet & komputer.</small></div>${session?'<p class="muted" style="margin-bottom:0">Kemajuan syif anda sudah disimpan.</p>':''}</div>`);$('careerMode').onclick=()=>{selected='career';$('careerMode').classList.add('active');$('practiceMode').classList.remove('active');$('startBtn').innerHTML=(session?'Sambung syif · Hari ':'Buka kedai · Hari ')+progress.day+' '+icon('arrow')};$('practiceMode').onclick=()=>{selected='practice';$('practiceMode').classList.add('active');$('careerMode').classList.remove('active');$('startBtn').innerHTML=(practiceRunCache?'Sambung latihan santai ':'Mula latihan santai ')+icon('arrow')};$('startBtn').onclick=()=>startPlay(selected==='career'&&session?'resume':selected)}
@@ -617,7 +622,7 @@ cloud=createCloudSync({
  report:label=>{if($('saveStatus'))$('saveStatus').textContent=label},
  onDeveloperChanged:developerAccessChanged
 });
-delivery=createDelivery({getProgress:()=>progress,getSession:()=>session,getMode:()=>mode,save,notify:toast,money,products:PRODUCTS,categories:CATEGORIES,productArt,icon,openModal,closeModal,receiveCash:receiveStoreCash,onFinish:(order,completed)=>{
+delivery=createDelivery({getProgress:()=>progress,getSession:()=>session,getMode:()=>mode,save,notify:toast,money,products:PRODUCTS,categories:CATEGORIES,productArt,icon,openModal,closeModal,receiveCash:receiveStoreCash,isClockPaused:()=>mode!=='career'||!session||phase!=='delivery'||document.hidden||$('accountOverlay').open||explicitPause||(paused&&modalKind!=='delivery'),onFinish:(order,completed)=>{
  if(customer?.kind==='kitafood'&&customer.orderId===order.id){
   syncShiftClockToCustomerCount();
   scanToken++;customer=null;phase='waiting';renderedSceneCustomer=undefined;renderedBasket=null;
@@ -655,7 +660,7 @@ document.addEventListener('keydown',e=>{
   else{e.preventDefault();showPause()}
   return;
  }if(!paused&&phase==='offer'&&customer?.cardStage==='pin'&&(/^\d$/.test(e.key)||['Backspace','Enter'].includes(e.key))){e.preventDefault();pressPin(e.key==='Backspace'?'⌫':e.key==='Enter'?'OK':e.key);return}if(!paused&&!editing&&/^[1-9]$/.test(e.key)&&customer){const p=(Array.isArray(customer.items)?customer.items:[]).filter(p=>!p.scanned)[+e.key-1];if(p)processItem(p.uid)}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){save();cloud?.flush?.().catch(()=>{});if(!paused)showPause()}syncBackgroundMusic()});window.addEventListener('pagehide',()=>{save();cloud?.flush?.().catch(()=>{});musicUnlocked=false;musicFade=null;musicTarget=0;writeMusicLevel(0);$('backgroundMusic').pause();stopScannerSound();stopChaChing();stopScaleSound();stopDrawerSound()});window.addEventListener('pageshow',()=>{if(session&&modalKind!=='intro'){musicUnlocked=true;syncBackgroundMusic()}});
+document.addEventListener('visibilitychange',()=>{delivery?.syncClock();if(document.hidden){save();cloud?.flush?.().catch(()=>{});if(!paused)showPause()}syncBackgroundMusic()});window.addEventListener('pagehide',()=>{if(!paused)showPause();save();cloud?.flush?.().catch(()=>{});musicUnlocked=false;musicFade=null;musicTarget=0;writeMusicLevel(0);$('backgroundMusic').pause();stopScannerSound();stopChaChing();stopScaleSound();stopDrawerSound()});window.addEventListener('pageshow',()=>{if(session&&modalKind!=='intro'){musicUnlocked=true;syncBackgroundMusic()}});
 let lastTick=performance.now(),sinceSave=0;function loop(now){const dt=Math.min((now-lastTick)/1000,.1);lastTick=now;if(!paused&&!document.hidden&&session&&phase!=='end'){
  if(mode!=='practice'){tickShiftClock(dt);renderOperations();sinceSave+=dt;if(sinceSave>5){save();sinceSave=0}}
  if(mode==='career'&&tickRushHour(session,dt)){
@@ -1096,15 +1101,20 @@ function prepareChaChing(){
  prepareScannerAudio();if(!audioCtx||chaChingPromise||typeof fetch!=='function')return;
  chaChingPromise=fetch('./cha-ching.wav').then(r=>{if(!r.ok)throw new Error('Audio unavailable');return r.arrayBuffer()}).then(b=>audioCtx.decodeAudioData(b)).then(b=>{chaChingBuffer=b;return b}).catch(()=>{chaChingPromise=null;return null});
 }
-function stopChaChing(){try{chaChingSource?.node.stop()}catch{}chaChingSource=null;try{$('chaChingSound').pause();$('chaChingSound').currentTime=0}catch{}}
-function playChaChing(){
+function stopChaChing(){
+ ++chaChingSequence;
+ try{chaChingSource?.node.stop()}catch{}chaChingSource=null;
+ for(const node of chaChingFallbackNodes){try{node.stop()}catch{}}
+ chaChingFallbackNodes=[];
+ try{$('chaChingSound').pause();$('chaChingSound').currentTime=0}catch{}
+}
+async function playChaChing(){
  if(!sound||effectVolume('chaching')===0)return;
- prepareChaChing();
- stopChaChing();
- try{if(audioCtx?.state==='suspended')audioCtx.resume().catch(()=>{});}catch{}
- const level=effectVolume('chaching');
+ stopChaChing();prepareChaChing();
+ const token=chaChingSequence,level=effectVolume('chaching');
+ const current=()=>token===chaChingSequence&&sound&&effectVolume('chaching')>0;
  const playBuffer=()=>{
-  if(!chaChingBuffer||!audioCtx)return false;
+  if(!current()||!chaChingBuffer||audioCtx?.state!=='running')return false;
   try{
    const node=audioCtx.createBufferSource(),gain=audioCtx.createGain();
    node.buffer=chaChingBuffer;gain.gain.value=level;
@@ -1113,47 +1123,32 @@ function playChaChing(){
    node.start(0);return true;
   }catch{return false}
  };
- const synthFallback=()=>{
-  if(!audioCtx)return false;
-  try{
-   if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
-   const now=audioCtx.currentTime;
-   [1046.5,1568,2093].forEach((freq,i)=>{
-    const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),t=now+i*.095;
-    osc.type='sine';osc.frequency.setValueAtTime(freq,t);
-    gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(level*.22,t+.012);
-    gain.gain.exponentialRampToValueAtTime(.001,t+.26);
-    osc.connect(gain);gain.connect(audioCtx.destination);
-    osc.start(t);osc.stop(t+.28);osc.onended=()=>{osc.disconnect();gain.disconnect()};
-   });
-   return true;
-  }catch{return false}
- };
- const playHtmlAudio=clip=>{
-  if(!clip)return false;
-  try{
-   clip.pause();clip.currentTime=0;clip.volume=level;clip.preload='auto';clip.load?.();
-   const playResult=clip.play();
-   if(playResult&&typeof playResult.then==='function'){
-    playResult.catch(()=>{
-      try{
-       const clone=clip.cloneNode(true);
-       clone.volume=level;clone.preload='auto';
-       const clonePlay=clone.play();
-       if(clonePlay&&typeof clonePlay.catch==='function')clonePlay.catch(()=>{if(!playBuffer())synthFallback()});
-      }catch{if(!playBuffer())synthFallback()}
-    });
-   }
-   return true;
-  }catch{return false}
- };
- if(playBuffer())return;
- const clip=$('chaChingSound');
- if(playHtmlAudio(clip)){
-  if(chaChingPromise)Promise.resolve(chaChingPromise).then(()=>{if(!clip?.paused)return;if(!playBuffer())synthFallback()}).catch(()=>{if(!playBuffer())synthFallback()});
-  return;
- }
- if(!playBuffer())synthFallback();
+ try{
+  // Start resume during the user action. HTML playback remains the fallback
+  // when Web Audio is unavailable or still suspended.
+  if(audioCtx?.state==='suspended')audioCtx.resume().catch(()=>{});
+  if(playBuffer())return;
+  const clip=$('chaChingSound');
+  if(clip){
+   clip.volume=level;
+   try{await clip.play();return}catch{}
+  }
+  // Never run HTML, decoded audio and synthetic chime concurrently. A rejected
+  // or delayed promise from an older transaction must not play after mute/reset.
+  if(!current())return;
+  if(playBuffer())return;
+  if(audioCtx?.state!=='running')return;
+  const now=audioCtx.currentTime;
+  [1046.5,1568,2093].forEach((freq,i)=>{
+   const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),t=now+i*.095;
+   osc.type='sine';osc.frequency.setValueAtTime(freq,t);
+   gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(level*.22,t+.012);
+   gain.gain.exponentialRampToValueAtTime(.001,t+.26);
+   osc.connect(gain);gain.connect(audioCtx.destination);chaChingFallbackNodes.push(osc);
+   osc.onended=()=>{osc.disconnect();gain.disconnect();chaChingFallbackNodes=chaChingFallbackNodes.filter(n=>n!==osc)};
+   osc.start(t);osc.stop(t+.28);
+  });
+ }catch{/* Audio failure must never interrupt an already committed sale. */}
 }
 
 
