@@ -5,7 +5,15 @@ export function kasihAccount(store,person,rng=Math.random){
  store.kitaKasih??={accounts:{},receipts:[]};
  store.kitaKasih.accounts??={};store.kitaKasih.receipts??=[];
  const key=person.id;
- return store.kitaKasih.accounts[key]??=( {balance:1000+Math.min(18,Math.max(0,Math.floor(rng()*19)))*500,card:'KK-'+String(Object.keys(store.kitaKasih.accounts).length+1).padStart(5,'0')} );
+ const account=store.kitaKasih.accounts[key]??={balance:1000+Math.min(18,Math.max(0,Math.floor(rng()*19)))*500};
+ // Random game ID is assigned once; keep balances and historical receipts intact.
+ if(!/^KK-\d{6}$/.test(account.card||'')){
+  const used=new Set(Object.values(store.kitaKasih.accounts).map(a=>a.card));
+  let n=100000+Math.min(899999,Math.max(0,Math.floor(rng()*900000)));
+  while(used.has('KK-'+n))n=n===999999?100000:n+1;
+  account.card='KK-'+n;
+ }
+ return account;
 }
 export function kasihQuote(customer){
  const price=i=>i.weighted?Math.round(i.price*i.grams/1000):i.price;

@@ -2310,3 +2310,16 @@ body[data-theme="dark"] .kasih-pro-hardware{background:radial-gradient(ellipse,#
 .aid-id-photo{position:absolute;left:7%;top:31%;width:27%;height:53%;overflow:hidden;border:1px solid #8da7a9;border-radius:3px;background:linear-gradient(#afc9d1,#deebed)}.aid-id-photo>svg{display:block;width:100%;height:100%;transform:scale(1.3);transform-origin:50% 33%}.aid-id-chip{position:absolute;right:8%;top:10%;width:22px;height:16px;border-radius:4px;border:1px solid #ae9b67;background:repeating-linear-gradient(90deg,#e7d59b 0 6px,#bdaa71 6px 7px)}
 .aid-id-data{position:absolute;left:39%;right:5%;top:34%;display:flex;flex-direction:column;align-items:flex-start;gap:3px}.aid-id-data>small{font-size:4.5px;letter-spacing:.6px;opacity:.7}.kasih-pro .pro-aid-card .aid-id-data>strong{position:static;max-width:100%;font-size:10px;line-height:1.15;white-space:normal;letter-spacing:.3px;color:#173d4c}.aid-id-data>b{font:700 9px monospace;letter-spacing:1px}.aid-id-data>em{font-size:4.5px;font-style:normal;margin-top:2px}.aid-id-footer{position:absolute;left:7%;right:5%;bottom:6%;font-size:4.5px;letter-spacing:.4px;text-align:center;font-weight:700}
 @media(max-width:430px){.aid-id-heading{font-size:8px;letter-spacing:1px}.aid-id-heading>span{font-size:4px}.aid-id-chip{width:18px;height:13px}.aid-id-data{gap:2px}.kasih-pro .pro-aid-card .aid-id-data>strong{font-size:8px}.aid-id-data>b{font-size:7px}.aid-id-footer{font-size:3.5px}.aid-id-data>em{font-size:3.5px}}
+
+/* V69: calm ID portraits and a clearer card reader prompt. */
+.aid-id-photo .customer-angry-brows,.aid-id-photo .customer-angry-mouth,.aid-id-photo .customer-anger{display:none!important}
+.aid-id-photo .customer-brows,.aid-id-photo .customer-mouth{display:block!important}
+.aid-id-photo svg *{animation:none!important}
+.aid-id-chip{right:6%;top:50%;transform:translateY(-50%)}
+.aid-id-data{right:22%}
+.pro-reader-screen.awaiting-card{min-height:128px;align-items:stretch}
+.kasih-pro .pro-reader-screen .pro-reader-instruction{display:grid;place-items:center;flex:1;width:100%;min-height:57px;font-size:14px;font-weight:800;line-height:1.4;text-align:center;letter-spacing:0}
+@media(max-width:600px){.pro-reader-screen.awaiting-card{min-height:105px}.kasih-pro .pro-reader-screen .pro-reader-instruction{font-size:11px;min-height:44px}}
+@media(max-height:600px) and (min-width:601px){.pro-reader-screen.awaiting-card{min-height:95px}.kasih-pro .pro-reader-screen .pro-reader-instruction{min-height:38px;font-size:12px}}
+@media(max-width:600px){.kasih-pro-grid{grid-template-columns:minmax(0,1fr)}.kasih-pro-hardware{grid-template-columns:minmax(0,1fr) var(--kk-physical-card-width);min-width:0}.kasih-pro .pro-reader{max-width:100%;min-width:0}.kasih-pro-receipt{min-width:0}}
+@media(max-width:350px){.kasih-pro .pro-reader{padding:6px}.pro-reader-screen{padding:6px}.kasih-pro .pro-reader-screen .pro-reader-instruction{font-size:10px}.kasih-pro .pro-reader-screen small{font-size:5px;letter-spacing:.4px}.pro-reader-brand{font-size:5px;letter-spacing:.5px}.pro-reader-screen>i{font-size:6px}}
