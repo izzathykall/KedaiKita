@@ -3225,7 +3225,7 @@
   var calculatorResult = "";
   var advancePending = false;
   var STORAGE = "kedai-kita-v1";
-  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v65-rider-qr";
+  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v66-single-report";
   var UPDATE_CHECK_URL = "./version.json";
   var storageOK = true;
   var progress = createProgress();
@@ -4522,10 +4522,7 @@
       session.clockMinutes = SHIFT_CLOSE_MINUTES;
       renderOperations();
     }
-    phase = "end";
-    save();
-    openModal("shift-closing", `<div class="modal-pad"><div class="modal-kicker">PENUTUPAN SYIF \xB7 HARI ${progress.day}</div><h2>Semak sebelum tutup kedai</h2><p>Semua pelanggan harian telah dilayan. Semak laporan sebelum meneruskan.</p><div class="day-summary"><div><small>JUALAN</small><b>${money(session.totalSales || 0)}</b></div><div><small>TIP</small><b>${money(session.tips || 0)}</b></div><div><small>UNTUNG DIREKOD</small><b>${money(session.earned || 0)}</b></div></div><p class="muted">Delivery: ${session.deliveryCompleted || 0} pesanan \xB7 ${money(session.deliveryRevenue || 0)} \xB7 Refund: ${money(session.refunds || 0)} \xB7 Perbelanjaan: ${money(session.expenses || 0)} \xB7 Pelanggan: ${session.served || 0}</p><p class="muted">Laporan ini tidak mengubah baki wang atau mengira caj dua kali.</p><button class="primary-btn" id="confirmShiftClose" style="width:100%">Tutup kedai & lihat laporan</button></div>`);
-    $("confirmShiftClose").onclick = () => showSummary();
+    showSummary();
   }
   function showSummary() {
     closeCalculator();

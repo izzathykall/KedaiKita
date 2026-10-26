@@ -1,9 +1,7 @@
 {
-  "version": "2026-10-27-v65-rider-qr",
-  "title": "KitaFood & pembayaran",
+  "version": "2026-10-27-v66-single-report",
+  "title": "Satu laporan penutupan syif",
   "notes": [
-    "Pendingin hawa +5s; upgrade kesabaran rider lima tahap.",
-    "Jadual 1\u20133 rider sehari dengan jarak pelanggan.",
-    "QR berpusat, scanner baharu boleh diseret; kad/scanner hilang selepas dibaca."
+    "Selepas syif tamat, terus paparkan laporan lengkap tanpa skrin semakan tambahan."
   ]
 }
