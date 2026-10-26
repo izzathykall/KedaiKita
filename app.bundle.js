@@ -188,6 +188,44 @@
     mobile.addEventListener?.("change", () => setOpen(false));
   })();
 
+  // kitakasih.mjs
+  var KASIH_PRODUCTS = /* @__PURE__ */ new Set(["milk", "bread", "eggs", "rice", "noodles", "cookies", "soap", "coffee", "water", "curry", "detergent", "oil", "sugar", "flour", "soy", "sardine", "tea", "malt", "salt", "condensed", "tissue", "toothpaste", "shampoo", "dishsoap"]);
+  var kasihEligible = (item) => KASIH_PRODUCTS.has(item.id);
+  function kasihAccount(store, person) {
+    store.kitaKasih ??= { accounts: {}, receipts: [] };
+    store.kitaKasih.accounts ??= {};
+    store.kitaKasih.receipts ??= [];
+    const key = person.id;
+    return store.kitaKasih.accounts[key] ??= { balance: 5e3, card: "KK-" + String(Object.keys(store.kitaKasih.accounts).length + 1).padStart(5, "0") };
+  }
+  function kasihQuote(customer2) {
+    const price = (i) => i.weighted ? Math.round(i.price * i.grams / 1e3) : i.price;
+    const gross = customer2.items.reduce((s, i) => s + price(i), 0);
+    const total = Math.max(0, gross - (customer2.discount || 0));
+    const eligibleGross = customer2.items.filter(kasihEligible).reduce((s, i) => s + price(i), 0);
+    const eligible = gross ? Math.floor(total * eligibleGross / gross) : 0;
+    const balance = Math.max(0, Math.floor(customer2.kasih?.balanceBefore || 0));
+    const aid = Math.min(balance, eligible);
+    return { total, eligible, ineligible: total - eligible, aid, remaining: total - aid, balanceAfter: balance - aid };
+  }
+  function kasihContribution(c) {
+    return c?.kasih?.reserved ? kasihQuote(c).aid : 0;
+  }
+  function commitKasih(store, c) {
+    if (!c.kasih) return true;
+    const k = c.kasih;
+    if (k.committed) return false;
+    const account = kasihAccount(store, c.person), q = kasihQuote(c);
+    if (!k.verified || !k.reserved || account.balance !== k.balanceBefore) return false;
+    account.balance = q.balanceAfter;
+    k.committed = true;
+    k.balanceAfter = q.balanceAfter;
+    k.aid = q.aid;
+    store.kitaKasih.receipts.unshift({ id: k.id, name: c.person.name, card: account.card, aid: q.aid, balance: q.balanceAfter, total: q.total, extra: q.remaining, method: c.method, day: store.day });
+    store.kitaKasih.receipts = store.kitaKasih.receipts.slice(0, 20);
+    return true;
+  }
+
   // delivery-clock.mjs
   function remainingMs(order, now = Date.now()) {
     if (!order) return 0;
@@ -1546,7 +1584,7 @@
     return Math.max(0, customer2.total - (customer2.discount || 0));
   }
   function amountDue(customer2) {
-    const total = netTotal(customer2);
+    const total = Math.max(0, netTotal(customer2) - kasihContribution(customer2));
     return customer2.method === "cash" && customer2.kind !== "return" ? Math.round(total / 5) * 5 : total;
   }
   function tenderFor(total) {
@@ -3155,7 +3193,7 @@
   var calculatorResult = "";
   var advancePending = false;
   var STORAGE = "kedai-kita-v1";
-  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-26-v63-startup-fix";
+  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-26-v64-kitakasih";
   var UPDATE_CHECK_URL = "./version.json";
   var storageOK = true;
   var progress = createProgress();
@@ -3517,6 +3555,7 @@
     }
     applyMachineSpeeds();
     prepareReturnCustomer();
+    prepareKasihCustomer(rush);
     session.seenPeople.push(customer.person.id);
     customer.patience += (progress.upgrades.comfort || 0) * 15;
     if (rush) applyRushPatience(customer);
@@ -3555,6 +3594,9 @@
     $("scaleZone").classList.remove("weighing", "highlight");
     $("scannerZone").classList.remove("scanning", "highlight");
     $("scannerStatus").textContent = "Sedia untuk scan";
+  }
+  function saleTotal(c) {
+    return amountDue(c) + kasihContribution(c);
   }
   function render() {
     refreshCalculatorPresets();
@@ -3618,7 +3660,7 @@
     document.body.classList.toggle("kita-food-at-counter", customer.kind === "kitafood");
     $("customerVipBadge").hidden = customer.kind !== "vip";
     $("customerVipTip").hidden = customer.kind !== "vip";
-    $("speech").textContent = customer.kind === "kitafood" ? "Hai! Saya rider KitaFood. Pesanan " + customer.orderId + " sudah sedia untuk diambil?" : customer.kind === "return" ? customer.returnReason || customerLine(customer, "returns") : phase === "success" ? customerLine(customer, lastTip > 0 ? "thanks" : "thanksNoTip") : phase === "lost" ? "Saya kena pergi dulu. Lain kali ya." : phase === "change" ? customerLine(customer, "change") : phase === "offer" ? customerLine(customer, customer.method) : customer.hasCoupon ? "Saya ada kupon 10%. Tolong gunakan diskaun saya ya." : customerLine(customer, "welcome");
+    $("speech").textContent = customer.kind === "kitafood" ? "Hai! Saya rider KitaFood. Pesanan " + customer.orderId + " sudah sedia untuk diambil?" : customer.kind === "return" ? customer.returnReason || customerLine(customer, "returns") : phase === "success" ? customerLine(customer, lastTip > 0 ? "thanks" : "thanksNoTip") : phase === "lost" ? "Saya kena pergi dulu. Lain kali ya." : phase === "change" ? customerLine(customer, "change") : customer.kasih && !customer.paid ? "Saya guna KitaKasih. Kalau tak cukup, saya tambah bayaran." : phase === "offer" ? customerLine(customer, customer.method) : customer.hasCoupon ? "Saya ada kupon 10%. Tolong gunakan diskaun saya ya." : customerLine(customer, "welcome");
     requestAnimationFrame(positionCustomerDialogue);
   }
   function renderProducts() {
@@ -3659,7 +3701,7 @@
     $("undoScanBtn").disabled = !customer || phase !== "scan" || busy || !scanned;
   }
   function productHTML(p, i) {
-    return `<button id="product-${p.uid}" class="product ${p.scanned ? "scanned" : ""}" data-uid="${p.uid}" style="--product-bg:${p.color};--item-index:${i};--slot:${i}" aria-label="${p.name}" ${p.scanned ? "disabled" : ""}><span class="product-illustration">${productArt(p.id)}</span><span class="product-name">${p.name}</span><span class="product-price">${money(p.price)}${p.weighted ? "/kg" : ""}</span><span class="mini-barcode" aria-hidden="true"></span>${p.weighted ? '<span class="weight-tag">' + icon("scale") + "</span>" : ""}<span class="damaged-tag"><small>KOD MANUAL</small>${p.manualCode || ""}</span></button>`;
+    return `<button id="product-${p.uid}" class="product ${p.scanned ? "scanned" : ""}" data-uid="${p.uid}" style="--product-bg:${p.color};--item-index:${i};--slot:${i}" aria-label="${p.name}" ${p.scanned ? "disabled" : ""}><span class="product-illustration">${productArt(p.id)}</span><span class="product-name">${p.name}</span>${kasihEligible(p) ? '<span class="kasih-tag">KitaKasih</span>' : ""}<span class="product-price">${money(p.price)}${p.weighted ? "/kg" : ""}</span><span class="mini-barcode" aria-hidden="true"></span>${p.weighted ? '<span class="weight-tag">' + icon("scale") + "</span>" : ""}<span class="damaged-tag"><small>KOD MANUAL</small>${p.manualCode || ""}</span></button>`;
   }
   function renderReceipt() {
     if (customer?.kind === "kitafood") {
@@ -3684,11 +3726,11 @@
       $("receiptSub").textContent = "Kaunter sedia untuk pelanggan seterusnya.";
       return;
     }
-    const items = customer.items.filter((i) => i.scanned), subtotal = basketTotal(items), all = items.length === customer.items.length, rounding = all && customer.method === "cash" ? amountDue(customer) - netTotal(customer) : 0;
+    const items = customer.items.filter((i) => i.scanned), subtotal = basketTotal(items), all = items.length === customer.items.length, rounding = all && customer.method === "cash" ? saleTotal(customer) - netTotal(customer) : 0;
     const old = $("roundingRow");
     old?.remove();
     $("discountRow")?.remove();
-    $("receiptList").innerHTML = items.length ? items.map((i) => `<div class="receipt-row"><span class="row-emoji">${productArt(i.id)}</span><span class="row-info"><b>${i.name}</b><small>${i.weighted ? (i.grams / 1e3).toFixed(3) + " kg \xD7 " + money(i.price) + "/kg" : "1 unit \xD7 " + money(i.price)}</small></span><strong>${money(itemPrice(i))}</strong></div>`).join("") : `<div class="receipt-empty">${icon("basket")}<b>Barang belum discan</b><small>Tekan barang di conveyor untuk mula.</small></div>`;
+    $("receiptList").innerHTML = items.length ? items.map((i) => `<div class="receipt-row"><span class="row-emoji">${productArt(i.id)}</span><span class="row-info"><b>${i.name}</b>${customer.kasih ? '<small class="kasih-label">' + (kasihEligible(i) ? "Layak KitaKasih" : "Bayaran sendiri") + "</small>" : ""}<small>${i.weighted ? (i.grams / 1e3).toFixed(3) + " kg \xD7 " + money(i.price) + "/kg" : "1 unit \xD7 " + money(i.price)}</small></span><strong>${money(itemPrice(i))}</strong></div>`).join("") : `<div class="receipt-empty">${icon("basket")}<b>Barang belum discan</b><small>Tekan barang di conveyor untuk mula.</small></div>`;
     $("receiptQuantity").textContent = "(" + items.length + " barang)";
     $("subtotal").textContent = money(subtotal);
     if (rounding) {
@@ -3709,6 +3751,10 @@
     $("total").innerHTML = "RM " + Math.floor(amount) + "<span>." + amount.toFixed(2).split(".")[1] + "</span>";
     $("receiptNo").textContent = "#" + String(progress.served + session.index + 1).padStart(4, "0");
     $("receiptSub").textContent = items.length === customer.items.length ? "Semua barang sudah direkodkan." : "";
+    if (customer.kasih && all) {
+      const q = kasihQuote(customer);
+      $("receiptSub").textContent = "KitaKasih " + money(q.aid) + " \xB7 Tambahan " + money(customer.kasih.reserved ? amountDue(customer) : q.remaining) + " \xB7 Baki bantuan " + money(q.balanceAfter);
+    }
     $("receiptList").scrollTop = $("receiptList").scrollHeight;
   }
   function renderPayment() {
@@ -3733,7 +3779,7 @@
       area.innerHTML = `<button class="primary-btn" disabled>Mula syif untuk bermain ${icon("arrow")}</button><p class="payment-hint">Kedai kecil. Pengalaman besar.</p>`;
       return;
     }
-    const all = customer.items.every((i) => i.scanned), method = customer.method, methodName = { cash: "Tunai", card: "Kad debit", qr: "QR e-wallet" }[method];
+    const all = customer.items.every((i) => i.scanned), method = customer.method, methodName = { cash: "Tunai", card: "Kad debit", qr: "QR e-wallet", kasih: "KitaKasih" }[method];
     if (phase === "scan") {
       area.innerHTML = `${customer.hasCoupon ? `<button class="coupon-btn ${customer.couponApplied ? "applied" : ""}" id="couponBtn" ${!all || customer.couponApplied ? "disabled" : ""}>${icon("ticket")}<span><b>${customer.couponApplied ? "Kupon berjaya digunakan" : "Kupon pelanggan \xB7 10% OFF"}</b><small>${customer.couponApplied ? "Jimat " + money(customer.discount) : all ? "Tekan untuk gunakan pada resit ini" : "Scan semua barang untuk aktifkan"}</small></span>${customer.couponApplied ? "\u2713" : "+"}</button>` : ""}<div class="method-preview">${icon(method)} Pelanggan bayar dengan ${methodName.toLowerCase()}</div><button class="primary-btn" id="checkoutBtn" ${all ? "" : "disabled"}>Teruskan bayaran ${icon("arrow")}</button><p class="payment-hint">${all ? "Semak jumlah, kemudian terima bayaran." : "Scan atau timbang semua barang dahulu."}</p>`;
       if ($("couponBtn")) $("couponBtn").onclick = () => {
@@ -3754,6 +3800,10 @@
         save();
         beep("coin");
       };
+      return;
+    }
+    if (phase === "offer" && method === "kasih") {
+      renderKasih();
       return;
     }
     if (phase === "offer" && method === "cash") {
@@ -3996,7 +4046,7 @@
     void bag2.offsetWidth;
     bag2.classList.add("pop");
     if (customer.items.every((i) => i.scanned)) {
-      $("speech").textContent = customer.kind === "kitafood" ? "Hai! Saya rider KitaFood. Pesanan " + customer.orderId + " sudah sedia untuk diambil?" : customer.kind === "return" ? customer.returnReason : "Dah siap semua! " + { cash: "Saya bayar tunai ya.", card: "Saya nak guna kad.", qr: "Saya guna QR." }[customer.method];
+      $("speech").textContent = customer.kind === "kitafood" ? "Hai! Saya rider KitaFood. Pesanan " + customer.orderId + " sudah sedia untuk diambil?" : customer.kind === "return" ? customer.returnReason : "Dah siap semua! " + { cash: "Saya bayar tunai ya.", card: "Saya nak guna kad.", qr: "Saya guna QR.", kasih: "Saya nak guna KitaKasih." }[customer.method];
       toast(customer.kind === "return" ? "Barang siap discan. Bandingkan resit pemulangan." : "Semua barang siap. Masa untuk bayaran!");
       setMobileView("payment");
     }
@@ -4058,6 +4108,22 @@
       toast("Stok tidak cukup. Tambah bekalan dan cuba bayaran semula.", true);
       return;
     }
+    if (transaction.kasih && !commitKasih(operatingStore(), transaction)) {
+      busy = false;
+      toast("Semak semula kad KitaKasih sebelum bayar.", true);
+      transaction.kasih.verified = false;
+      transaction.kasih.reserved = false;
+      transaction.method = "kasih";
+      phase = "offer";
+      render();
+      save();
+      return;
+    }
+    if (transaction.kasih) {
+      const r = operatingStore().kitaKasih.receipts[0];
+      r.extra = amountDue(transaction);
+      r.total = saleTotal(transaction);
+    }
     ensureShift(session);
     const missedCoupon = transaction.hasCoupon && !transaction.couponApplied, reason = missedCoupon ? "Kupon diminta tetapi tidak digunakan." : "";
     const starLost = missedCoupon ? loseStar(session, reason) : 0;
@@ -4068,7 +4134,7 @@
     session.bestCombo = Math.max(session.bestCombo, combo);
     lastTip = missedCoupon ? 0 : tipFor(customer, combo, progress.upgrades);
     const cost = transaction.items.reduce((n, p) => n + stockCost(p, stockUnits(p), progress.day), 0);
-    const itemMargin = amountDue(transaction) - cost;
+    const itemMargin = saleTotal(transaction) - cost;
     const rushBonus = mode === "career" ? rushHourProfitBonus(itemMargin, progress.upgrades, rushUnlimited(transaction) || rushHourActive(progress.day, session)) : 0;
     transaction.rushBonus = rushBonus;
     lastEarned = itemMargin + lastTip + rushBonus;
@@ -4077,11 +4143,11 @@
     session.served++;
     if (transaction.rushCustomer) {
       session.rushServed = (session.rushServed || 0) + 1;
-      session.rushRevenue = (session.rushRevenue || 0) + amountDue(transaction);
+      session.rushRevenue = (session.rushRevenue || 0) + saleTotal(transaction);
       session.rushEarned = (session.rushEarned || 0) + lastEarned;
     }
     if (transaction.method === "cash" && !transaction.cashMistakes && !transaction.overpaid) session.perfectCash = (session.perfectCash || 0) + 1;
-    session.totalSales += amountDue(transaction);
+    session.totalSales += saleTotal(transaction);
     session.tips += lastTip;
     session.earned += lastEarned;
     session.overpaid += transaction.overpaid || 0;
@@ -4090,7 +4156,7 @@
         takeStock(progress, transaction.items);
         progress.paper--;
       }
-      receiveStoreCash(progress, amountDue(transaction) + lastTip);
+      receiveStoreCash(progress, saleTotal(transaction) + lastTip);
       progress.wallet += rushBonus;
       progress.lifetime += lastEarned;
       progress.bestCombo = Math.max(progress.bestCombo, combo);
@@ -5389,7 +5455,7 @@
     if (!session.seenPeople.includes(id)) session.seenPeople.push(id);
     customer.cardPin ??= String(1e3 + Math.floor(Math.random() * 9e3));
     customer.requiresPin ??= customer.method === "card" && Math.random() < 0.5;
-    if (mode !== "practice" && !availablePaymentMethods(progress.upgrades).includes(customer.method) && !["success", "end"].includes(phase)) {
+    if (mode !== "practice" && customer.method !== "kasih" && !availablePaymentMethods(progress.upgrades).includes(customer.method) && !["success", "end"].includes(phase)) {
       customer.method = "cash";
       customer.tender = tenderFor(amountDue(customer));
       customer.requiresPin = false;
@@ -5423,7 +5489,7 @@
       $("catalogueCount").textContent = list.length + " produk ditemui";
       $("catalogueItems").innerHTML = list.length ? list.map((p) => {
         const unlocked = mode === "practice" || progress.unlocked.includes(p.category);
-        return `<div class="catalogue-item ${unlocked ? "" : "locked"}">${productArt(p.id)}<b>${p.name}</b><small>${money(p.price)}${p.weighted ? "/kg" : ""}</small><span class="catalogue-lock">${icon(unlocked ? "check" : "lock")} ${unlocked ? "Tersedia" : "Kategori terkunci"}</span></div>`;
+        return `<div class="catalogue-item ${unlocked ? "" : "locked"}">${productArt(p.id)}<b>${p.name}</b>${kasihEligible(p) ? '<small class="kasih-label">Layak KitaKasih</small>' : ""}<small>${money(p.price)}${p.weighted ? "/kg" : ""}</small><span class="catalogue-lock">${icon(unlocked ? "check" : "lock")} ${unlocked ? "Tersedia" : "Kategori terkunci"}</span></div>`;
       }).join("") : '<p class="catalogue-empty">Tiada produk sepadan. Cuba nama atau kategori lain.</p>';
     }
     $("closeCatalogue").onclick = closeModal;
@@ -6080,9 +6146,9 @@
       overlay.dataset.method = customer.method;
       overlay.dataset.kind = customer.kind;
       overlay.dataset.phase = phase;
-      $("paymentTitle").textContent = customer.kind === "return" ? "Pemulangan barang" : customer.method === "cash" ? phase === "change" ? "Laci baki tunai" : "Terima bayaran tunai" : customer.method === "card" ? "Pembayaran kad" : "Pembayaran QR";
-      $("paymentCustomer").textContent = customer.person.name + " \xB7 Jumlah " + money(amountDue(customer)) + (customer.method === "cash" ? customer.kind === "return" ? " \xB7 Bayaran balik" : " \xB7 Diterima " + money(customer.tender) : "");
-      $("paymentInstructions").textContent = customer.kind === "return" ? "Bandingkan data resit dengan rekod sistem. Terima hanya pemulangan yang sah." : customer.method === "cash" ? "Pilih dari laci \xB7 tekan duit dalam dulang untuk masukkan semula" : customer.method === "card" ? "Sentuh kad pada terminal. Jika diminta, masukkan PIN pada mesin" : "Ambil scanner dan imbas kod pada telefon pelanggan";
+      $("paymentTitle").textContent = customer.kind === "return" ? "Pemulangan barang" : customer.method === "kasih" ? "Pembayaran KitaKasih" : customer.method === "cash" ? phase === "change" ? "Laci baki tunai" : "Terima bayaran tunai" : customer.method === "card" ? "Pembayaran kad" : "Pembayaran QR";
+      $("paymentCustomer").textContent = customer.person.name + (customer.kasih && customer.method !== "kasih" ? " \xB7 Tambahan selepas KitaKasih " : " \xB7 Jumlah ") + money(amountDue(customer)) + (customer.method === "cash" ? customer.kind === "return" ? " \xB7 Bayaran balik" : " \xB7 Diterima " + money(customer.tender) : "");
+      $("paymentInstructions").textContent = customer.method === "kasih" ? "Semak kad bantuan, kemudian pilih bayaran tambahan jika perlu." : customer.kind === "return" ? "Bandingkan data resit dengan rekod sistem. Terima hanya pemulangan yang sah." : customer.method === "cash" ? "Pilih dari laci \xB7 tekan duit dalam dulang untuk masukkan semula" : customer.method === "card" ? "Sentuh kad pada terminal. Jika diminta, masukkan PIN pada mesin" : "Ambil scanner dan imbas kod pada telefon pelanggan";
     }
     if (opening) $("paymentTitle").focus?.({ preventScroll: true });
     $("resumePayment").onclick = () => {
@@ -6351,12 +6417,12 @@
     };
   }
   function recordSale(transaction) {
-    const seq = ++progress.saleSequence, total = amountDue(transaction);
+    const seq = ++progress.saleSequence, total = saleTotal(transaction);
     let allocated = 0;
     transaction.items.forEach((p, i) => {
       const paid = i === transaction.items.length - 1 ? total - allocated : Math.floor(total * itemPrice(p) / Math.max(1, transaction.total));
       allocated += paid;
-      progress.sales.push({ id: progress.day + "-" + seq + "-" + i, receipt: "KK-" + String(seq).padStart(5, "0"), day: progress.day, productId: p.id, grams: p.grams, paid, cost: stockCost(p, stockUnits(p), progress.day), returned: false });
+      progress.sales.push({ id: progress.day + "-" + seq + "-" + i, receipt: "KK-" + String(seq).padStart(5, "0"), day: progress.day, productId: p.id, grams: p.grams, paid, cost: stockCost(p, stockUnits(p), progress.day), kasih: !!transaction.kasih, returned: false });
     });
     progress.sales = progress.sales.slice(-120);
   }
@@ -6364,7 +6430,7 @@
     if (mode === "practice" || mode === "career" && rushHourActive(progress.day, session) || progress.day < 2 || session.index < 2 || (session.index + progress.day) % 4 !== 0) return;
     const record = [...progress.sales].reverse().find((x) => {
       const rule2 = returnPolicy(PRODUCTS.find((p) => p.id === x.productId));
-      return rule2 && !x.returned && x.paid > 0 && progress.day - x.day <= rule2.days;
+      return rule2 && !x.kasih && !x.returned && x.paid > 0 && progress.day - x.day <= rule2.days;
     });
     if (!record) return;
     const product = PRODUCTS.find((p) => p.id === record.productId), rule = returnPolicy(product);
@@ -6485,7 +6551,7 @@
     const el = $("transactionResult");
     clearTimeout(resultTimer);
     el.hidden = false;
-    el.innerHTML = `<div class="result-check">${icon("check")}</div><small>${phase === "lost" ? "PELANGGAN TELAH PERGI" : customer?.kind === "return" ? phase === "offer" ? "SEMAKAN PEMULANGAN" : "URUSAN PULANGAN SELESAI" : "PAYMENT APPROVED"}</small><strong>${tip > 0 ? "Tip +" + money(tip) : starLost ? "Servis perlu diperbaiki" : "Terima kasih!"}</strong>${starLost ? `<div class="result-stars">${"\u2605".repeat(session.stars) + "\u2606".repeat(3 - session.stars)}</div>` : ""}<p>${starLost ? "\u2212" + starLost + " bintang \xB7 " : ""}${reason || customerLine(customer || {}, tip > 0 ? "thanks" : "thanksNoTip")}</p>${overpaid ? `<span>Baki terlebih ${money(overpaid)} \xB7 ditolak pada akhir hari</span>` : ""}${customer?.rushBonus > 0 ? `<span class="result-rush-bonus">\u26A1 Bonus Rush Hour +${money(customer.rushBonus)} \xB7 \xD7${rushHourMultiplier(progress.upgrades).toFixed(1)} untung</span>` : ""}`;
+    el.innerHTML = `<div class="result-check">${icon("check")}</div><small>${phase === "lost" ? "PELANGGAN TELAH PERGI" : customer?.kind === "return" ? phase === "offer" ? "SEMAKAN PEMULANGAN" : "URUSAN PULANGAN SELESAI" : "PAYMENT APPROVED"}</small><strong>${tip > 0 ? "Tip +" + money(tip) : starLost ? "Servis perlu diperbaiki" : "Terima kasih!"}</strong>${starLost ? `<div class="result-stars">${"\u2605".repeat(session.stars) + "\u2606".repeat(3 - session.stars)}</div>` : ""}<p>${starLost ? "\u2212" + starLost + " bintang \xB7 " : ""}${reason || customerLine(customer || {}, tip > 0 ? "thanks" : "thanksNoTip")}</p>${customer?.kasih?.committed ? `<p>KitaKasih ${money(customer.kasih.aid)} \xB7 Baki bantuan ${money(customer.kasih.balanceAfter)}<br>Kad dipulangkan kepada pelanggan.</p>` : ""}${overpaid ? `<span>Baki terlebih ${money(overpaid)} \xB7 ditolak pada akhir hari</span>` : ""}${customer?.rushBonus > 0 ? `<span class="result-rush-bonus">\u26A1 Bonus Rush Hour +${money(customer.rushBonus)} \xB7 \xD7${rushHourMultiplier(progress.upgrades).toFixed(1)} untung</span>` : ""}`;
     el.classList.remove("show");
     void el.offsetWidth;
     el.classList.add("show");
@@ -7055,6 +7121,92 @@
   setupMobileControls();
   cloud.start();
   startUpdateChecker();
+  function prepareKasihCustomer(rush) {
+    if (rush || customer.kind === "return" || customer.kind === "kitafood") return;
+    if (mode === "practice" ? session.index % 3 !== 0 : session.index % 4 !== 1) return;
+    const account = kasihAccount(operatingStore(), customer.person);
+    customer.kasih = { id: progress.day + "-" + session.index + "-" + customer.person.id, card: account.card, balanceBefore: account.balance, verified: false, reserved: false, committed: false };
+    customer.method = "kasih";
+    customer.requiresPin = false;
+    customer.cardDeclineReason = null;
+    customer.patience += 15;
+  }
+  function renderKasih() {
+    const c = customer, k = c.kasih, q = kasihQuote(c), area = $("paymentArea");
+    const active = () => customer === c && !paused && !busy && phase === "offer" && c.method === "kasih" && !c.paid;
+    area.innerHTML = `<section class="kasih-panel"><header><span class="kasih-pill">KitaKasih</span><small>Simulasi bantuan dalam permainan</small></header><div class="kasih-devices"><button class="kasih-card ${k.verified ? "verified" : ""}" id="kasihCard" aria-label="Semak kad KitaKasih pelanggan"><small>KAD BANTUAN REKAAN</small><span class="kasih-chip" aria-hidden="true"></span><strong>${c.person.name}</strong><span>${k.card}</span><em>${k.verified ? "Kad disahkan" : "Tekan kad atau seret ke pembaca"}</em></button><button class="kasih-reader" id="kasihReader" aria-label="Baca kad KitaKasih"><span>${icon(k.verified ? "check" : "card")}</span><small>${k.verified ? "KAD AKTIF" : "PEMBACA KAD"}</small><b>${k.verified ? money(k.balanceBefore) : "Sedia membaca"}</b><span>${k.verified ? "Baki bantuan tersedia" : "Letakkan kad pelanggan"}</span></button></div>${k.verified ? `<div class="kasih-breakdown"><div><span>Barang layak (selepas kupon)</span><b>${money(q.eligible)}</b></div><div><span>Barang tidak layak</span><b>${money(q.ineligible)}</b></div><div class="kasih-funded"><span>Dibayar melalui KitaKasih</span><b>${money(q.aid)}</b></div><div><span>Baki bantuan selepas bayaran</span><b>${money(q.balanceAfter)}</b></div><div class="kasih-extra"><span>Bayaran tambahan</span><b>${money(q.remaining)}</b></div></div><p class="kasih-note">${q.remaining ? "Pilih kaedah untuk baki belian. Tunai dibundarkan kepada 5 sen." : "Bantuan mencukupi untuk semua barang."} Bantuan belum dipotong.</p>${q.remaining ? `<div class="kasih-actions">${availablePaymentMethods(progress.upgrades, mode === "practice").map((m) => `<button class="secondary-btn" data-kasih-method="${m}">${icon(m)} ${{ cash: "Tunai", card: "Kad debit", qr: "QR" }[m]}</button>`).join("")}</div>` : '<button id="kasihConfirm" class="primary-btn">Sahkan bayaran & pulangkan kad</button>'}<button id="kasihCancel" class="text-btn">Batal penggunaan bantuan \xB7 bayar sendiri</button>` : '<p class="kasih-note">Semak kad dahulu. Hanya produk berlabel KitaKasih layak menerima bantuan.</p>'}</section>`;
+    const verify = () => {
+      if (!active()) return;
+      const a = kasihAccount(operatingStore(), c.person);
+      k.balanceBefore = a.balance;
+      k.verified = true;
+      beep("coin");
+      renderKasih();
+      renderReceipt();
+      save();
+    };
+    $("kasihCard").onclick = verify;
+    $("kasihReader").onclick = verify;
+    const card = $("kasihCard");
+    let start = null;
+    card.onpointerdown = (e) => {
+      start = { x: e.clientX, y: e.clientY };
+      card.setPointerCapture(e.pointerId);
+    };
+    card.onpointermove = (e) => {
+      if (start) {
+        card.style.transform = `translate(${e.clientX - start.x}px,${e.clientY - start.y}px)`;
+        card.style.zIndex = "3";
+      }
+    };
+    card.onpointerup = (e) => {
+      if (!start) return;
+      const target = $("kasihReader").getBoundingClientRect();
+      const moved = Math.hypot(e.clientX - start.x, e.clientY - start.y) > 10;
+      start = null;
+      card.style.transform = "";
+      if (moved && inside(e, target)) verify();
+    };
+    card.onpointercancel = () => {
+      start = null;
+      card.style.transform = "";
+    };
+    area.querySelectorAll("[data-kasih-method]").forEach((b) => b.onclick = () => {
+      if (!active() || !k.verified) return;
+      k.reserved = true;
+      c.method = b.dataset.kasihMethod;
+      c.tender = tenderFor(amountDue(c));
+      resetDigitalAttempt(c);
+      cashPicked = [];
+      render();
+      save();
+    });
+    if ($("kasihConfirm")) $("kasihConfirm").onclick = () => {
+      if (!active() || !k.verified) return;
+      k.reserved = true;
+      completePayment(c);
+    };
+    if ($("kasihCancel")) $("kasihCancel").onclick = () => {
+      if (!active()) return;
+      delete c.kasih;
+      c.method = "cash";
+      c.tender = tenderFor(amountDue(c));
+      render();
+      save();
+      toast("Bantuan tidak dipotong. Pelanggan bayar tunai.");
+    };
+  }
+  function showKasihHistory() {
+    const store = operatingStore(), receipts = store.kitaKasih?.receipts || [];
+    openModal("kasih-history", `<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">SIMULASI BANTUAN DALAM PERMAINAN</div><h2>Resit KitaKasih</h2></div><button class="icon-btn" id="closeKasihHistory" aria-label="Tutup">${icon("close")}</button></div><p>Rekod 20 transaksi terkini. Baki kad rekaan disimpan mengikut pelanggan. Baki awal RM50, tanpa tambah nilai automatik.</p><div class="kasih-history">${receipts.length ? receipts.map((r) => `<article><b>${r.name} \xB7 ${r.card}</b><small>Hari ${r.day} \xB7 ${r.id}</small><div><span>Jumlah belian</span><b>${money(r.total)}</b></div><div><span>KitaKasih</span><b>${money(r.aid)}</b></div><div><span>Tambahan (${{ cash: "tunai", card: "kad", qr: "QR", kasih: "tiada" }[r.method] || r.method})</span><b>${money(r.extra)}</b></div><div><span>Baki bantuan</span><b>${money(r.balance)}</b></div></article>`).join("") : "<p>Belum ada transaksi. Pelanggan KitaKasih pertama muncul sebagai pelanggan kedua syif biasa. Dalam latihan, pelanggan pertama menggunakan KitaKasih.</p>"}</div></div>`);
+    $("closeKasihHistory").onclick = closeModal;
+  }
+  var kasihHistoryButton = document.createElement("button");
+  kasihHistoryButton.type = "button";
+  kasihHistoryButton.className = "text-btn kasih-history-button";
+  kasihHistoryButton.textContent = "Resit KitaKasih";
+  kasihHistoryButton.onclick = showKasihHistory;
+  $("receiptSub").parentElement.append(kasihHistoryButton);
 
   // entry.mjs
   window.__KEDAI_GAME_READY__ = true;

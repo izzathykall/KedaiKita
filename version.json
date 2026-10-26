@@ -1,1 +1,9 @@
-{"version": "2026-10-26-v63-startup-fix", "title": "KedaiKita · Mobile Studio", "notes": "Baiki permulaan game: CSS cache tidak menyekat skrip, semua modul tempatan digabungkan dan ralat fail dipaparkan dengan jelas."}
+{
+  "version": "2026-10-26-v64-kitakasih",
+  "title": "KitaKasih",
+  "notes": [
+    "Kad bantuan rekaan, kelayakan produk dan bayaran campuran.",
+    "Baki bantuan serta resit disimpan bersama progres.",
+    "Pembaikan startup V63 dikekalkan."
+  ]
+}

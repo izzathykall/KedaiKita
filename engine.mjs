@@ -1,3 +1,4 @@
+import {kasihContribution} from './kitakasih.mjs';
 export const PRODUCTS = [
   {id:'milk',name:'Susu segar',price:680,color:'#dceefa'},
   {id:'bread',name:'Roti putih',price:320,color:'#f8e6c8'},
@@ -700,7 +701,7 @@ export function money(cents){return 'RM '+(cents/100).toFixed(2)}
 export function itemPrice(item){return item.weighted?Math.round(item.price*item.grams/1000):item.price}
 export function basketTotal(items){return items.reduce((s,i)=>s+itemPrice(i),0)}
 export function netTotal(customer){return Math.max(0,customer.total-(customer.discount||0))}
-export function amountDue(customer){const total=netTotal(customer);return customer.method==='cash'&&customer.kind!=='return'?Math.round(total/5)*5:total}
+export function amountDue(customer){const total=Math.max(0,netTotal(customer)-kasihContribution(customer));return customer.method==='cash'&&customer.kind!=='return'?Math.round(total/5)*5:total}
 export function tenderFor(total){return [500,1000,2000,5000,10000,20000].find(v=>v>=total)||Math.ceil(total/10000)*10000}
 export function changeParts(cents){const parts=[];for(const value of DENOMS){const count=Math.floor(cents/value);if(count)parts.push({value,count});cents%=value}return {parts,remainder:cents}}
 // One 60-second Rush Hour every two game days (2,4,6...), measured in active REAL seconds.

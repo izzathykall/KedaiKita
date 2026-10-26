@@ -2242,3 +2242,17 @@ body[data-theme="dark"] .music-track-picker>small{color:#b4cbbb}
  .game-viewport-fit #storeMenu>button{font-size:max(11px,calc(10px / var(--game-zoom,1)))!important;min-height:max(43px,calc(36px / var(--game-zoom,1)))!important;height:auto!important;white-space:normal!important}
 }
 
+
+/* V64: compact KitaKasih surface; reuses the existing payment overlay. */
+.kasih-tag{position:absolute;top:5px;left:5px;background:#e1eed9;color:#245842;padding:3px 5px;border-radius:5px;font-size:9px;font-weight:800;pointer-events:none}
+.kasih-label{color:#327257;font-weight:700}.kasih-history-button{font-size:10px;padding:4px 0;min-height:24px}
+#paymentOverlay[data-method="kasih"] .payment-sheet{width:min(760px,94vw)}
+.kasih-panel{color:var(--ink,#23483d);display:grid;gap:10px;padding:12px;max-width:720px;margin:auto;width:100%;box-sizing:border-box}
+.kasih-panel header{display:flex;align-items:center;justify-content:space-between;gap:10px}.kasih-panel header small{font-size:10px;opacity:.7}.kasih-pill{padding:5px 12px;background:#dcebd5;color:#295a43;border-radius:20px;font-weight:800}
+.kasih-devices{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;align-items:center;padding:8px 0}
+.kasih-card{position:relative;touch-action:none;text-align:left;border:1px solid #7da58e;border-radius:14px;padding:16px;background:linear-gradient(125deg,#1d5446,#367560);color:white;display:grid;gap:8px;box-shadow:0 8px 18px #173f3720;cursor:pointer;min-width:0}
+.kasih-card small{font-size:9px;letter-spacing:1.3px}.kasih-card strong{font-size:17px}.kasih-card em{font-size:10px;font-style:normal;opacity:.8}.kasih-chip{display:block;width:27px;height:21px;border-radius:5px;background:linear-gradient(90deg,#d7b874,#eedba8);border:1px solid #b3975c}.kasih-card.verified{border:2px solid #b6d997}
+.kasih-reader{background:#243b35;border:5px solid #d3d9d0;border-radius:18px;padding:18px 12px;color:#e4f4d2;display:grid;justify-items:center;gap:8px;min-width:0;cursor:pointer}.kasih-reader b{font-size:19px}.kasih-reader small,.kasih-reader>span:last-child{font-size:10px}.kasih-reader .icon{width:24px;height:24px}
+.kasih-breakdown{display:grid;gap:6px;font-size:12px}.kasih-breakdown>div,.kasih-history article>div{display:flex;justify-content:space-between;gap:10px}.kasih-funded{color:#387953}.kasih-extra{padding-top:8px;border-top:1px solid #81978640;font-size:16px}.kasih-note{font-size:11px;line-height:1.5;margin:0;opacity:.8}.kasih-actions{display:flex;gap:8px}.kasih-actions button{flex:1;display:flex;align-items:center;justify-content:center;gap:5px}.kasih-actions .icon{width:16px;height:16px}.kasih-history{display:grid;gap:12px}.kasih-history article{border:1px solid #81978640;border-radius:12px;padding:14px;display:grid;gap:7px;font-size:12px}.kasih-history article>small{opacity:.65}
+@media(max-width:500px){.kasih-panel{padding:6px;gap:8px}.kasih-devices{gap:8px}.kasih-card{padding:12px;gap:6px}.kasih-card strong{font-size:14px}.kasih-reader{padding:13px 6px}.kasih-reader b{font-size:16px}.kasih-panel header small{max-width:130px;text-align:right}.kasih-actions button{padding:10px 6px}}
+body[data-theme="dark"] .kasih-panel{color:#e3ecd9}body[data-theme="dark"] .kasih-funded,body[data-theme="dark"] .kasih-label{color:#b9d8a3}
