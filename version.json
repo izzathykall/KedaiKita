@@ -1,7 +1,9 @@
 {
-  "version": "2026-10-27-v66-single-report",
-  "title": "Satu laporan penutupan syif",
+  "version": "2026-10-27-v67-kasih-design",
+  "title": "KitaKasih & dialog pelanggan",
   "notes": [
-    "Selepas syif tamat, terus paparkan laporan lengkap tanpa skrin semakan tambahan."
+    "Terminal KitaKasih baharu dengan kad bersaiz kad debit.",
+    "Permintaan KitaKasih dan kupon disebut bersama; kupon boleh digunakan pada terminal.",
+    "Scanner QR mengikut rujukan dengan saiz lebih besar."
   ]
 }

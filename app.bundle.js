@@ -188,6 +188,45 @@
     mobile.addEventListener?.("change", () => setOpen(false));
   })();
 
+  // dialogue.mjs
+  var lines = {
+    welcome: ["Hai, boleh tolong kira barang saya?", "Saya singgah beli barang keperluan.", "Ini barang saya ya. Terima kasih.", "Boleh bantu saya di kaunter?", "Saya dah pilih barang. Boleh kira sekarang?", "Hai! Saya nak bayar barang ini."],
+    cash: ["Saya bayar tunai ya.", "Ini duit saya. Tolong semak bakinya ya.", "Saya guna wang tunai untuk belian ini.", "Boleh terima tunai? Saya dah sediakan duit."],
+    card: ["Saya guna kad debit ya.", "Kad saya dah sedia. Boleh teruskan bayaran.", "Saya nak bayar dengan kad ini.", "Tolong proses melalui kad debit saya."],
+    qr: ["Saya dah buka kod QR pada telefon.", "Boleh imbas QR pada skrin saya?", "Saya bayar dengan e-wallet ya.", "Telefon saya dah sedia untuk diimbas."],
+    coupon: ["Saya ada kupon 10%. Tolong gunakan sebelum bayar ya.", "Boleh tolak kupon 10% saya dahulu?", "Jangan lupa kupon 10% saya ya.", "Saya nak gunakan kupon 10% untuk belian ini."],
+    kasihCoupon: ["Saya guna KitaKasih dan ada kupon 10%. Tolong guna kupon dahulu ya.", "Boleh tolak kupon 10% dahulu, kemudian bayar dengan KitaKasih?", "Saya nak guna KitaKasih. Jangan lupa kupon 10% saya juga ya.", "Kupon 10% ini untuk belian saya. Selebihnya saya guna KitaKasih ya."],
+    kasih: ["Saya nak bayar dengan KitaKasih. Ini kad saya.", "Boleh semak baki KitaKasih saya dahulu?", "Saya guna KitaKasih untuk barang yang layak ya.", "Tolong gunakan KitaKasih. Baki belian saya bayar sendiri."],
+    kasihApplied: ["Terima kasih guna kupon tadi. Sekarang saya bayar dengan KitaKasih.", "Kupon dah ditolak ya? Boleh teruskan dengan kad KitaKasih saya.", "Baik, selepas diskaun saya guna KitaKasih ya."],
+    couponApplied: ["Terima kasih, kupon saya dah digunakan.", "Diskaun dah masuk. Boleh teruskan bayaran ya.", "Baik, jumlah selepas kupon itu betul."],
+    change: ["Saya tunggu baki ya. Terima kasih.", "Boleh semak baki sebelum serahkan?", "Kira perlahan pun tak mengapa, asalkan tepat.", "Terima kasih. Bakinya sekali ya."],
+    lost: ["Saya perlu pergi dulu. Nanti saya datang semula.", "Maaf, saya tak dapat tunggu lebih lama.", "Saya ada urusan lain. Belian ini saya tangguhkan dulu."],
+    thanks: ["Terima kasih! Ini sedikit tip untuk awak.", "Layanan baik. Saya beri sedikit tip ya.", "Ini tip untuk awak. Terima kasih bantu saya."],
+    thanksNoTip: ["Terima kasih, jumpa lagi!", "Dah selesai ya? Terima kasih.", "Terima kasih kerana bantu uruskan belian saya.", "Baik, saya bawa barang dulu. Jumpa lagi!", "Semoga urusan kedai dipermudahkan. Terima kasih."]
+  };
+  function say(c, key) {
+    const pool = lines[key] || lines.welcome;
+    let seed = Number(c.dialogueSeed) || 0;
+    for (const ch of key) seed = seed * 31 + ch.charCodeAt(0) >>> 0;
+    return pool[seed % pool.length];
+  }
+  function customerSpeech(c, phase2 = "scan", tip = 0) {
+    if (!c) return "";
+    if (c.kind === "kitafood") return `Hai, saya rider KitaFood. Saya ambil pesanan ${c.orderId} ya.`;
+    if (c.kind === "return") return c.returnReason || "Saya bawa barang dan resit untuk semakan pemulangan.";
+    if (phase2 === "success") return say(c, tip > 0 ? "thanks" : "thanksNoTip");
+    if (phase2 === "lost") return say(c, "lost");
+    if (phase2 === "change") return say(c, "change");
+    if (c.hasCoupon && !c.couponApplied) return say(c, c.kasih ? "kasihCoupon" : "coupon");
+    if (c.kasih) {
+      if (c.method !== "kasih") return `Baki selepas KitaKasih saya bayar dengan ${{ cash: "tunai", card: "kad debit", qr: "QR e-wallet" }[c.method] || "kaedah lain"} ya.`;
+      return say(c, c.couponApplied ? "kasihApplied" : "kasih");
+    }
+    if (phase2 === "offer" || c.items?.every((i) => i.scanned)) return say(c, c.method);
+    if (c.couponApplied) return say(c, "couponApplied");
+    return say(c, "welcome");
+  }
+
   // kitakasih.mjs
   var KASIH_PRODUCTS = /* @__PURE__ */ new Set(["milk", "bread", "eggs", "rice", "noodles", "cookies", "soap", "coffee", "water", "curry", "detergent", "oil", "sugar", "flour", "soy", "sardine", "tea", "malt", "salt", "condensed", "tissue", "toothpaste", "shampoo", "dishsoap"]);
   var kasihEligible = (item) => KASIH_PRODUCTS.has(item.id);
@@ -382,7 +421,7 @@
           el.style.removeProperty("font-size");
           const style = getComputedStyle(el), available = Math.max(16, el.clientWidth - 4);
           let size = parseFloat(style.fontSize);
-          function lines() {
+          function lines2() {
             ctx.font = `${style.fontWeight} ${size}px ${style.fontFamily}`;
             let count = 1, line = "";
             for (const word of el.textContent.trim().split(/\s+/)) {
@@ -395,7 +434,7 @@
             }
             return count;
           }
-          while (size > 5 && lines() > 2) size -= 0.25;
+          while (size > 5 && lines2() > 2) size -= 0.25;
           el.style.setProperty("font-size", size + "px", "important");
         });
       });
@@ -1413,13 +1452,13 @@
     ensureOperations(p);
     const manual = units !== null;
     if (manual && (!id || !Number.isInteger(units) || units < 1 || units > MAX_STOCK_PURCHASE)) return { lines: [], total: 0, manual: true };
-    const lines = availableProducts(p.unlocked).filter((x) => !id || x.id === id).map((x) => {
+    const lines2 = availableProducts(p.unlocked).filter((x) => !id || x.id === id).map((x) => {
       const available = Math.max(0, stockTarget(x, p) - p.inventory[x.id]);
       const requested = manual ? units * (x.weighted ? 1e3 : 1) : Math.min(available, MAX_STOCK_PURCHASE * (x.weighted ? 1e3 : 1));
       const quantity = manual ? requested <= available ? requested : 0 : requested;
       return { id: x.id, name: x.name, weighted: !!x.weighted, quantity, cost: quantity ? stockCost(x, quantity, p.day) : 0 };
     }).filter((x) => x.quantity > 0);
-    return { lines, total: lines.reduce((sum, x) => sum + x.cost, 0), manual };
+    return { lines: lines2, total: lines2.reduce((sum, x) => sum + x.cost, 0), manual };
   }
   function payStoreCost(p, cost, credit = false) {
     if (!Number.isInteger(cost) || cost < 0 || !credit && p.wallet < cost) return false;
@@ -1515,8 +1554,8 @@
     returns: ["Saya tersalah beli barang ini. Masih berbungkus, ini resitnya.", "Barang ini belum dibuka. Boleh bantu pulangkan?", "Keluarga saya terbeli dua. Saya bawa resit untuk pulangkan satu."]
   };
   function customerLine(c, key) {
-    const lines = CUSTOMER_LINES[key] || CUSTOMER_LINES.welcome;
-    return (key === "returns" && c.returnReason ? c.returnReason : lines[(c.dialogueSeed || 0) % lines.length]).replaceAll(",", "");
+    const lines2 = CUSTOMER_LINES[key] || CUSTOMER_LINES.welcome;
+    return (key === "returns" && c.returnReason ? c.returnReason : lines2[(c.dialogueSeed || 0) % lines2.length]).replaceAll(",", "");
   }
   function cardRepairCost(store) {
     const health = Math.max(0, Math.min(100, store.cardHealth ?? 100));
@@ -3225,7 +3264,7 @@
   var calculatorResult = "";
   var advancePending = false;
   var STORAGE = "kedai-kita-v1";
-  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v66-single-report";
+  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v67-kasih-design";
   var UPDATE_CHECK_URL = "./version.json";
   var storageOK = true;
   var progress = createProgress();
@@ -3692,7 +3731,7 @@
     document.body.classList.toggle("kita-food-at-counter", customer.kind === "kitafood");
     $("customerVipBadge").hidden = customer.kind !== "vip";
     $("customerVipTip").hidden = customer.kind !== "vip";
-    $("speech").textContent = customer.kind === "kitafood" ? "Hai! Saya rider KitaFood. Pesanan " + customer.orderId + " sudah sedia untuk diambil?" : customer.kind === "return" ? customer.returnReason || customerLine(customer, "returns") : phase === "success" ? customerLine(customer, lastTip > 0 ? "thanks" : "thanksNoTip") : phase === "lost" ? "Saya kena pergi dulu. Lain kali ya." : phase === "change" ? customerLine(customer, "change") : customer.kasih && !customer.paid ? "Saya guna KitaKasih. Kalau tak cukup, saya tambah bayaran." : phase === "offer" ? customerLine(customer, customer.method) : customer.hasCoupon ? "Saya ada kupon 10%. Tolong gunakan diskaun saya ya." : customerLine(customer, "welcome");
+    $("speech").textContent = customerSpeech(customer, phase, lastTip);
     requestAnimationFrame(positionCustomerDialogue);
   }
   function renderProducts() {
@@ -3819,6 +3858,7 @@
           beep("coin");
           renderReceipt();
           renderPayment();
+          renderScene();
           save();
           toast("Kupon digunakan. Pelanggan jimat " + money(customer.discount));
         }
@@ -4078,7 +4118,8 @@
     void bag2.offsetWidth;
     bag2.classList.add("pop");
     if (customer.items.every((i) => i.scanned)) {
-      $("speech").textContent = customer.kind === "kitafood" ? "Hai! Saya rider KitaFood. Pesanan " + customer.orderId + " sudah sedia untuk diambil?" : customer.kind === "return" ? customer.returnReason : "Dah siap semua! " + { cash: "Saya bayar tunai ya.", card: "Saya nak guna kad.", qr: "Saya guna QR.", kasih: "Saya nak guna KitaKasih." }[customer.method];
+      $("speech").textContent = customerSpeech(customer, phase, lastTip);
+      requestAnimationFrame(positionCustomerDialogue);
       toast(customer.kind === "return" ? "Barang siap discan. Bandingkan resit pemulangan." : "Semua barang siap. Masa untuk bayaran!");
       setMobileView("payment");
     }
@@ -5539,7 +5580,7 @@
       return;
     }
     const stage = customer.cardStage || "ready", working = stage === "processing";
-    $("paymentArea").innerHTML = `<div id="payDevice" class="payment-scene qr-scene kk-qr-stage stage-${stage}"><div class="kk-qr-phone"><div class="kk-phone-island" aria-hidden="true"></div><div class="kk-phone-status"><span>9:41</span><span>\u25B0 \u25B0</span></div><div class="kk-wallet-brand"><span>K</span><div><small>KITA PAY</small><b>${customer.person.name}</b></div></div><small class="kk-amount-label">JUMLAH BAYARAN</small><strong class="kk-amount">${money(amountDue(customer))}</strong><button class="kk-qr-code" id="qrTarget" aria-label="Imbas kod QR pada telefon" ${working ? "disabled" : ""}>${qrArt()}<i></i></button><span class="kk-wallet-status">${working ? "Mengesahkan bayaran\u2026" : "Imbas kod untuk bayar"}</span><div class="kk-home-indicator"></div></div>${working ? "" : `<button type="button" class="kk-qr-reader" id="qrScanner" aria-label="Seret scanner ke kod QR atau tekan untuk mengambilnya"><svg viewBox="0 0 108 164" aria-hidden="true"><defs><linearGradient id="kkShell" x2="1" y2="1"><stop stop-color="#52656b"/><stop offset=".48" stop-color="#25383f"/><stop offset="1" stop-color="#12262c"/></linearGradient><linearGradient id="kkGrip" x2="1"><stop stop-color="#172b31"/><stop offset=".5" stop-color="#3c5257"/><stop offset="1" stop-color="#20363c"/></linearGradient></defs><path d="M38 74h36l-5 65q-1 12-14 12H44q-12-1-10-14Z" fill="url(#kkGrip)" stroke="#71858a" stroke-width="2"/><path d="M39 92h29m-30 9h29m-29 9h28m-28 9h27m-27 9h26" stroke="#111f24" stroke-width="3" opacity=".55"/><rect x="8" y="8" width="92" height="76" rx="22" fill="url(#kkShell)" stroke="#8c9d9e" stroke-width="2"/><rect x="17" y="17" width="74" height="35" rx="11" fill="#0b1b23" stroke="#597982"/><path d="M23 23h59" stroke="#9ad7de" stroke-width="3" opacity=".6"/><path d="M24 39h60" stroke="#f17b60" stroke-width="2"/><path d="M29 30v14m7-14v14m4-14v14m7-14v14m8-14v14m4-14v14m7-14v14m6-14v14" stroke="#91c5ce" opacity=".45"/><circle class="kk-reader-led" cx="79" cy="65" r="4" fill="#80d7b0"/><text x="48" y="68" font-size="8" font-weight="700" letter-spacing="1" fill="#dceae8" text-anchor="middle">KITA SCAN</text></svg><span>AMBIL & IMBAS</span></button>`}</div><p class="payment-hint kk-qr-hint">${working ? "Kod dibaca. Scanner disimpan secara automatik." : "Seret scanner ke kod QR, atau tekan scanner kemudian tekan kod QR."}</p>`;
+    $("paymentArea").innerHTML = `<div id="payDevice" class="payment-scene qr-scene kk-qr-stage stage-${stage}"><div class="kk-qr-phone"><div class="kk-phone-island" aria-hidden="true"></div><div class="kk-phone-status"><span>9:41</span><span>\u25B0 \u25B0</span></div><div class="kk-wallet-brand"><span>K</span><div><small>KITA PAY</small><b>${customer.person.name}</b></div></div><small class="kk-amount-label">JUMLAH BAYARAN</small><strong class="kk-amount">${money(amountDue(customer))}</strong><button class="kk-qr-code" id="qrTarget" aria-label="Imbas kod QR pada telefon" ${working ? "disabled" : ""}>${qrArt()}<i></i></button><span class="kk-wallet-status">${working ? "Mengesahkan bayaran\u2026" : "Imbas kod untuk bayar"}</span><div class="kk-home-indicator"></div></div>${working ? "" : `<button type="button" class="kk-qr-reader" id="qrScanner" aria-label="Seret scanner ke kod QR atau tekan untuk mengambilnya"><svg viewBox="0 0 132 192" aria-hidden="true"><defs><linearGradient id="kkShell" x2=".8" y2="1"><stop stop-color="#718b83"/><stop offset=".4" stop-color="#31564c"/><stop offset="1" stop-color="#142f2b"/></linearGradient><linearGradient id="kkGrip" x2="1"><stop stop-color="#193b33"/><stop offset=".5" stop-color="#496b5d"/><stop offset="1" stop-color="#203e35"/></linearGradient><radialGradient id="kkGlass"><stop stop-color="#326965"/><stop offset="1" stop-color="#102c30"/></radialGradient></defs><g transform="rotate(-13 66 96)"><path d="M46 83h39l4 80q0 11-10 12H57q-9-1-10-12Z" fill="url(#kkGrip)" stroke="#153b32" stroke-width="3"/><path d="M49 106h37m-36 11h37m-36 11h37m-36 11h37m-36 11h37m-36 11h36" stroke="#142f29" stroke-width="5"/><rect x="14" y="13" width="105" height="86" rx="18" fill="url(#kkShell)" stroke="#183b34" stroke-width="3"/><path d="M26 20h78q8 0 8 8v53" fill="none" stroke="#9dbba8" stroke-opacity=".55" stroke-width="3"/><rect x="24" y="25" width="84" height="51" rx="12" fill="url(#kkGlass)" stroke="#83a395" stroke-width="2"/><path d="M35 35h10m-10 0v10m61-10H86m10 0v10M35 65h10m-10 0V55m61 10H86m10 0V55" fill="none" stroke="#9cdcc1" stroke-width="2"/><path d="M53 39h9v9h-9Zm16 0h9v9h-9ZM53 55h9v9h-9Zm16-2h4v4h5v7h-9Z" fill="none" stroke="#b6eed9" stroke-width="2"/><circle class="kk-reader-led" cx="105" cy="20" r="4" fill="#83f3b6"/><text x="67" y="89" text-anchor="middle" font-size="8" font-weight="700" letter-spacing="1" fill="#e1f1e5">IMBAS QR</text></g></svg><span>AMBIL & IMBAS</span></button>`}</div><p class="payment-hint kk-qr-hint">${working ? "Kod dibaca. Scanner disimpan secara automatik." : "Seret scanner ke kod QR, atau tekan scanner kemudian tekan kod QR."}</p>`;
     if (!working) bindQrScanner();
   }
   var CARD_DECLINE_MESSAGES = {
@@ -7183,7 +7224,7 @@
   function renderKasih() {
     const c = customer, k = c.kasih, q = kasihQuote(c), area = $("paymentArea");
     const active = () => customer === c && !paused && !busy && phase === "offer" && c.method === "kasih" && !c.paid;
-    area.innerHTML = `<section class="kasih-panel"><header><span class="kasih-pill">KitaKasih</span><small>Simulasi bantuan dalam permainan</small></header><div class="kasih-devices"><button class="kasih-card ${k.verified ? "verified" : ""}" id="kasihCard" aria-label="Semak kad KitaKasih pelanggan"><small>KAD BANTUAN REKAAN</small><span class="kasih-chip" aria-hidden="true"></span><strong>${c.person.name}</strong><span>${k.card}</span><em>${k.verified ? "Kad disahkan" : "Tekan kad atau seret ke pembaca"}</em></button><button class="kasih-reader" id="kasihReader" aria-label="Baca kad KitaKasih"><span>${icon(k.verified ? "check" : "card")}</span><small>${k.verified ? "KAD AKTIF" : "PEMBACA KAD"}</small><b>${k.verified ? money(k.balanceBefore) : "Sedia membaca"}</b><span>${k.verified ? "Baki bantuan tersedia" : "Letakkan kad pelanggan"}</span></button></div>${k.verified ? `<div class="kasih-breakdown"><div><span>Barang layak (selepas kupon)</span><b>${money(q.eligible)}</b></div><div><span>Barang tidak layak</span><b>${money(q.ineligible)}</b></div><div class="kasih-funded"><span>Dibayar melalui KitaKasih</span><b>${money(q.aid)}</b></div><div><span>Baki bantuan selepas bayaran</span><b>${money(q.balanceAfter)}</b></div><div class="kasih-extra"><span>Bayaran tambahan</span><b>${money(q.remaining)}</b></div></div><p class="kasih-note">${q.remaining ? "Pilih kaedah untuk baki belian. Tunai dibundarkan kepada 5 sen." : "Bantuan mencukupi untuk semua barang."} Bantuan belum dipotong.</p>${q.remaining ? `<div class="kasih-actions">${availablePaymentMethods(progress.upgrades, mode === "practice").map((m) => `<button class="secondary-btn" data-kasih-method="${m}">${icon(m)} ${{ cash: "Tunai", card: "Kad debit", qr: "QR" }[m]}</button>`).join("")}</div>` : '<button id="kasihConfirm" class="primary-btn">Sahkan bayaran & pulangkan kad</button>'}<button id="kasihCancel" class="text-btn">Batal penggunaan bantuan \xB7 bayar sendiri</button>` : '<p class="kasih-note">Semak kad dahulu. Hanya produk berlabel KitaKasih layak menerima bantuan.</p>'}</section>`;
+    area.innerHTML = `<section class="kasih-panel kasih-pro"><header><div><span class="kasih-pill">KitaKasih</span><small>Terminal bantuan kedai</small></div><span class="kasih-connection"><i></i> ${k.verified ? "Kad disahkan" : "Sedia"}</span></header><div class="kasih-pro-grid"><div class="kasih-pro-hardware"><button class="kasih-reader pro-reader" id="kasihReader" aria-label="Baca kad KitaKasih"><span class="pro-reader-brand">KITA \xB7 SMART TERMINAL</span><span class="pro-reader-screen"><small>${k.verified ? "BAKI BANTUAN" : "PENGESAHAN KAD"}</small><b>${k.verified ? money(k.balanceBefore) : "Sila baca kad"}</b><span>${k.verified ? c.person.name : "Tekan kad atau seret ke pembaca"}</span><i>${icon(k.verified ? "check" : "card")} ${k.verified ? "Kad aktif" : "Menunggu kad"}</i></span><span class="pro-reader-slot"><i></i></span><span class="pro-reader-contact">${icon("scan")} PEMBACA KAD</span></button><button class="kasih-card pro-aid-card ${k.verified ? "verified" : ""}" id="kasihCard" aria-label="Semak kad KitaKasih pelanggan"><span class="aid-card-brand">KitaKasih<span>BANTUAN KOMUNITI</span></span><span class="aid-card-pattern" aria-hidden="true"></span><span class="kasih-chip" aria-hidden="true"></span><span class="aid-card-number">${k.card}</span><strong>${c.person.name}</strong><small>KAD SIMULASI</small></button><span class="kasih-device-caption">${k.verified ? "Kad pelanggan telah disahkan" : "Tekan kad atau seret ke pembaca"}</span></div><div class="kasih-pro-receipt"><div class="kasih-review-title"><span>SEMAKAN BELIAN</span><b>${money(netTotal(c))}</b></div>${c.hasCoupon ? `<div class="kasih-coupon ${c.couponApplied ? "applied" : ""}"><span>${icon("receipt")}<b>${c.couponApplied ? "Kupon 10% digunakan" : "Pelanggan minta kupon 10%"}</b></span>${c.couponApplied ? `<strong>\u2212${money(c.discount)}</strong>` : '<button id="kasihCoupon" class="secondary-btn">Gunakan kupon</button>'}</div>` : ""}<div class="kasih-breakdown"><div><span>Barang layak${c.couponApplied ? " selepas kupon" : ""}</span><b>${money(q.eligible)}</b></div><div><span>Barang tidak layak</span><b>${money(q.ineligible)}</b></div><div class="kasih-funded"><span>Daripada KitaKasih</span><b>${k.verified ? money(q.aid) : "\u2014"}</b></div><div><span>Baki bantuan selepas bayaran</span><b>${k.verified ? money(q.balanceAfter) : "\u2014"}</b></div><div class="kasih-extra"><span>Bayaran tambahan</span><b>${k.verified ? money(q.remaining) : "\u2014"}</b></div></div><p class="kasih-note" role="status">${!k.verified ? "Sahkan kad untuk semak bantuan dan bayaran tambahan." : q.remaining ? "Pilih kaedah untuk baki belian. Bantuan belum dipotong." : "Bantuan mencukupi. Sahkan untuk lengkapkan pembelian."}</p>${k.verified ? q.remaining ? `<div class="kasih-actions">${availablePaymentMethods(progress.upgrades, mode === "practice").map((m) => `<button class="secondary-btn" data-kasih-method="${m}">${icon(m)} ${{ cash: "Tunai", card: "Kad debit", qr: "QR" }[m]}</button>`).join("")}</div><small class="kasih-rounding-note">Tambahan tunai dibundarkan kepada 5 sen.</small>` : '<button id="kasihConfirm" class="primary-btn">Sahkan bayaran & pulangkan kad</button>' : '<div class="kasih-awaiting">' + icon("lock") + " Menunggu pengesahan kad</div>"}<button id="kasihCancel" class="text-btn">Bayar sendiri tanpa bantuan</button></div></div><footer class="kasih-pro-footer"><span>${icon("lock")} Kad rekaan \xB7 Simulasi dalam permainan</span><b>KITA PAY</b></footer></section>`;
     const verify = () => {
       if (!active()) return;
       const a = kasihAccount(operatingStore(), c.person);
@@ -7194,31 +7235,55 @@
       renderReceipt();
       save();
     };
-    $("kasihCard").onclick = verify;
     $("kasihReader").onclick = verify;
     const card = $("kasihCard");
-    let start = null;
+    let start = null, suppressClick = false;
+    card.onclick = () => {
+      if (suppressClick) {
+        suppressClick = false;
+        return;
+      }
+      verify();
+    };
+    const resetCard = () => {
+      start = null;
+      card.style.transform = "";
+      card.style.zIndex = "";
+    };
     card.onpointerdown = (e) => {
-      start = { x: e.clientX, y: e.clientY };
+      if (!active() || e.button > 0) return;
+      start = { x: e.clientX, y: e.clientY, id: e.pointerId, scale: card.getBoundingClientRect().width / card.offsetWidth || 1, moved: false };
+      suppressClick = false;
       card.setPointerCapture(e.pointerId);
+      e.preventDefault();
     };
     card.onpointermove = (e) => {
-      if (start) {
-        card.style.transform = `translate(${e.clientX - start.x}px,${e.clientY - start.y}px)`;
-        card.style.zIndex = "3";
-      }
+      if (!start || start.id !== e.pointerId) return;
+      start.moved ||= Math.hypot(e.clientX - start.x, e.clientY - start.y) > 6;
+      card.style.transform = `translate(${(e.clientX - start.x) / start.scale}px,${(e.clientY - start.y) / start.scale}px)`;
+      card.style.zIndex = "3";
     };
     card.onpointerup = (e) => {
-      if (!start) return;
-      const target = $("kasihReader").getBoundingClientRect();
-      const moved = Math.hypot(e.clientX - start.x, e.clientY - start.y) > 10;
-      start = null;
-      card.style.transform = "";
-      if (moved && inside(e, target)) verify();
+      if (!start || start.id !== e.pointerId) return;
+      const hit = inside(e, $("kasihReader").getBoundingClientRect()), moved = start.moved;
+      resetCard();
+      suppressClick = moved;
+      if (moved && hit) verify();
     };
-    card.onpointercancel = () => {
-      start = null;
-      card.style.transform = "";
+    card.onpointercancel = resetCard;
+    card.onlostpointercapture = () => {
+      if (start) resetCard();
+    };
+    if ($("kasihCoupon")) $("kasihCoupon").onclick = () => {
+      if (!active() || k.reserved) return;
+      if (applyCoupon(c)) {
+        renderReceipt();
+        renderScene();
+        renderKasih();
+        syncPaymentSurface();
+        save();
+        beep("coin");
+      }
     };
     area.querySelectorAll("[data-kasih-method]").forEach((b) => b.onclick = () => {
       if (!active() || !k.verified) return;
