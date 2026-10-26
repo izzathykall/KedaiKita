@@ -8,7 +8,7 @@ const configValid = config => !!(config?.apiKey && config?.projectId && config?.
 const clone = data => JSON.parse(JSON.stringify(data));
 const BOOT_TIMEOUT_MS = 15000;
 const DATA_TIMEOUT_MS = 18000;
-const {chooseSave,withTimeout}=await import(new URL('./sync-policy.mjs'+new URL(import.meta.url).search,import.meta.url));
+import {chooseSave,withTimeout} from './sync-policy.mjs';
 
 const errorMalay = error => {
   const codes = {

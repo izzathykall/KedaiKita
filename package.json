@@ -1,0 +1,7 @@
+{
+  "name": "kedaikita-cashier-simulator",
+  "private": true,
+  "version": "1.0.63",
+  "scripts": {"build": "node build.mjs"},
+  "devDependencies": {"esbuild": "0.25.0"}
+}

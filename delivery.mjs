@@ -1,4 +1,4 @@
-const {remainingMs,remainingSeconds,setClockPaused}=await import(new URL('./delivery-clock.mjs'+new URL(import.meta.url).search,import.meta.url));
+import {remainingMs,remainingSeconds,setClockPaused} from './delivery-clock.mjs';
 /* KitaFood v30 — rider at the normal checkout counter.
  * Items are selected from a shelf, staged in a bag and only deducted from
  * inventory after a verified handoff. Existing delivery progress is migrated.

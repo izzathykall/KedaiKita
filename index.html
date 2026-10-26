@@ -5,8 +5,8 @@
 <meta name="theme-color" content="#173f37"><meta name="description" content="Jaga kaunter pasar mini anda. Scan barang, timbang hasil segar, kira baki dan bina Kedai Kita!">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Outfit:wght@400;500;600;700;800&amp;display=swap">
 <title>Kedai Kita — Cashier Simulator</title>
-<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-26-v62-delivery-payment-audio">
-<link id="designStyles" rel="stylesheet" href="design.css?v=2026-10-26-v62-delivery-payment-audio">
+<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-26-v63-startup-fix">
+<link id="designStyles" rel="stylesheet" href="design.css?v=2026-10-26-v63-startup-fix">
 </head>
 <body>
 <div class="app" id="gameApp">
@@ -121,46 +121,66 @@
 <audio id="chaChingSound" src="./cha-ching.wav" preload="auto"></audio>
 <audio id="scannerSound" src="./scanner-beep.wav" preload="auto"></audio>
 
-<!-- Developer allowlist is loaded fresh below, before app.mjs. -->
-<script type="module">
-// One build identifier for every local script, module and stylesheet.
-const fallbackBuild = '2026-10-26-v62-delivery-payment-audio';
-const versionController=new AbortController();
-const versionTimer=setTimeout(()=>versionController.abort(),6000);
-let activeBuild=fallbackBuild;
-try{
-  const response=await fetch('./version.json?init='+Date.now(),{cache:'no-store',signal:versionController.signal});
-  if(response.ok){const data=await response.json();if(/^[a-zA-Z0-9._-]{1,100}$/.test(data.version||''))activeBuild=data.version}
-}catch{}finally{clearTimeout(versionTimer)}
-window.__KEDAI_ACTIVE_VERSION__=activeBuild;
-const asset=name=>'./'+name+'?v='+encodeURIComponent(activeBuild);
-function loadAsset(element,url,attribute){
-  return new Promise((resolve,reject)=>{
-    if(attribute==='href'&&element.getAttribute('href')===url&&element.sheet){resolve();return}
-    const timeout=setTimeout(()=>{element.onload=element.onerror=null;reject(new Error('Muat turun terlalu lama'))},12000);
-    element.onload=()=>{clearTimeout(timeout);resolve()};
-    element.onerror=()=>{clearTimeout(timeout);reject(new Error('Fail permainan tidak dapat dimuatkan'))};
-    element[attribute]=url;
-    if(!element.isConnected)document.head.append(element);
-  });
-}
-try{
-  await Promise.all([
-    loadAsset(document.getElementById('gameStyles'),asset('style.css'),'href'),
-    loadAsset(document.getElementById('designStyles'),asset('design.css'),'href'),
-    ...['firebase-config.js','developer-config.js','viewport-fit.js','mobile-ui.js'].map(name=>loadAsset(document.createElement('script'),asset(name),'src'))
-  ]);
-  await import(asset('app.mjs'));
-}catch(error){
-  console.error('[KedaiKita Startup]',error);
-  const panel=document.getElementById('accountOverlay');
-  document.getElementById('accountTitle').textContent='Permainan belum dapat dimuatkan';
-  document.getElementById('accountHint').textContent='Semak sambungan internet dan cuba semula.';
-  for(const id of ['accountAuthFields','accountChoice','accountOverview','accountGuest','accountClose','accountLogout'])document.getElementById(id).hidden=true;
-  const retry=document.getElementById('accountRetry');retry.hidden=false;retry.onclick=()=>location.reload();
-  if(!panel.open)panel.showModal();
-}
-</script>
+
 <audio id="scaleSound" src="./digital-scale.wav" preload="auto"></audio>
 <audio id="drawerSound" src="./drawer-open.mp3" preload="auto"></audio>
+<script>
+(function(){
+ 'use strict';
+ var build='2026-10-26-v63-startup-fix',detail='',stopped=false;
+ var currentURL=new URL(location.href),retry=currentURL.searchParams.get('boot')||'';
+ window.__KEDAI_ACTIVE_VERSION__=build;
+ window.__KEDAI_GAME_READY__=false;
+ function asset(name){return './'+name+'?v='+encodeURIComponent(build)+(retry?'&boot='+encodeURIComponent(retry):'')}
+ function message(title,hint,error){
+  var panel=document.getElementById('accountOverlay');
+  document.getElementById('accountTitle').textContent=title;
+  document.getElementById('accountHint').textContent=hint;
+  document.getElementById('accountMessage').textContent=error||'';
+  ['accountAuthFields','accountChoice','accountOverview','accountGuest','accountClose','accountLogout'].forEach(function(id){document.getElementById(id).hidden=true});
+  document.getElementById('accountControls').hidden=!error;
+  var button=document.getElementById('accountRetry');button.hidden=!error;
+  button.textContent='Muat semula permainan';
+  button.onclick=function(){var url=new URL(location.href);url.searchParams.set('boot',String(Date.now()));location.replace(url.href)};
+  if(!panel.open)panel.showModal();
+ }
+ function fail(error){
+  if(window.__KEDAI_GAME_READY__||stopped)return;
+  stopped=true;
+  message('Permainan belum dapat dimuatkan','Muat naik semua fail kemas kini, kemudian cuba semula. Progres anda tidak dipadam.',detail||String(error&&error.message||error));
+ }
+ var watchdog=setTimeout(function(){fail(new Error('Masa memuatkan game tamat. Cuba muat semula.'))},25000);
+ function onError(event){
+  if(window.__KEDAI_GAME_READY__)return;
+  if(event.filename&&event.filename.indexOf('app.bundle.js')!==-1){
+   detail='app.bundle.js: '+String(event.message||'Skrip tidak dapat dimulakan');fail(new Error(detail));
+  }
+ }
+ window.addEventListener('error',onError);
+ function loadScript(name){
+  return new Promise(function(resolve,reject){
+   var script=document.createElement('script');
+   var timer=setTimeout(function(){reject(new Error('Masa memuatkan '+name+' tamat.'))},18000);
+   script.onload=function(){clearTimeout(timer);resolve()};
+   script.onerror=function(){clearTimeout(timer);reject(new Error('Fail '+name+' tidak dapat dimuatkan. Pastikan fail ini berada di folder yang sama dengan index.html.'))};
+   script.src=asset(name);document.head.appendChild(script);
+  });
+ }
+ try{
+  message('Menyediakan kedai anda','Memuatkan permainan…','');
+  // Stylesheets load independently. A cached stylesheet may not emit a new
+  // load event for the same resolved URL; that must never block game startup.
+  [['gameStyles','style.css'],['designStyles','design.css']].forEach(function(pair){
+   var link=document.getElementById(pair[0]),url=new URL(asset(pair[1]),document.baseURI).href;
+   if(link.href!==url)link.href=url;
+  });
+  Promise.all([loadScript('firebase-config.js'),loadScript('developer-config.js')])
+   .then(function(){if(stopped)throw new Error('Pemuatan dibatalkan');return loadScript('app.bundle.js')})
+   .then(function(){
+    if(!window.__KEDAI_GAME_READY__)throw new Error(detail||'app.bundle.js tidak selesai bermula. Muat naik fail ZIP penuh dan cuba semula.');
+    clearTimeout(watchdog);window.removeEventListener('error',onError);
+   }).catch(function(error){clearTimeout(watchdog);fail(error)});
+ }catch(error){clearTimeout(watchdog);fail(error)}
+})();
+</script>
 </body></html>
