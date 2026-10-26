@@ -188,6 +188,26 @@
     mobile.addEventListener?.("change", () => setOpen(false));
   })();
 
+  // product-migration.mjs
+  var ids = { dogfood: "fishfood", treatsdog: "birdseed", petpad: "catbed", pettoy: "cattoy" };
+  var names = { "Makanan anjing": "Makanan ikan", "Snek anjing": "Biji makanan burung", "Alas latihan haiwan": "Alas tidur kucing", "Syampu haiwan": "Syampu kucing", "Mainan haiwan": "Bola benang kucing" };
+  function migrateProducts(value) {
+    if (!value || typeof value !== "object") return value;
+    for (const key of Object.keys(value)) {
+      const item = value[key];
+      if (ids[key]) {
+        const next = ids[key];
+        if (value[next] === void 0) value[next] = item;
+        delete value[key];
+      } else if (typeof item === "string") {
+        if ((key === "id" || key === "productId") && ids[item]) value[key] = ids[item];
+        else if (key === "name" && names[item]) value[key] = names[item];
+      }
+      if (item && typeof item === "object") migrateProducts(item);
+    }
+    return value;
+  }
+
   // dialogue.mjs
   var lines = {
     welcome: ["Hai, boleh tolong kira barang saya?", "Saya singgah beli barang keperluan.", "Ini barang saya ya. Terima kasih.", "Boleh bantu saya di kaunter?", "Saya dah pilih barang. Boleh kira sekarang?", "Hai! Saya nak bayar barang ini."],
@@ -230,12 +250,12 @@
   // kitakasih.mjs
   var KASIH_PRODUCTS = /* @__PURE__ */ new Set(["milk", "bread", "eggs", "rice", "noodles", "cookies", "soap", "coffee", "water", "curry", "detergent", "oil", "sugar", "flour", "soy", "sardine", "tea", "malt", "salt", "condensed", "tissue", "toothpaste", "shampoo", "dishsoap"]);
   var kasihEligible = (item) => KASIH_PRODUCTS.has(item.id);
-  function kasihAccount(store, person) {
+  function kasihAccount(store, person, rng = Math.random) {
     store.kitaKasih ??= { accounts: {}, receipts: [] };
     store.kitaKasih.accounts ??= {};
     store.kitaKasih.receipts ??= [];
     const key = person.id;
-    return store.kitaKasih.accounts[key] ??= { balance: 5e3, card: "KK-" + String(Object.keys(store.kitaKasih.accounts).length + 1).padStart(5, "0") };
+    return store.kitaKasih.accounts[key] ??= { balance: 1e3 + Math.min(18, Math.max(0, Math.floor(rng() * 19))) * 500, card: "KK-" + String(Object.keys(store.kitaKasih.accounts).length + 1).padStart(5, "0") };
   }
   function kasihQuote(customer2) {
     const price = (i) => i.weighted ? Math.round(i.price * i.grams / 1e3) : i.price;
@@ -543,9 +563,9 @@
     { "id": "babybottle", "name": "Botol susu bayi", "price": 1590, "category": "baby", "color": "#f0dce5" },
     { "id": "babyporridge", "name": "Bubur bayi", "price": 1290, "category": "baby", "color": "#f0dce5" },
     { "id": "catfood", "name": "Makanan kucing", "price": 790, "category": "pets", "color": "#e3dec8" },
-    { "id": "dogfood", "name": "Makanan anjing", "price": 990, "category": "pets", "color": "#e3dec8" },
+    { "id": "fishfood", "name": "Makanan ikan", "price": 990, "category": "pets", "color": "#e3dec8" },
     { "id": "catlitter", "name": "Pasir kucing", "price": 1890, "category": "pets", "color": "#e3dec8" },
-    { "id": "petshampoo", "name": "Syampu haiwan", "price": 1290, "category": "pets", "color": "#e3dec8" },
+    { "id": "petshampoo", "name": "Syampu kucing", "price": 1290, "category": "pets", "color": "#e3dec8" },
     { "id": "notebook", "name": "Buku nota", "price": 450, "category": "stationery", "color": "#e1dcf1" },
     { "id": "pencils", "name": "Pensel 6 batang", "price": 350, "category": "stationery", "color": "#e1dcf1" },
     { "id": "crayons", "name": "Krayon warna", "price": 690, "category": "stationery", "color": "#e1dcf1" },
@@ -601,11 +621,11 @@
     { "id": "bib", "name": "Bib makan bayi", "price": 790, "category": "baby", "color": "#f0dce5" },
     { "id": "babycereal", "name": "Bijirin bayi", "price": 1190, "category": "baby", "color": "#f0dce5" },
     { "id": "treatscat", "name": "Snek kucing", "price": 690, "category": "pets", "color": "#e3dec8" },
-    { "id": "treatsdog", "name": "Snek anjing", "price": 650, "category": "pets", "color": "#e3dec8" },
-    { "id": "pettoy", "name": "Mainan haiwan", "price": 990, "category": "pets", "color": "#e3dec8" },
+    { "id": "birdseed", "name": "Biji makanan burung", "price": 650, "category": "pets", "color": "#e3dec8" },
+    { "id": "cattoy", "name": "Bola benang kucing", "price": 990, "category": "pets", "color": "#e3dec8" },
     { "id": "petbowl", "name": "Mangkuk makanan haiwan", "price": 1250, "category": "pets", "color": "#e3dec8" },
     { "id": "petbrush", "name": "Berus bulu haiwan", "price": 790, "category": "pets", "color": "#e3dec8" },
-    { "id": "petpad", "name": "Alas latihan haiwan", "price": 1690, "category": "pets", "color": "#e3dec8" },
+    { "id": "catbed", "name": "Alas tidur kucing", "price": 1690, "category": "pets", "color": "#e3dec8" },
     { "id": "eraser", "name": "Pemadam getah", "price": 120, "category": "stationery", "color": "#e1dcf1" },
     { "id": "ruler", "name": "Pembaris 30 cm", "price": 250, "category": "stationery", "color": "#e1dcf1" },
     { "id": "highlighter", "name": "Pen penanda", "price": 480, "category": "stationery", "color": "#e1dcf1" },
@@ -1224,7 +1244,7 @@
     }
     return { parts, remainder: cents };
   }
-  var RUSH_DURATION_SECONDS = 60;
+  var RUSH_DURATION_SECONDS = 30;
   var RUSH_PATIENCE_SECONDS = 10;
   function rushHourActive(day, session2) {
     return Number(day) >= 1 && !!session2 && !!session2.rushStarted && !session2.rushCompleted && Number(session2.rushSecondsRemaining) > 0;
@@ -1244,6 +1264,8 @@
     session2.rushStarted = true;
     session2.rushCompleted = false;
     session2.rushSecondsRemaining = RUSH_DURATION_SECONDS;
+    session2.rushDurationSeconds = RUSH_DURATION_SECONDS;
+    session2.rushDurationVersion = 68;
     return true;
   }
   function tickRushHour(session2, seconds) {
@@ -1504,6 +1526,16 @@
     s.waitSeconds = Math.max(0, s.waitSeconds || 0);
     s.rushStarted = !!s.rushStarted;
     s.rushCompleted = !!s.rushCompleted;
+    if (s.rushStarted && !s.rushCompleted && s.rushDurationVersion !== 68) {
+      const elapsed = Math.max(0, (Number(s.rushDurationSeconds) || 60) - (Number(s.rushSecondsRemaining) || 0));
+      s.rushSecondsRemaining = Math.max(0, RUSH_DURATION_SECONDS - elapsed);
+      if (s.rushSecondsRemaining === 0) {
+        s.rushReportPending = true;
+        s.rushReportShown = false;
+      }
+    }
+    s.rushDurationSeconds = RUSH_DURATION_SECONDS;
+    s.rushDurationVersion = 68;
     s.rushSecondsRemaining = s.rushCompleted ? 0 : Math.max(0, Math.min(RUSH_DURATION_SECONDS, Number(s.rushSecondsRemaining) || 0));
     if (s.rushStarted && s.rushSecondsRemaining <= 0) s.rushCompleted = true;
     s.rushBonus = Math.max(0, Math.floor(Number(s.rushBonus) || 0));
@@ -2085,10 +2117,10 @@
       tart: plate + path("M23 51L30 72H69L78 51", "#c89453") + ellipse(50, 50, 28, 18, "#d8ad6d") + ellipse(50, 48, 22, 13, "#f3d77b"),
       pacifier: ellipse(50, 50, 29, 18, "#c9b2c6") + path("M41 49V28Q50 13 59 28V49", "#e7d6b8") + ellipse(50, 68, 15, 14, "#b694b7") + ellipse(50, 68, 10, 9, "#f9f6e8"),
       bib: path("M29 16H41Q50 43 59 16H71V55Q79 86 50 86Q21 86 29 55Z", "#e3b7b9") + path("M31 62Q50 72 69 62V76H31Z", "#f0d2c4") + ellipse(50, 50, 8, 8, "#f8e1ae"),
-      pettoy: path("M26 39Q11 23 14 42Q1 56 25 58L72 58Q94 73 88 53Q99 35 73 39Z", "#cbab78"),
+      cattoy: ellipse(46, 49, 27, 27, "#c7a0ad") + path("M23 37Q51 35 62 69M28 29Q57 27 70 54M20 49Q40 49 51 75M26 66Q42 35 58 25M38 74Q54 42 69 40M69 59Q86 59 82 76Q78 85 68 82", "none", "#f2d7de", 3),
       petbowl: ellipse(50, 42, 32, 12, "#9fbbb1") + path("M18 42H82L89 73Q50 87 11 73Z", "#a8c2ba") + ellipse(50, 42, 25, 8, "#536b5d") + ellipse(50, 70, 7, 6, "#eff0dc"),
       petbrush: rect(45, 54, 10, 33, "#aa9270", 4) + rect(25, 18, 50, 43, "#c9ae88", 12) + [0, 1, 2, 3].map((i) => path(`M32 ${28 + i * 8}H68`, "none", "#7b7667", 3)).join(""),
-      petpad: rect(17, 20, 65, 63, "#b5ccd1", 3) + rect(24, 27, 51, 49, "#edf1e6", 2) + path("M29 37H71M29 49H71M29 61H71M38 30V73M51 30V73M64 30V73", "none", "#d5dfd8", 1),
+      catbed: ellipse(50, 60, 37, 23, "#b89778") + ellipse(50, 55, 32, 20, "#e5cba7") + ellipse(50, 56, 24, 13, "#cba98c") + path("M32 47Q34 31 44 42Q53 35 60 44L68 50", "none", "#f3dfbf", 5),
       eraser: path("M21 38L40 23H78V63L59 78H21Z", "#d7a7ac") + path("M21 38H59L78 23V63L59 78V38", "#c28c94") + rect(33, 38, 26, 40, "#e9dfce", 0) + text("KITA", 46, 60, 22, 6),
       ruler: `<g transform="rotate(-32 50 50)">${rect(11, 39, 78, 23, "#dfbd78", 2) + Array.from({ length: 14 }, (_, i) => path(`M${16 + i * 5} 40V${i % 2 ? 46 : 51}`, "none", "#8e774e", 1)).join("") + text("30 cm", 51, 58, 31, 5)}</g>`,
       folder: rect(14, 31, 72, 50, "#c4af7f", 4) + path("M14 31V22H42L49 31", "#c4af7f") + path("M18 40H89L80 82H14Z", "#e5cd94") + tag("DOKUMEN", "", 40, 61),
@@ -2140,7 +2172,7 @@
     if (["tape", "ducttape"].includes(id)) return roll(id === "tape" ? "#e6d6b1" : "#8f9d98");
     if (["highlighter", "markers"].includes(id)) return ["#dab774", "#a1b5cc", "#a3ba8b"].map((c, i) => rect(19 + i * 24, 30, 17, 51, c, 3) + rect(19 + i * 24, 14, 17, 25, c, 3) + path(`M${21 + i * 24} 37H${34 + i * 24}`, "none", "#f2f0db", 3)).join("");
     if (["facialtissue", "wetwipes", "screenwipe"].includes(id)) return rect(17, 34, 67, 43, "#b3c9bf", 7) + path("M35 37L31 15L47 20L61 14L67 36Z", "#fcf9ec") + tag(id === "screenwipe" ? "LAP SKRIN" : id === "wetwipes" ? "TISU BASAH" : "TISU MUKA", "", 43, 59);
-    const food = { chips: ["KENTANG", "#d1ac64", grain()], cracker: ["KEROPOK", "#adbfa2", grain("#e9d8ab")], cereal: ["BIJIRIN", "#d6bc7f", grain()], babycereal: ["BIJIRIN BAYI", "#dfb9b7", grain()], treatscat: ["SNEK KUCING", "#c4ab81", grain("#a08b62")], treatsdog: ["SNEK ANJING", "#b7a17d", grain("#a08b62")], cornflour: ["TEPUNG JAGUNG", "#dacd9a", grain("#f5edcf")], vermicelli: ["BIHUN BERAS", "#b9cbb8", path("M33 50Q40 42 47 54T66 54M33 59Q42 50 50 61T66 60", "none", "#e2d4af", 3)], chickenstock: ["PATI AYAM", "#dbbc72", rect(33, 48, 15, 14, "#b39454") + rect(51, 52, 16, 14, "#bf9d5a")], mulch: ["SUNGKUPAN", "#b6a07e", grain("#8b7254")], herbseeds: ["DAUN SUP", "#a9c29b", leaf] };
+    const food = { chips: ["KENTANG", "#d1ac64", grain()], cracker: ["KEROPOK", "#adbfa2", grain("#e9d8ab")], cereal: ["BIJIRIN", "#d6bc7f", grain()], babycereal: ["BIJIRIN BAYI", "#dfb9b7", grain()], treatscat: ["SNEK KUCING", "#c4ab81", grain("#a08b62")], birdseed: ["BIJI BURUNG", "#b7a17d", grain("#a08b62")], cornflour: ["TEPUNG JAGUNG", "#dacd9a", grain("#f5edcf")], vermicelli: ["BIHUN BERAS", "#b9cbb8", path("M33 50Q40 42 47 54T66 54M33 59Q42 50 50 61T66 60", "none", "#e2d4af", 3)], chickenstock: ["PATI AYAM", "#dbbc72", rect(33, 48, 15, 14, "#b39454") + rect(51, 52, 16, 14, "#bf9d5a")], mulch: ["SUNGKUPAN", "#b6a07e", grain("#8b7254")], herbseeds: ["DAUN SUP", "#a9c29b", leaf] };
     if (food[id]) return bag(...food[id]);
     const liquids = { bleach: ["PELUNTUR", "#e0e3d1"], floorcleaner: ["LANTAI", "#b5c8ad"], softener: ["PELEMBUT", "#c9b6ce"], babyshampoo: ["SYAMPU BAYI", "#dbc9ad"], babylotion: ["LOSYEN BAYI", "#d8c4ce"], babysoap: ["MANDIAN BAYI", "#b7ced2"], bodywash: ["MANDIAN", "#c5b5ce"], conditioner: ["PERAPI", "#bed1af"], mouthwash: ["MULUT", "#a1c6c8"], tehbotol: ["TEH AIS", "#bc9b6d"], isotonik: ["ISOTONIK", "#bcd5d8"], sirap: ["KORDIAL ROS", "#c78d8c"], greentea: ["TEH HIJAU", "#b2c499"], minumanyogurt: ["YOGURT", "#e5dec7"], chilisauce: ["SOS CILI", "#bc745f"], tomatosauce: ["SOS TOMATO", "#c9836b"], vinegar: ["CUKA", "#d3d9b9"] };
     if (liquids[id]) return bottle(...liquids[id]);
@@ -2302,7 +2334,7 @@
       babybottle: `<path d="M32 38h36v40q-18 13-36 0Z" fill="#e1eae0" stroke="#99b7b1" stroke-width="2"/><path d="M35 56h30v19q-15 9-30 0Z" fill="#f7ead0"/><rect x="29" y="29" width="42" height="13" rx="4" fill="#b4a4d4"/><path d="M39 28V17q0-8 10-8t11 8v11Z" fill="#e3c5a6"/><path d="M58 48h6m-6 8h6m-6 8h6m-6 8h6" stroke="#769f9e" stroke-width="2"/><path d="M38 45v29" stroke="#fff" stroke-width="3"/>`,
       babyporridge: bag2("#edc08c", "BUBUR BAYI", "BERAS & SAYUR", `<path d="M31 36h38q-3 17-19 17T31 36" fill="#9dbbb6"/><ellipse cx="50" cy="36" rx="19" ry="5" fill="#f5e3b2"/><path d="m40 33 4 3m10-3 4 3" stroke="#a4b078" stroke-width="3"/>`),
       catfood: bag2("#d3b488", "MAKANAN KUCING", "IKAN PILIHAN", `<path d="m32 38 2-17 12 9h9l12-9 2 17q-18 22-37 0" fill="#eee2bf"/><circle cx="43" cy="38" r="2" fill="#514b3f"/><circle cx="58" cy="38" r="2" fill="#514b3f"/><path d="m48 44 3 3 3-3" fill="#b97d73"/>`),
-      dogfood: bag2("#a9c2b5", "MAKANAN ANJING", "NUTRISI HARIAN", `<ellipse cx="50" cy="36" rx="15" ry="14" fill="#dfbb8b"/><ellipse cx="33" cy="34" rx="7" ry="14" fill="#8c674b"/><ellipse cx="67" cy="34" rx="7" ry="14" fill="#8c674b"/><path d="m44 42 6 5 6-5Z" fill="#4e4d44"/><circle cx="44" cy="33" r="2" fill="#41483d"/><circle cx="57" cy="33" r="2" fill="#41483d"/>`),
+      fishfood: bag2("#9fc5c9", "MAKANAN IKAN", "PELET AKUARIUM", `<ellipse cx="49" cy="39" rx="18" ry="11" fill="#e9b96c"/><path d="m65 39 13-11v22Z" fill="#d58d54"/><circle cx="39" cy="36" r="2" fill="#29433f"/><path d="m47 28 9-6 3 10" fill="#c58f55"/>`),
       catlitter: bag2("#a8c2d1", "PASIR KUCING", "SERAP & BERSIH", `<path d="M29 35h43l-6 16H35Z" fill="#759295"/><ellipse cx="50" cy="35" rx="21" ry="6" fill="#e7d8ad"/>${[34, 43, 52, 62].map((x) => ellipse2(x, 35, 2, 1, "#bca777")).join("")}`),
       petshampoo: bottle2("#c7b3da", "PET CARE", `<circle cx="50" cy="44" r="6" fill="#7b6b95"/><circle cx="41" cy="35" r="3" fill="#7b6b95"/><circle cx="50" cy="32" r="3" fill="#7b6b95"/><circle cx="59" cy="35" r="3" fill="#7b6b95"/>`),
       notebook: `<rect x="22" y="13" width="56" height="74" rx="5" fill="#527d91"/><path d="M29 14h44v68H29Z" fill="#b5d4d9"/><path d="M33 18h37v64H33Z" fill="#f7efdb"/><rect x="41" y="29" width="24" height="17" rx="2" fill="#d5e2d2"/><path d="M45 35h16m-16 5h12M41 58h23m-23 6h23m-23 6h15" stroke="#a1b2a3" stroke-width="1.5"/>${[25, 36, 47, 58, 69, 80].map((y) => `<path d="M18 ${y}h11" stroke="#6e8079" stroke-width="3" stroke-linecap="round"/>`).join("")}`,
@@ -3264,7 +3296,7 @@
   var calculatorResult = "";
   var advancePending = false;
   var STORAGE = "kedai-kita-v1";
-  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v67-kasih-design";
+  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v68-rush-identity";
   var UPDATE_CHECK_URL = "./version.json";
   var storageOK = true;
   var progress = createProgress();
@@ -3307,7 +3339,7 @@
   }
   var kitaFoodSecondsRemaining = remainingSeconds;
   try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE) || "null");
+    const raw = migrateProducts(JSON.parse(localStorage.getItem(STORAGE) || "null"));
     if (raw) {
       progress = restoreProgress(JSON.stringify(raw.progress));
       sound = raw.sound !== false;
@@ -3362,6 +3394,7 @@
     return { progress, session, practiceRun: practiceRunCache, sound };
   }
   function hydrateGame(data) {
+    migrateProducts(data);
     delivery?.reset();
     clearTimeout(kitaFoodArrivalTimer);
     stopChaChing();
@@ -3487,7 +3520,7 @@
   function beginDailyRush() {
     if (mode !== "career" || modalKind === "rush-start" || !shouldStartRushHour(session, progress.day)) return false;
     if (customer?.kind === "return" && !["success", "lost"].includes(phase)) return false;
-    openModal("rush-start", `<div class="modal-pad rush-event-modal"><div class="rush-event-symbol">\u26A1</div><div class="modal-kicker">CABARAN KHAS \xB7 HARI ${progress.day}</div><h2>Rush Hour akan bermula!</h2><p>Dalam 60 saat, pelanggan cuma sabar selama <b>10 saat</b>. Scanner, penimbang dan conveyor menjadi tahap MAX. Untung barang \xD7${rushHourMultiplier(progress.upgrades).toFixed(1)}, stok dan resit tanpa had.</p><div class="rush-event-stats"><span><b>60s</b><small>Tempoh</small></span><span><b>10s</b><small>Kesabaran</small></span><span><b>\xD7${rushHourMultiplier(progress.upgrades).toFixed(1)}</b><small>Untung</small></span></div><p class="rush-event-hint">Pelanggan Rush Hour tidak dikira dalam sasaran harian.</p><button class="primary-btn rush-event-primary" id="rushEventStart">\u26A1 Mula Rush Hour</button></div>`);
+    openModal("rush-start", `<div class="modal-pad rush-event-modal"><div class="rush-event-symbol">\u26A1</div><div class="modal-kicker">CABARAN KHAS \xB7 HARI ${progress.day}</div><h2>Rush Hour akan bermula!</h2><p>Dalam 30 saat, pelanggan cuma sabar selama <b>10 saat</b>. Scanner, penimbang dan conveyor menjadi tahap MAX. Untung barang \xD7${rushHourMultiplier(progress.upgrades).toFixed(1)}, stok dan resit tanpa had.</p><div class="rush-event-stats"><span><b>30s</b><small>Tempoh</small></span><span><b>10s</b><small>Kesabaran</small></span><span><b>\xD7${rushHourMultiplier(progress.upgrades).toFixed(1)}</b><small>Untung</small></span></div><p class="rush-event-hint">Pelanggan Rush Hour tidak dikira dalam sasaran harian.</p><button class="primary-btn rush-event-primary" id="rushEventStart">\u26A1 Mula Rush Hour</button></div>`);
     $("rushEventStart").onclick = () => {
       if (!startRushHour(session, progress.day)) {
         closeModal();
@@ -3511,10 +3544,37 @@
     };
     return true;
   }
+  function finishRushNow() {
+    if (customer?.rushCustomer && !customer.paid && ["scan", "offer", "change"].includes(phase)) {
+      scanToken++;
+      busy = false;
+      advancePending = false;
+      cancelDrag();
+      cancelBankCardDrag();
+      stopScannerSound();
+      stopScaleSound();
+      stopDrawerSound();
+      session.rushUnfinished = (session.rushUnfinished || 0) + 1;
+      customer = null;
+      phase = "waiting";
+      session.waitSeconds = 0;
+      session.index++;
+      cashPicked = [];
+      renderedBasket = null;
+      renderedSceneCustomer = void 0;
+      resetStations();
+    }
+    restoreRushPatience();
+    applyMachineSpeeds();
+    render();
+    syncBackgroundMusic();
+    save();
+    showRushEnd();
+  }
   function showRushEnd() {
     if (!session?.rushReportPending || session.rushReportShown) return false;
     const count = session.rushServed || 0, lost = session.rushLost || 0;
-    openModal("rush-end", `<div class="modal-pad rush-event-modal"><div class="rush-event-symbol">\u2726</div><div class="modal-kicker">CABARAN SELESAI</div><h2>Rush Hour tamat!</h2><p>Hebat! Berikut ialah hasil jualan pelanggan semasa Rush Hour hari ini.</p><div class="rush-end-earnings"><small>UNTUNG BERSIH + TIP RUSH HOUR</small><strong>${money(session.rushEarned || 0)}</strong></div><div class="rush-event-stats"><span><b>${count}</b><small>Pelanggan dilayan</small></span><span><b>${money(session.rushRevenue || 0)}</b><small>Jumlah jualan</small></span><span><b>+${money(session.rushBonus || 0)}</b><small>Bonus pengganda</small></span></div>${lost ? `<p class="rush-event-hint">${lost} pelanggan Rush Hour tidak sempat dilayan.</p>` : ""}<p class="rush-event-hint">Pelanggan Rush Hour tidak menambah sasaran harian. Sambung pelanggan biasa untuk tamat syif.</p><button class="primary-btn rush-event-primary" id="rushEventContinue">Teruskan bermain ${icon("arrow")}</button></div>`);
+    openModal("rush-end", `<div class="modal-pad rush-event-modal"><div class="rush-event-symbol">\u2726</div><div class="modal-kicker">CABARAN SELESAI</div><h2>Rush Hour tamat!</h2><p>Hebat! Berikut ialah hasil jualan pelanggan semasa Rush Hour hari ini.</p><div class="rush-end-earnings"><small>UNTUNG BERSIH + TIP RUSH HOUR</small><strong>${money(session.rushEarned || 0)}</strong></div><div class="rush-event-stats"><span><b>${count}</b><small>Pelanggan dilayan</small></span><span><b>${money(session.rushRevenue || 0)}</b><small>Jumlah jualan</small></span><span><b>+${money(session.rushBonus || 0)}</b><small>Bonus pengganda</small></span></div>${session.rushUnfinished ? `<p class="rush-event-hint">${session.rushUnfinished} transaksi belum selesai dibatalkan. Tiada stok atau bayaran ditolak.</p>` : ""}${lost ? `<p class="rush-event-hint">${lost} pelanggan Rush Hour tidak sempat dilayan.</p>` : ""}<p class="rush-event-hint">Pelanggan Rush Hour tidak menambah sasaran harian. Sambung pelanggan biasa untuk tamat syif.</p><button class="primary-btn rush-event-primary" id="rushEventContinue">Teruskan bermain ${icon("arrow")}</button></div>`);
     $("rushEventContinue").onclick = () => {
       session.rushReportPending = false;
       session.rushReportShown = true;
@@ -4466,7 +4526,7 @@
     advancePending = false;
     mode = "career";
     try {
-      const raw = JSON.parse(localStorage.getItem(cloud?.getStorageKey() || STORAGE) || "null");
+      const raw = migrateProducts(JSON.parse(localStorage.getItem(cloud?.getStorageKey() || STORAGE) || "null"));
       session = raw?.session || null;
       if (session) {
         customer = session.customer;
@@ -4771,7 +4831,7 @@
  <button data-dev-scenario="decline"><span class="dev-scenario-art">${icon("close")}</span> <b>Kad ditolak</b><small>Baki tidak cukup</small></button>
  <button data-dev-scenario="qr"><span class="dev-scenario-art">${icon("qr")}</span> <b>Imbas QR</b><small>Bayaran e-wallet</small></button>
  <button data-dev-scenario="barcode"><span class="dev-scenario-art">${icon("scan")}</span> <b>Barcode rosak</b><small>Masukkan kod manual</small></button>
- <button data-dev-scenario="rush"><span class="dev-scenario-art">${icon("spark")}</span> <b>Rush Hour</b><small>60s \xB7 10s sabar \xB7 mesin tahap 5</small></button>
+ <button data-dev-scenario="rush"><span class="dev-scenario-art">${icon("spark")}</span> <b>Rush Hour</b><small>30s \xB7 10s sabar \xB7 mesin tahap 5</small></button>
  <button data-dev-scenario="refundValid"><span class="dev-scenario-art">${icon("undo")}</span> <b>Refund sah</b><small>Resit sepadan</small></button>
  <button data-dev-scenario="refundInvalid"><span class="dev-scenario-art">${icon("help")}</span> <b>Refund salah</b><small>Resit tidak sepadan</small></button>
  <button data-dev-scenario="vip"><span class="dev-scenario-art">${icon("user")}</span> <b>Pelanggan VIP</b><small>Cabaran tip</small></button>
@@ -4795,9 +4855,8 @@
  </div>
  <div class="dev-stock-tool"><label for="devStockProduct">Uji stok mengikut produk</label><select id="devStockProduct" aria-label="Pilih produk untuk ubah stok">${CATEGORIES.map((c) => `<optgroup label="${c.name}">${PRODUCTS.filter((p) => p.category === c.id).map((p) => `<option value="${p.id}">${p.name}${p.weighted ? " (kg)" : ""}</option>`).join("")}</optgroup>`).join("")}</select><div class="dev-stock-row"><input id="devStockAmount" type="number" min="0" max="1000" step="1" value="5" inputmode="numeric" aria-label="Jumlah stok (unit atau kg)"><button type="button" class="primary-btn" id="devSetStock">Tetapkan stok</button></div><small>Untuk hasil segar, nilai stok dikira dalam kilogram. Tindakan mengubah sandbox sahaja.</small></div>
  <h3>Audit Firebase</h3><div class="dev-audit"><p>Semak simpanan sebenar melalui bacaan semula Realtime Database. Data ujian tidak akan bercampur dengan progres kerjaya.</p><button id="devVerifyFirebase" class="primary-btn">Simpan & semak Firebase</button><div id="devAuditResult" role="status" aria-live="polite">Belum diuji pada sesi ini.</div></div>
- <h3>Ujian hari permainan</h3><div class="dev-day-input"><label for="developerDay">Hari (1\u201360)</label><input id="developerDay" type="number" min="1" max="60" value="${progress.day}"><button id="devRunDay" class="primary-btn">Buka hari</button></div><section class="dev-data-reset" aria-label="Reset keseluruhan data ujian"><div><b>Reset semua data ujian</b><small>Padam progres ujian sahaja termasuk hari, inventori, upgrade dan duit kedai. Akaun Firebase kekal.</small></div><button type="button" class="secondary-btn" id="devClearSandbox">Reset data ujian</button></section><p id="devResetError" class="dev-reset-error" role="alert" aria-live="polite"></p><div class="dev-panel-footer"><button class="primary-btn" id="devBack">Kembali ke game</button></div></div>`);
+ <h3>Ujian hari permainan</h3><div class="dev-day-input"><label for="developerDay">Hari (1\u201360)</label><input id="developerDay" type="number" min="1" max="60" value="${progress.day}"><button id="devRunDay" class="primary-btn">Buka hari</button></div><section class="dev-data-reset" aria-label="Reset keseluruhan data ujian"><div><b>Reset semua data ujian</b><small>Padam progres ujian sahaja termasuk hari, inventori, upgrade dan duit kedai. Akaun Firebase kekal.</small></div><button type="button" class="secondary-btn" id="devClearSandbox">Reset data ujian</button></section><p id="devResetError" class="dev-reset-error" role="alert" aria-live="polite"></p></div>`);
     $("closeDeveloperPanel").onclick = closeModal;
-    $("devBack").onclick = closeModal;
     async function storeDeveloperWallet(next, action) {
       if (!assertDeveloper()) return;
       if (!Number.isSafeInteger(next) || next < 0 || next > 1e9) {
@@ -5118,17 +5177,16 @@
           sinceSave = 0;
         }
       }
+      if (mode === "career" && session.rushReportPending && !session.rushReportShown) {
+        finishRushNow();
+        requestAnimationFrame(loop);
+        return;
+      }
       if (mode === "career" && tickRushHour(session, dt)) {
-        restoreRushPatience();
-        applyMachineSpeeds();
         session.rushReportPending = true;
-        renderOperations();
-        save();
-        if (!customer || ["success", "lost"].includes(phase) || !customer.rushCustomer) {
-          showRushEnd();
-          requestAnimationFrame(loop);
-          return;
-        }
+        finishRushNow();
+        requestAnimationFrame(loop);
+        return;
       }
       if (mode === "career" && phase !== "delivery" && !session.rushStarted && beginDailyRush()) {
         requestAnimationFrame(loop);
@@ -6009,6 +6067,9 @@
     const track = $("backgroundMusic");
     if (!track) return;
     ensureMusicTrack();
+    const rate = mode === "career" && rushHourActive(progress.day, session) ? 1.18 : 1;
+    if (track.playbackRate !== rate) track.playbackRate = rate;
+    if ("preservesPitch" in track) track.preservesPitch = true;
     if (!musicWanted()) {
       fadeMusicTo(0);
       return;
@@ -7224,7 +7285,7 @@
   function renderKasih() {
     const c = customer, k = c.kasih, q = kasihQuote(c), area = $("paymentArea");
     const active = () => customer === c && !paused && !busy && phase === "offer" && c.method === "kasih" && !c.paid;
-    area.innerHTML = `<section class="kasih-panel kasih-pro"><header><div><span class="kasih-pill">KitaKasih</span><small>Terminal bantuan kedai</small></div><span class="kasih-connection"><i></i> ${k.verified ? "Kad disahkan" : "Sedia"}</span></header><div class="kasih-pro-grid"><div class="kasih-pro-hardware"><button class="kasih-reader pro-reader" id="kasihReader" aria-label="Baca kad KitaKasih"><span class="pro-reader-brand">KITA \xB7 SMART TERMINAL</span><span class="pro-reader-screen"><small>${k.verified ? "BAKI BANTUAN" : "PENGESAHAN KAD"}</small><b>${k.verified ? money(k.balanceBefore) : "Sila baca kad"}</b><span>${k.verified ? c.person.name : "Tekan kad atau seret ke pembaca"}</span><i>${icon(k.verified ? "check" : "card")} ${k.verified ? "Kad aktif" : "Menunggu kad"}</i></span><span class="pro-reader-slot"><i></i></span><span class="pro-reader-contact">${icon("scan")} PEMBACA KAD</span></button><button class="kasih-card pro-aid-card ${k.verified ? "verified" : ""}" id="kasihCard" aria-label="Semak kad KitaKasih pelanggan"><span class="aid-card-brand">KitaKasih<span>BANTUAN KOMUNITI</span></span><span class="aid-card-pattern" aria-hidden="true"></span><span class="kasih-chip" aria-hidden="true"></span><span class="aid-card-number">${k.card}</span><strong>${c.person.name}</strong><small>KAD SIMULASI</small></button><span class="kasih-device-caption">${k.verified ? "Kad pelanggan telah disahkan" : "Tekan kad atau seret ke pembaca"}</span></div><div class="kasih-pro-receipt"><div class="kasih-review-title"><span>SEMAKAN BELIAN</span><b>${money(netTotal(c))}</b></div>${c.hasCoupon ? `<div class="kasih-coupon ${c.couponApplied ? "applied" : ""}"><span>${icon("receipt")}<b>${c.couponApplied ? "Kupon 10% digunakan" : "Pelanggan minta kupon 10%"}</b></span>${c.couponApplied ? `<strong>\u2212${money(c.discount)}</strong>` : '<button id="kasihCoupon" class="secondary-btn">Gunakan kupon</button>'}</div>` : ""}<div class="kasih-breakdown"><div><span>Barang layak${c.couponApplied ? " selepas kupon" : ""}</span><b>${money(q.eligible)}</b></div><div><span>Barang tidak layak</span><b>${money(q.ineligible)}</b></div><div class="kasih-funded"><span>Daripada KitaKasih</span><b>${k.verified ? money(q.aid) : "\u2014"}</b></div><div><span>Baki bantuan selepas bayaran</span><b>${k.verified ? money(q.balanceAfter) : "\u2014"}</b></div><div class="kasih-extra"><span>Bayaran tambahan</span><b>${k.verified ? money(q.remaining) : "\u2014"}</b></div></div><p class="kasih-note" role="status">${!k.verified ? "Sahkan kad untuk semak bantuan dan bayaran tambahan." : q.remaining ? "Pilih kaedah untuk baki belian. Bantuan belum dipotong." : "Bantuan mencukupi. Sahkan untuk lengkapkan pembelian."}</p>${k.verified ? q.remaining ? `<div class="kasih-actions">${availablePaymentMethods(progress.upgrades, mode === "practice").map((m) => `<button class="secondary-btn" data-kasih-method="${m}">${icon(m)} ${{ cash: "Tunai", card: "Kad debit", qr: "QR" }[m]}</button>`).join("")}</div><small class="kasih-rounding-note">Tambahan tunai dibundarkan kepada 5 sen.</small>` : '<button id="kasihConfirm" class="primary-btn">Sahkan bayaran & pulangkan kad</button>' : '<div class="kasih-awaiting">' + icon("lock") + " Menunggu pengesahan kad</div>"}<button id="kasihCancel" class="text-btn">Bayar sendiri tanpa bantuan</button></div></div><footer class="kasih-pro-footer"><span>${icon("lock")} Kad rekaan \xB7 Simulasi dalam permainan</span><b>KITA PAY</b></footer></section>`;
+    area.innerHTML = `<section class="kasih-panel kasih-pro"><header><div><span class="kasih-pill">KitaKasih</span><small>Terminal bantuan kedai</small></div><span class="kasih-connection"><i></i> ${k.verified ? "Kad disahkan" : "Sedia"}</span></header><div class="kasih-pro-grid"><div class="kasih-pro-hardware"><button class="kasih-reader pro-reader" id="kasihReader" aria-label="Baca kad KitaKasih"><span class="pro-reader-brand">KITA \xB7 SMART TERMINAL</span><span class="pro-reader-screen"><small>${k.verified ? "BAKI BANTUAN" : "PENGESAHAN KAD"}</small><b>${k.verified ? money(k.balanceBefore) : "Sila baca kad"}</b><span>${k.verified ? c.person.name : "Tekan kad atau seret ke pembaca"}</span><i>${icon(k.verified ? "check" : "card")} ${k.verified ? "Kad aktif" : "Menunggu kad"}</i></span><span class="pro-reader-slot"><i></i></span><span class="pro-reader-contact">${icon("scan")} PEMBACA KAD</span></button><button class="kasih-card pro-aid-card ${k.verified ? "verified" : ""}" id="kasihCard" aria-label="Semak kad KitaKasih pelanggan"><span class="aid-id-heading">KAD KOMUNITI<span>KEDAI KITA \xB7 KitaKasih</span></span><span class="aid-id-pattern" aria-hidden="true"></span><span class="aid-id-photo">${avatar(c.person)}</span><span class="aid-id-chip" aria-hidden="true"></span><span class="aid-id-data"><small>NAMA PEMEGANG</small><strong>${c.person.name}</strong><small>ID PELANGGAN</small><b>${k.card}</b><em>AHLI KOMUNITI \xB7 AKTIF</em></span><span class="aid-id-footer">KAD REKAAN \xB7 UNTUK PERMAINAN SAHAJA</span></button><span class="kasih-device-caption">${k.verified ? "Kad pelanggan telah disahkan" : "Tekan kad atau seret ke pembaca"}</span></div><div class="kasih-pro-receipt"><div class="kasih-review-title"><span>SEMAKAN BELIAN</span><b>${money(netTotal(c))}</b></div>${c.hasCoupon ? `<div class="kasih-coupon ${c.couponApplied ? "applied" : ""}"><span>${icon("receipt")}<b>${c.couponApplied ? "Kupon 10% digunakan" : "Pelanggan minta kupon 10%"}</b></span>${c.couponApplied ? `<strong>\u2212${money(c.discount)}</strong>` : '<button id="kasihCoupon" class="secondary-btn">Gunakan kupon</button>'}</div>` : ""}<div class="kasih-breakdown"><div><span>Barang layak${c.couponApplied ? " selepas kupon" : ""}</span><b>${money(q.eligible)}</b></div><div><span>Barang tidak layak</span><b>${money(q.ineligible)}</b></div><div class="kasih-funded"><span>Daripada KitaKasih</span><b>${k.verified ? money(q.aid) : "\u2014"}</b></div><div><span>Baki bantuan selepas bayaran</span><b>${k.verified ? money(q.balanceAfter) : "\u2014"}</b></div><div class="kasih-extra"><span>Bayaran tambahan</span><b>${k.verified ? money(q.remaining) : "\u2014"}</b></div></div><p class="kasih-note" role="status">${!k.verified ? "Sahkan kad untuk semak bantuan dan bayaran tambahan." : q.remaining ? "Pilih kaedah untuk baki belian. Bantuan belum dipotong." : "Bantuan mencukupi. Sahkan untuk lengkapkan pembelian."}</p>${k.verified ? q.remaining ? `<div class="kasih-actions">${availablePaymentMethods(progress.upgrades, mode === "practice").map((m) => `<button class="secondary-btn" data-kasih-method="${m}">${icon(m)} ${{ cash: "Tunai", card: "Kad debit", qr: "QR" }[m]}</button>`).join("")}</div><small class="kasih-rounding-note">Tambahan tunai dibundarkan kepada 5 sen.</small>` : '<button id="kasihConfirm" class="primary-btn">Sahkan bayaran & pulangkan kad</button>' : '<div class="kasih-awaiting">' + icon("lock") + " Menunggu pengesahan kad</div>"}<button id="kasihCancel" class="text-btn">Bayar sendiri tanpa bantuan</button></div></div><footer class="kasih-pro-footer"><span>${icon("lock")} Kad rekaan \xB7 Simulasi dalam permainan</span><b>KITA PAY</b></footer></section>`;
     const verify = () => {
       if (!active()) return;
       const a = kasihAccount(operatingStore(), c.person);
@@ -7312,7 +7373,7 @@
   }
   function showKasihHistory() {
     const store = operatingStore(), receipts = store.kitaKasih?.receipts || [];
-    openModal("kasih-history", `<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">SIMULASI BANTUAN DALAM PERMAINAN</div><h2>Resit KitaKasih</h2></div><button class="icon-btn" id="closeKasihHistory" aria-label="Tutup">${icon("close")}</button></div><p>Rekod 20 transaksi terkini. Baki kad rekaan disimpan mengikut pelanggan. Baki awal RM50, tanpa tambah nilai automatik.</p><div class="kasih-history">${receipts.length ? receipts.map((r) => `<article><b>${r.name} \xB7 ${r.card}</b><small>Hari ${r.day} \xB7 ${r.id}</small><div><span>Jumlah belian</span><b>${money(r.total)}</b></div><div><span>KitaKasih</span><b>${money(r.aid)}</b></div><div><span>Tambahan (${{ cash: "tunai", card: "kad", qr: "QR", kasih: "tiada" }[r.method] || r.method})</span><b>${money(r.extra)}</b></div><div><span>Baki bantuan</span><b>${money(r.balance)}</b></div></article>`).join("") : "<p>Belum ada transaksi. Pelanggan KitaKasih pertama muncul sebagai pelanggan kedua syif biasa. Dalam latihan, pelanggan pertama menggunakan KitaKasih.</p>"}</div></div>`);
+    openModal("kasih-history", `<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">SIMULASI BANTUAN DALAM PERMAINAN</div><h2>Resit KitaKasih</h2></div><button class="icon-btn" id="closeKasihHistory" aria-label="Tutup">${icon("close")}</button></div><p>Rekod 20 transaksi terkini. Baki kad rekaan disimpan mengikut pelanggan. Baki awal pelanggan baharu rawak RM10\u2013RM100, tanpa tambah nilai automatik. Baki sedia ada dikekalkan.</p><div class="kasih-history">${receipts.length ? receipts.map((r) => `<article><b>${r.name} \xB7 ${r.card}</b><small>Hari ${r.day} \xB7 ${r.id}</small><div><span>Jumlah belian</span><b>${money(r.total)}</b></div><div><span>KitaKasih</span><b>${money(r.aid)}</b></div><div><span>Tambahan (${{ cash: "tunai", card: "kad", qr: "QR", kasih: "tiada" }[r.method] || r.method})</span><b>${money(r.extra)}</b></div><div><span>Baki bantuan</span><b>${money(r.balance)}</b></div></article>`).join("") : "<p>Belum ada transaksi. Pelanggan KitaKasih pertama muncul sebagai pelanggan kedua syif biasa. Dalam latihan, pelanggan pertama menggunakan KitaKasih.</p>"}</div></div>`);
     $("closeKasihHistory").onclick = closeModal;
   }
   var kasihHistoryButton = document.createElement("button");

@@ -1,9 +1,9 @@
 {
-  "version": "2026-10-27-v67-kasih-design",
-  "title": "KitaKasih & dialog pelanggan",
+  "version": "2026-10-27-v68-rush-identity",
+  "title": "Rush Hour 30 saat & kad komuniti",
   "notes": [
-    "Terminal KitaKasih baharu dengan kad bersaiz kad debit.",
-    "Permintaan KitaKasih dan kupon disebut bersama; kupon boleh digunakan pada terminal.",
-    "Scanner QR mengikut rujukan dengan saiz lebih besar."
+    "Rush Hour 30 saat, muzik 1.18x dan laporan serta-merta.",
+    "Baki awal KitaKasih rawak dan kad pengenalan komuniti rekaan.",
+    "Gantian produk haiwan serta migrasi stok lama."
   ]
 }

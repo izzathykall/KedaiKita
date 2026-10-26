@@ -43,10 +43,10 @@ export function detailedProductArt(id){
  tart:plate+path('M23 51L30 72H69L78 51','#c89453')+ellipse(50,50,28,18,'#d8ad6d')+ellipse(50,48,22,13,'#f3d77b'),
  pacifier:ellipse(50,50,29,18,'#c9b2c6')+path('M41 49V28Q50 13 59 28V49','#e7d6b8')+ellipse(50,68,15,14,'#b694b7')+ellipse(50,68,10,9,'#f9f6e8'),
  bib:path('M29 16H41Q50 43 59 16H71V55Q79 86 50 86Q21 86 29 55Z','#e3b7b9')+path('M31 62Q50 72 69 62V76H31Z','#f0d2c4')+ellipse(50,50,8,8,'#f8e1ae'),
- pettoy:path('M26 39Q11 23 14 42Q1 56 25 58L72 58Q94 73 88 53Q99 35 73 39Z','#cbab78'),
+ cattoy:ellipse(46,49,27,27,'#c7a0ad')+path('M23 37Q51 35 62 69M28 29Q57 27 70 54M20 49Q40 49 51 75M26 66Q42 35 58 25M38 74Q54 42 69 40M69 59Q86 59 82 76Q78 85 68 82','none','#f2d7de',3),
  petbowl:ellipse(50,42,32,12,'#9fbbb1')+path('M18 42H82L89 73Q50 87 11 73Z','#a8c2ba')+ellipse(50,42,25,8,'#536b5d')+ellipse(50,70,7,6,'#eff0dc'),
  petbrush:rect(45,54,10,33,'#aa9270',4)+rect(25,18,50,43,'#c9ae88',12)+[0,1,2,3].map(i=>path(`M32 ${28+i*8}H68`,'none','#7b7667',3)).join(''),
- petpad:rect(17,20,65,63,'#b5ccd1',3)+rect(24,27,51,49,'#edf1e6',2)+path('M29 37H71M29 49H71M29 61H71M38 30V73M51 30V73M64 30V73','none','#d5dfd8',1),
+ catbed:ellipse(50,60,37,23,'#b89778')+ellipse(50,55,32,20,'#e5cba7')+ellipse(50,56,24,13,'#cba98c')+path('M32 47Q34 31 44 42Q53 35 60 44L68 50','none','#f3dfbf',5),
  eraser:path('M21 38L40 23H78V63L59 78H21Z','#d7a7ac')+path('M21 38H59L78 23V63L59 78V38','#c28c94')+rect(33,38,26,40,'#e9dfce',0)+text('KITA',46,60,22,6),
  ruler:`<g transform="rotate(-32 50 50)">${rect(11,39,78,23,'#dfbd78',2)+Array.from({length:14},(_,i)=>path(`M${16+i*5} 40V${i%2?46:51}`,'none','#8e774e',1)).join('')+text('30 cm',51,58,31,5)}</g>`,
  folder:rect(14,31,72,50,'#c4af7f',4)+path('M14 31V22H42L49 31','#c4af7f')+path('M18 40H89L80 82H14Z','#e5cd94')+tag('DOKUMEN','',40,61),
@@ -96,7 +96,7 @@ export function detailedProductArt(id){
  if(['tape','ducttape'].includes(id))return roll(id==='tape'?'#e6d6b1':'#8f9d98');
  if(['highlighter','markers'].includes(id))return ['#dab774','#a1b5cc','#a3ba8b'].map((c,i)=>rect(19+i*24,30,17,51,c,3)+rect(19+i*24,14,17,25,c,3)+path(`M${21+i*24} 37H${34+i*24}`,'none','#f2f0db',3)).join('');
  if(['facialtissue','wetwipes','screenwipe'].includes(id))return rect(17,34,67,43,'#b3c9bf',7)+path('M35 37L31 15L47 20L61 14L67 36Z','#fcf9ec')+tag(id==='screenwipe'?'LAP SKRIN':id==='wetwipes'?'TISU BASAH':'TISU MUKA','',43,59);
- const food={chips:['KENTANG','#d1ac64',grain()],cracker:['KEROPOK','#adbfa2',grain('#e9d8ab')],cereal:['BIJIRIN','#d6bc7f',grain()],babycereal:['BIJIRIN BAYI','#dfb9b7',grain()],treatscat:['SNEK KUCING','#c4ab81',grain('#a08b62')],treatsdog:['SNEK ANJING','#b7a17d',grain('#a08b62')],cornflour:['TEPUNG JAGUNG','#dacd9a',grain('#f5edcf')],vermicelli:['BIHUN BERAS','#b9cbb8',path('M33 50Q40 42 47 54T66 54M33 59Q42 50 50 61T66 60','none','#e2d4af',3)],chickenstock:['PATI AYAM','#dbbc72',rect(33,48,15,14,'#b39454')+rect(51,52,16,14,'#bf9d5a')],mulch:['SUNGKUPAN','#b6a07e',grain('#8b7254')],herbseeds:['DAUN SUP','#a9c29b',leaf]};
+ const food={chips:['KENTANG','#d1ac64',grain()],cracker:['KEROPOK','#adbfa2',grain('#e9d8ab')],cereal:['BIJIRIN','#d6bc7f',grain()],babycereal:['BIJIRIN BAYI','#dfb9b7',grain()],treatscat:['SNEK KUCING','#c4ab81',grain('#a08b62')],birdseed:['BIJI BURUNG','#b7a17d',grain('#a08b62')],cornflour:['TEPUNG JAGUNG','#dacd9a',grain('#f5edcf')],vermicelli:['BIHUN BERAS','#b9cbb8',path('M33 50Q40 42 47 54T66 54M33 59Q42 50 50 61T66 60','none','#e2d4af',3)],chickenstock:['PATI AYAM','#dbbc72',rect(33,48,15,14,'#b39454')+rect(51,52,16,14,'#bf9d5a')],mulch:['SUNGKUPAN','#b6a07e',grain('#8b7254')],herbseeds:['DAUN SUP','#a9c29b',leaf]};
  if(food[id])return bag(...food[id]);
  const liquids={bleach:['PELUNTUR','#e0e3d1'],floorcleaner:['LANTAI','#b5c8ad'],softener:['PELEMBUT','#c9b6ce'],babyshampoo:['SYAMPU BAYI','#dbc9ad'],babylotion:['LOSYEN BAYI','#d8c4ce'],babysoap:['MANDIAN BAYI','#b7ced2'],bodywash:['MANDIAN','#c5b5ce'],conditioner:['PERAPI','#bed1af'],mouthwash:['MULUT','#a1c6c8'],tehbotol:['TEH AIS','#bc9b6d'],isotonik:['ISOTONIK','#bcd5d8'],sirap:['KORDIAL ROS','#c78d8c'],greentea:['TEH HIJAU','#b2c499'],minumanyogurt:['YOGURT','#e5dec7'],chilisauce:['SOS CILI','#bc745f'],tomatosauce:['SOS TOMATO','#c9836b'],vinegar:['CUKA','#d3d9b9']};
  if(liquids[id])return bottle(...liquids[id]);

@@ -65,7 +65,7 @@ export const PRODUCTS = [
   {"id": "toaster", "name": "Pembakar roti", "price": 7500, "category": "electrical", "color": "#dce2e9"},
   {"id": "dryer", "name": "Pengering rambut", "price": 6500, "category": "electrical", "color": "#dce2e9"},
   {"id": "led", "name": "Lampu LED", "price": 1290, "category": "electrical", "color": "#dce2e9"}
-,{"id": "croissant", "name": "Croissant mentega", "price": 450, "category": "bakery", "color": "#efd8b8"},{"id": "muffin", "name": "Mufin coklat", "price": 380, "category": "bakery", "color": "#efd8b8"},{"id": "oats", "name": "Oat segera", "price": 890, "category": "bakery", "color": "#efd8b8"},{"id": "jam", "name": "Jem strawberi", "price": 650, "category": "bakery", "color": "#efd8b8"},{"id": "nuggets", "name": "Nuget ayam", "price": 1290, "category": "frozen", "color": "#cce5ee"},{"id": "sausage", "name": "Sosej ayam", "price": 790, "category": "frozen", "color": "#cce5ee"},{"id": "dumpling", "name": "Dumpling sayur", "price": 1090, "category": "frozen", "color": "#cce5ee"},{"id": "frozenroti", "name": "Roti paratha beku", "price": 850, "category": "frozen", "color": "#cce5ee"},{"id": "diapers", "name": "Lampin bayi", "price": 2490, "category": "baby", "color": "#f0dce5"},{"id": "babywipes", "name": "Tisu basah bayi", "price": 590, "category": "baby", "color": "#f0dce5"},{"id": "babybottle", "name": "Botol susu bayi", "price": 1590, "category": "baby", "color": "#f0dce5"},{"id": "babyporridge", "name": "Bubur bayi", "price": 1290, "category": "baby", "color": "#f0dce5"},{"id": "catfood", "name": "Makanan kucing", "price": 790, "category": "pets", "color": "#e3dec8"},{"id": "dogfood", "name": "Makanan anjing", "price": 990, "category": "pets", "color": "#e3dec8"},{"id": "catlitter", "name": "Pasir kucing", "price": 1890, "category": "pets", "color": "#e3dec8"},{"id": "petshampoo", "name": "Syampu haiwan", "price": 1290, "category": "pets", "color": "#e3dec8"},{"id": "notebook", "name": "Buku nota", "price": 450, "category": "stationery", "color": "#e1dcf1"},{"id": "pencils", "name": "Pensel 6 batang", "price": 350, "category": "stationery", "color": "#e1dcf1"},{"id": "crayons", "name": "Krayon warna", "price": 690, "category": "stationery", "color": "#e1dcf1"},{"id": "glue", "name": "Gam sekolah", "price": 250, "category": "stationery", "color": "#e1dcf1"},{"id": "soil", "name": "Tanah tanaman", "price": 590, "category": "garden", "color": "#d8e4c7"},{"id": "seeds", "name": "Benih cili", "price": 290, "category": "garden", "color": "#d8e4c7"},{"id": "plantpot", "name": "Pasu bunga", "price": 750, "category": "garden", "color": "#d8e4c7"},{"id": "fertilizer", "name": "Baja organik", "price": 1290, "category": "garden", "color": "#d8e4c7"},{"id": "plaster", "name": "Plaster luka", "price": 390, "category": "health", "color": "#d6e9e3"},{"id": "mask", "name": "Pelitup muka", "price": 590, "category": "health", "color": "#d6e9e3"},{"id": "sanitizer", "name": "Pensanitasi tangan", "price": 650, "category": "health", "color": "#d6e9e3"},{"id": "thermometer", "name": "Termometer digital", "price": 1890, "category": "health", "color": "#d6e9e3"},
+,{"id": "croissant", "name": "Croissant mentega", "price": 450, "category": "bakery", "color": "#efd8b8"},{"id": "muffin", "name": "Mufin coklat", "price": 380, "category": "bakery", "color": "#efd8b8"},{"id": "oats", "name": "Oat segera", "price": 890, "category": "bakery", "color": "#efd8b8"},{"id": "jam", "name": "Jem strawberi", "price": 650, "category": "bakery", "color": "#efd8b8"},{"id": "nuggets", "name": "Nuget ayam", "price": 1290, "category": "frozen", "color": "#cce5ee"},{"id": "sausage", "name": "Sosej ayam", "price": 790, "category": "frozen", "color": "#cce5ee"},{"id": "dumpling", "name": "Dumpling sayur", "price": 1090, "category": "frozen", "color": "#cce5ee"},{"id": "frozenroti", "name": "Roti paratha beku", "price": 850, "category": "frozen", "color": "#cce5ee"},{"id": "diapers", "name": "Lampin bayi", "price": 2490, "category": "baby", "color": "#f0dce5"},{"id": "babywipes", "name": "Tisu basah bayi", "price": 590, "category": "baby", "color": "#f0dce5"},{"id": "babybottle", "name": "Botol susu bayi", "price": 1590, "category": "baby", "color": "#f0dce5"},{"id": "babyporridge", "name": "Bubur bayi", "price": 1290, "category": "baby", "color": "#f0dce5"},{"id": "catfood", "name": "Makanan kucing", "price": 790, "category": "pets", "color": "#e3dec8"},{"id": "fishfood", "name": "Makanan ikan", "price": 990, "category": "pets", "color": "#e3dec8"},{"id": "catlitter", "name": "Pasir kucing", "price": 1890, "category": "pets", "color": "#e3dec8"},{"id": "petshampoo", "name": "Syampu kucing", "price": 1290, "category": "pets", "color": "#e3dec8"},{"id": "notebook", "name": "Buku nota", "price": 450, "category": "stationery", "color": "#e1dcf1"},{"id": "pencils", "name": "Pensel 6 batang", "price": 350, "category": "stationery", "color": "#e1dcf1"},{"id": "crayons", "name": "Krayon warna", "price": 690, "category": "stationery", "color": "#e1dcf1"},{"id": "glue", "name": "Gam sekolah", "price": 250, "category": "stationery", "color": "#e1dcf1"},{"id": "soil", "name": "Tanah tanaman", "price": 590, "category": "garden", "color": "#d8e4c7"},{"id": "seeds", "name": "Benih cili", "price": 290, "category": "garden", "color": "#d8e4c7"},{"id": "plantpot", "name": "Pasu bunga", "price": 750, "category": "garden", "color": "#d8e4c7"},{"id": "fertilizer", "name": "Baja organik", "price": 1290, "category": "garden", "color": "#d8e4c7"},{"id": "plaster", "name": "Plaster luka", "price": 390, "category": "health", "color": "#d6e9e3"},{"id": "mask", "name": "Pelitup muka", "price": 590, "category": "health", "color": "#d6e9e3"},{"id": "sanitizer", "name": "Pensanitasi tangan", "price": 650, "category": "health", "color": "#d6e9e3"},{"id": "thermometer", "name": "Termometer digital", "price": 1890, "category": "health", "color": "#d6e9e3"},
 {"id":"pineapple","name":"Nanas madu","price":850,"category":"fresh","color":"#dbe9ce","weighted":true} ,
 {"id":"papaya","name":"Betik masak","price":620,"category":"fresh","color":"#dbe9ce","weighted":true} ,
 {"id":"mango","name":"Mangga harum manis","price":1590,"category":"fresh","color":"#dbe9ce","weighted":true} ,
@@ -109,11 +109,11 @@ export const PRODUCTS = [
 {"id":"bib","name":"Bib makan bayi","price":790,"category":"baby","color":"#f0dce5"} ,
 {"id":"babycereal","name":"Bijirin bayi","price":1190,"category":"baby","color":"#f0dce5"} ,
 {"id":"treatscat","name":"Snek kucing","price":690,"category":"pets","color":"#e3dec8"} ,
-{"id":"treatsdog","name":"Snek anjing","price":650,"category":"pets","color":"#e3dec8"} ,
-{"id":"pettoy","name":"Mainan haiwan","price":990,"category":"pets","color":"#e3dec8"} ,
+{"id":"birdseed","name":"Biji makanan burung","price":650,"category":"pets","color":"#e3dec8"} ,
+{"id":"cattoy","name":"Bola benang kucing","price":990,"category":"pets","color":"#e3dec8"} ,
 {"id":"petbowl","name":"Mangkuk makanan haiwan","price":1250,"category":"pets","color":"#e3dec8"} ,
 {"id":"petbrush","name":"Berus bulu haiwan","price":790,"category":"pets","color":"#e3dec8"} ,
-{"id":"petpad","name":"Alas latihan haiwan","price":1690,"category":"pets","color":"#e3dec8"} ,
+{"id":"catbed","name":"Alas tidur kucing","price":1690,"category":"pets","color":"#e3dec8"} ,
 {"id":"eraser","name":"Pemadam getah","price":120,"category":"stationery","color":"#e1dcf1"} ,
 {"id":"ruler","name":"Pembaris 30 cm","price":250,"category":"stationery","color":"#e1dcf1"} ,
 {"id":"highlighter","name":"Pen penanda","price":480,"category":"stationery","color":"#e1dcf1"} ,
@@ -705,9 +705,9 @@ export function netTotal(customer){return Math.max(0,customer.total-(customer.di
 export function amountDue(customer){const total=Math.max(0,netTotal(customer)-kasihContribution(customer));return customer.method==='cash'&&customer.kind!=='return'?Math.round(total/5)*5:total}
 export function tenderFor(total){return [500,1000,2000,5000,10000,20000].find(v=>v>=total)||Math.ceil(total/10000)*10000}
 export function changeParts(cents){const parts=[];for(const value of DENOMS){const count=Math.floor(cents/value);if(count)parts.push({value,count});cents%=value}return {parts,remainder:cents}}
-// One 60-second Rush Hour every two game days (2,4,6...), measured in active REAL seconds.
+// One 30-second Rush Hour every two game days (2,4,6...), measured in active REAL seconds.
 // Pause and backgrounding do not consume the countdown; state is persisted in session.
-export const RUSH_DURATION_SECONDS=60;
+export const RUSH_DURATION_SECONDS=30;
 export const RUSH_PATIENCE_SECONDS=10;
 export function rushHourActive(day,session){
  return Number(day)>=1&&!!session&&!!session.rushStarted&&!session.rushCompleted&&Number(session.rushSecondsRemaining)>0;
@@ -728,7 +728,7 @@ export function shouldStartRushHour(session,day){
 }
 export function startRushHour(session,day){
  if(!shouldStartRushHour(session,day))return false;
- session.rushStarted=true;session.rushCompleted=false;session.rushSecondsRemaining=RUSH_DURATION_SECONDS;
+ session.rushStarted=true;session.rushCompleted=false;session.rushSecondsRemaining=RUSH_DURATION_SECONDS;session.rushDurationSeconds=RUSH_DURATION_SECONDS;session.rushDurationVersion=68;
  return true;
 }
 export function tickRushHour(session,seconds){
@@ -887,6 +887,12 @@ export function takeStock(p,items){if(!stockForBasket(p,items))return false;for(
 export function receiveStoreCash(p,cents){const repayment=Math.min(p.supplierDebt||0,Math.max(0,Math.floor(cents*.3)));p.supplierDebt-=repayment;p.wallet+=cents-repayment;return repayment}
 export function ensureShift(s){if(!s)return;s.stars=Number.isInteger(s.stars)?Math.max(0,Math.min(3,s.stars)):3;s.clockMinutes=Number.isFinite(s.clockMinutes)?s.clockMinutes:480;s.overpaid=Math.max(0,s.overpaid||0);s.expenses=s.expenses||0;s.refunds=s.refunds||0;s.returnCount=s.returnCount||0;s.waitSeconds=Math.max(0,s.waitSeconds||0);
  s.rushStarted=!!s.rushStarted;s.rushCompleted=!!s.rushCompleted;
+ if(s.rushStarted&&!s.rushCompleted&&s.rushDurationVersion!==68){
+  const elapsed=Math.max(0,(Number(s.rushDurationSeconds)||60)-(Number(s.rushSecondsRemaining)||0));
+  s.rushSecondsRemaining=Math.max(0,RUSH_DURATION_SECONDS-elapsed);
+  if(s.rushSecondsRemaining===0){s.rushReportPending=true;s.rushReportShown=false;}
+ }
+ s.rushDurationSeconds=RUSH_DURATION_SECONDS;s.rushDurationVersion=68;
  s.rushSecondsRemaining=s.rushCompleted?0:Math.max(0,Math.min(RUSH_DURATION_SECONDS,Number(s.rushSecondsRemaining)||0));
  if(s.rushStarted&&s.rushSecondsRemaining<=0)s.rushCompleted=true;
  s.rushBonus=Math.max(0,Math.floor(Number(s.rushBonus)||0));s.rushSales=Math.max(0,Math.floor(Number(s.rushSales)||0));

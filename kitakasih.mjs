@@ -1,11 +1,11 @@
 // Fictional in-game aid. All amounts are integer sen; no real identity data.
 export const KASIH_PRODUCTS = new Set(['milk','bread','eggs','rice','noodles','cookies','soap','coffee','water','curry','detergent','oil','sugar','flour','soy','sardine','tea','malt','salt','condensed','tissue','toothpaste','shampoo','dishsoap']);
 export const kasihEligible = item => KASIH_PRODUCTS.has(item.id);
-export function kasihAccount(store,person){
+export function kasihAccount(store,person,rng=Math.random){
  store.kitaKasih??={accounts:{},receipts:[]};
  store.kitaKasih.accounts??={};store.kitaKasih.receipts??=[];
  const key=person.id;
- return store.kitaKasih.accounts[key]??=( {balance:5000,card:'KK-'+String(Object.keys(store.kitaKasih.accounts).length+1).padStart(5,'0')} );
+ return store.kitaKasih.accounts[key]??=( {balance:1000+Math.min(18,Math.max(0,Math.floor(rng()*19)))*500,card:'KK-'+String(Object.keys(store.kitaKasih.accounts).length+1).padStart(5,'0')} );
 }
 export function kasihQuote(customer){
  const price=i=>i.weighted?Math.round(i.price*i.grams/1000):i.price;
