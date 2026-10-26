@@ -693,7 +693,8 @@ export const UPGRADES = [
   {id:'conveyor',name:'Motor conveyor',icon:'arrow',cost:1500,max:5,desc:'Barang maju dan tali sawat bergerak lebih pantas.'},
   {id:'scale',name:'Penimbang pantas',icon:'scale',cost:1800,max:5,desc:'Bacaan berat stabil lebih cepat.'},
   {id:'scanner',name:'Scanner pantas',icon:'scan',cost:2000,max:5,desc:'Scan barang lebih pantas.'},
-  {id:'comfort',name:'Pendingin hawa',icon:'snow',cost:2500,max:5,desc:'Pelanggan lebih sabar (+15 saat).'},
+  {id:'riderPatience',name:'Kesabaran KitaFood',icon:'delivery',cost:2000,max:5,desc:'Rider menunggu +5 saat setiap tahap. 30 → 55 saat.'},
+  {id:'comfort',name:'Pendingin hawa',icon:'snow',cost:2500,max:5,desc:'Pelanggan biasa lebih sabar (+5 saat setiap tahap).'},
   {id:'tips',name:'Kaunter premium',icon:'spark',cost:3000,max:5,desc:'Tip pelanggan bertambah 25%.'}
 ];
 export const DENOMS = [10000,5000,2000,1000,500,100,50,20,10,5];
@@ -739,7 +740,7 @@ export function tickRushHour(session,seconds){
 }
 // Each day increases the required number of customers; maximum 20 per shift.
 export function dayTarget(day){return Math.min(20,4+Math.max(1,Math.floor(Number(day)||1)))}
-export function createProgress(){return {version:1,day:1,wallet:0,lifetime:0,served:0,bestCombo:0,upgrades:{scanner:0,scale:0,conveyor:0,comfort:0,tips:0,storage:0,card:0,qr:0,rushBoost:0},history:[],unlocked:['essentials'],settings:{motion:true,theme:'mint',volume:.6,music:true,musicVolume:.2,musicTrack:'random'}}}
+export function createProgress(){return {version:1,day:1,wallet:0,lifetime:0,served:0,bestCombo:0,upgrades:{scanner:0,scale:0,conveyor:0,comfort:0,riderPatience:0,tips:0,storage:0,card:0,qr:0,rushBoost:0},history:[],unlocked:['essentials'],settings:{motion:true,theme:'mint',volume:.6,music:true,musicVolume:.2,musicTrack:'random'}}}
 export function restoreProgress(raw){try{const p=JSON.parse(raw);if(p?.version!==1||!Number.isInteger(p.day)||p.day<1||!Number.isFinite(p.wallet))return createProgress();return {...createProgress(),...p,upgrades:{...createProgress().upgrades,...p.upgrades},history:Array.isArray(p.history)?p.history.slice(-20):[],settings:{...createProgress().settings,...p.settings},unlocked:Array.isArray(p.unlocked)?[...new Set(['essentials',...p.unlocked.filter(id=>CATEGORIES.some(c=>c.id===id))])]:['essentials']}}catch{return createProgress()}}
 export function randomManualCode(rng=Math.random){return String(1000+Math.floor(rng()*9000))}
 export function availableProducts(unlocked=['essentials']){return PRODUCTS.filter(p=>unlocked.includes(p.category))}
@@ -769,7 +770,7 @@ export function makeCustomer(day,index,rng=Math.random,options={}){
  const fail=challenges&&method==='card'&&day>=11&&rng()<declineChance;
  const declineRoll=rng();
  const cardDeclineReason=fail?(declineRoll<.45?'insufficient':declineRoll<.75?'technical':'expired'):null;
- return {person,items,method,willTip:rng()<.4,dialogueSeed:Math.floor(rng()*10000),cardFailure:false,cardDeclineReason,cardDeclineHandled:false,total:basketTotal(items),tender:tenderFor(basketTotal(items)),patience:20,patienceRulesVersion:46,elapsed:0,kind,hasCoupon:index%3===1,couponApplied:false,discount:0,requiresPin:method==='card'&&rng()<.5,cardPin:String(1000+Math.floor(rng()*9000)),cardStage:'ready',pinInput:''};
+ return {person,items,method,willTip:rng()<.4,dialogueSeed:Math.floor(rng()*10000),cardFailure:false,cardDeclineReason,cardDeclineHandled:false,total:basketTotal(items),tender:tenderFor(basketTotal(items)),patience:20,patienceRulesVersion:65,elapsed:0,kind,hasCoupon:index%3===1,couponApplied:false,discount:0,requiresPin:method==='card'&&rng()<.5,cardPin:String(1000+Math.floor(rng()*9000)),cardStage:'ready',pinInput:''};
 }
 export function unlockCategory(progress,id){
  const c=CATEGORIES.find(c=>c.id===id);

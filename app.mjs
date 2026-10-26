@@ -28,7 +28,7 @@ let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=nu
 let chaChingSequence=0,chaChingFallbackNodes=[];
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-26-v64-kitakasih';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-27-v65-rider-qr';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
@@ -194,7 +194,7 @@ function newCustomer(){
  const selected=makeCustomer(mode==='practice'?Math.max(2,progress.day):progress.day,session.index,Math.random,{seen:session.seenPeople,forcedPersonId:featuredId,paymentMethods:availablePaymentMethods(progress.upgrades,mode==='practice'),upgrades:effectiveRushMachineUpgrades(progress.upgrades,rush),challenges:mode==='career',unlocked:mode==='practice'?CATEGORIES.map(c=>c.id):progress.unlocked,stock:mode==='practice'||rush?null:progress.inventory});
  if(!selected){session.practiceDay=(session.practiceDay||1)+1;session.seenPeople=[];toast('Syif latihan baharu bermula.');newCustomer();return}
  customer=selected;if(rush){customer.rushUnlimited=true;customer.rushCustomer=true;}applyMachineSpeeds();prepareReturnCustomer();prepareKasihCustomer(rush);session.seenPeople.push(customer.person.id);
- customer.patience+=(progress.upgrades.comfort||0)*15;
+ customer.patience+=(progress.upgrades.comfort||0)*5;
  // Even a level-5 comfort upgrade cannot override the 10-second Rush Hour challenge.
  if(rush)applyRushPatience(customer);
  $('customerArt').className='customer arrive';
@@ -384,7 +384,7 @@ function showShop(returnTo='game'){
  openModal('shop',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">KEMBANGKAN PASAR MINI ANDA</div><h2>Naik Taraf & Kategori</h2></div><button class="icon-btn" id="closeShop" aria-label="Tutup">${icon('close')}</button></div><div class="shop-wallet"><small>Duit kedai anda</small><b>${money(progress.wallet)}</b></div><h3 class="shop-section-title">Buka kelas barangan</h3><div class="category-shop">${CATEGORIES.map(c=>{const owned=progress.unlocked.includes(c.id),count=PRODUCTS.filter(p=>p.category===c.id).length;return `<div class="category-card ${owned?'owned':''}"><div class="category-art">${productArt(c.art)}<span>${count} barang</span></div><div><h3>${c.name}</h3><p>Kelas ini mengandungi ${count} jenis barangan. ${owned?'Semua barangan sudah tersedia.':'Buka kelas untuk menjual barangan ini.'}</p></div><button data-category="${c.id}" class="secondary-btn" ${owned||progress.wallet<c.cost?'disabled':''}>${owned?'✓ Dibuka':money(c.cost)}</button><button type="button" class="secondary-btn category-preview-open" data-preview-category="${c.id}" aria-label="Lihat senarai barangan ${c.name}">${icon('book')} Lihat senarai barangan (${count})</button></div>`}).join('')}</div>${paymentUpgradeCards()}<h3 class="shop-section-title">Peralatan kedai & bonus Rush Hour</h3>${UPGRADES.filter(u=>u.type!=='payment').map(u=>{const level=progress.upgrades[u.id]||0,cost=u.cost*(level+1),maxed=level>=u.max;return `<div class="upgrade-row"><span class="upgrade-icon">${icon(u.icon)}</span><div class="upgrade-info"><b>${u.name}</b><span class="level-dots">${'●'.repeat(level)+'○'.repeat(u.max-level)}</span><small>${u.desc}${machineUpgradeInfo(u.id,level,u.max)}</small></div><button class="primary-btn" data-upgrade="${u.id}" ${maxed||progress.wallet<cost?'disabled':''}>${maxed?'Maksimum':money(cost)}</button></div>`}).join('')}</div>`);
  const back=()=>destination==='summary'?showSummary():closeModal();$('closeShop').onclick=back;
  $('modalContent').querySelectorAll('[data-preview-category]').forEach(b=>b.onclick=()=>showCategoryProducts(b.dataset.previewCategory));
- $('modalContent').querySelectorAll('[data-upgrade]').forEach(b=>b.onclick=()=>{{const previous=progress.upgrades[b.dataset.upgrade]||0;if(buyUpgrade(progress,b.dataset.upgrade)){if(b.dataset.upgrade==='comfort'&&customer)customer.patience+=15;save();if(cloud?.getUser?.())cloud.flush().catch(()=>toast('Upgrade BELUM disimpan dalam Firebase. Jangan log keluar dahulu.',true));renderHeader();beep('success');showShop(destination);if(['card','qr'].includes(b.dataset.upgrade))toast(previous===0?'Bayaran '+(b.dataset.upgrade==='card'?'kad':'QR')+' dibuka untuk pelanggan seterusnya!':'Peralatan pembayaran dinaik taraf ke tahap '+(previous+1));else if(b.dataset.upgrade==='storage')toast('Kapasiti stor kini '+stockCapacity(progress)+' unit / kg setiap produk.')}}});
+ $('modalContent').querySelectorAll('[data-upgrade]').forEach(b=>b.onclick=()=>{{const previous=progress.upgrades[b.dataset.upgrade]||0;if(buyUpgrade(progress,b.dataset.upgrade)){if(b.dataset.upgrade==='comfort'&&customer&&customer.kind!=='kitafood'&&!customer.rushCustomer&&customer.rushOriginalPatience===undefined)customer.patience+=5;if(b.dataset.upgrade==='riderPatience'){delivery?.extendPatience(5);if(customer?.kind==='kitafood')customer.patience=kitaFoodOrderState(customer.orderId)?.timeLimit||customer.patience;}save();if(cloud?.getUser?.())cloud.flush().catch(()=>toast('Upgrade BELUM disimpan dalam Firebase. Jangan log keluar dahulu.',true));renderHeader();beep('success');showShop(destination);if(['card','qr'].includes(b.dataset.upgrade))toast(previous===0?'Bayaran '+(b.dataset.upgrade==='card'?'kad':'QR')+' dibuka untuk pelanggan seterusnya!':'Peralatan pembayaran dinaik taraf ke tahap '+(previous+1));else if(b.dataset.upgrade==='storage')toast('Kapasiti stor kini '+stockCapacity(progress)+' unit / kg setiap produk.')}}});
  $('modalContent').querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>{if(unlockCategory(progress,b.dataset.category)){save();if(cloud?.getUser?.())cloud.flush().catch(()=>toast('Kategori BELUM disimpan dalam Firebase. Jangan log keluar dahulu.',true));renderHeader();initIllustrations();showShop(destination);beep('success');confetti(18);toast('Kategori '+CATEGORIES.find(c=>c.id===b.dataset.category).name+' dibuka!')}});
 }
 // Paparan produk di dialog berasingan supaya kategori tidak lagi mengembang di halaman Upgrade.
@@ -851,12 +851,12 @@ function normalizeSession(){
  if(customer.kind==='kitafood'){session.seenPeople??=[];return;}
  // Migrate a current customer from older saves to the new 20-second base.
  // Keep their proportion of time elapsed, and never override Rush Hour.
- if(mode==='career'&&phase==='scan'&&!customer.rushCustomer&&customer.rushOriginalPatience===undefined&&customer.patienceRulesVersion!==46){
+ if(mode==='career'&&['scan','offer','change'].includes(phase)&&!customer.rushCustomer&&customer.rushOriginalPatience===undefined&&customer.patienceRulesVersion!==65){
   const oldTotal=Math.max(1,Number(customer.patience)||20);
   const progressRatio=Math.max(0,Math.min(1,(Number(customer.elapsed)||0)/oldTotal));
-  customer.patience=20+Math.max(0,Number(progress.upgrades?.comfort)||0)*15;
+  customer.patience=20+Math.max(0,Math.min(5,Number(progress.upgrades?.comfort)||0))*5+(customer.kasih?15:0);
   customer.elapsed=Math.min(customer.patience-1,Math.round(progressRatio*customer.patience));
-  customer.patienceRulesVersion=46;
+  customer.patienceRulesVersion=65;
  }
 
  if(!Array.isArray(customer.items)){customer=null;phase='waiting';session.customer=null;session.phase='waiting';session.waitSeconds=0;return;}
@@ -880,7 +880,7 @@ function cashArtStack(amount){return changeParts(amount).parts.flatMap(p=>Array.
 function renderDigital(){
  if(customer.method==='card'){renderCardTerminal();return}
  const stage=customer.cardStage||'ready',working=stage==='processing';
- $('paymentArea').innerHTML=`<div id="payDevice" class="payment-scene qr-scene qr-balanced stage-${stage}"><div class="customer-phone iphone-pro-pay"><div class="iphone18-sidekey" aria-hidden="true"></div><div class="phone-camera iphone18-island" aria-hidden="true"></div><div class="iphone18-status" aria-hidden="true"><span>9:41</span><span>▰ ▰ ▴</span></div><div class="iphone18-wallet-head"><span class="iphone18-paymark">K</span><div><small class="qr-wallet-brand">KITA PAY</small><b>${customer.person.name}</b></div></div><small class="iphone18-amount-label">JUMLAH BAYARAN</small><span class="iphone18-amount">${money(amountDue(customer))}</span><button class="phone-qr" id="qrTarget" aria-label="Imbas kod QR pada telefon" ${working?'disabled':''}>${qrArt()}<i class="qr-scan-line"></i></button><small class="qr-wallet-status">${working?'Mengesahkan pembayaran…':'Imbas kod untuk bayar'}</small><div class="iphone18-home" aria-hidden="true"></div></div><div class="qr-hand-scanner qr-pro-scanner" id="qrScanner" role="button" tabindex="0" aria-label="Ambil scanner kemudian imbas QR"><div class="qr-pro-lens" aria-hidden="true">${icon('scan')}<i></i></div><div class="qr-pro-led" aria-hidden="true"></div><span class="qr-scanner-label">IMBAS QR</span></div><div class="qr-light-cone"></div></div><p class="payment-hint qr-instructions">${working?'Mengesahkan bayaran…':'Seret scanner ke kod QR pada telefon, atau tekan scanner kemudian tekan kod QR.'}</p>`;
+ $('paymentArea').innerHTML=`<div id="payDevice" class="payment-scene qr-scene kk-qr-stage stage-${stage}"><div class="kk-qr-phone"><div class="kk-phone-island" aria-hidden="true"></div><div class="kk-phone-status"><span>9:41</span><span>▰ ▰</span></div><div class="kk-wallet-brand"><span>K</span><div><small>KITA PAY</small><b>${customer.person.name}</b></div></div><small class="kk-amount-label">JUMLAH BAYARAN</small><strong class="kk-amount">${money(amountDue(customer))}</strong><button class="kk-qr-code" id="qrTarget" aria-label="Imbas kod QR pada telefon" ${working?'disabled':''}>${qrArt()}<i></i></button><span class="kk-wallet-status">${working?'Mengesahkan bayaran…':'Imbas kod untuk bayar'}</span><div class="kk-home-indicator"></div></div>${working?'':`<button type="button" class="kk-qr-reader" id="qrScanner" aria-label="Seret scanner ke kod QR atau tekan untuk mengambilnya"><svg viewBox="0 0 108 164" aria-hidden="true"><defs><linearGradient id="kkShell" x2="1" y2="1"><stop stop-color="#52656b"/><stop offset=".48" stop-color="#25383f"/><stop offset="1" stop-color="#12262c"/></linearGradient><linearGradient id="kkGrip" x2="1"><stop stop-color="#172b31"/><stop offset=".5" stop-color="#3c5257"/><stop offset="1" stop-color="#20363c"/></linearGradient></defs><path d="M38 74h36l-5 65q-1 12-14 12H44q-12-1-10-14Z" fill="url(#kkGrip)" stroke="#71858a" stroke-width="2"/><path d="M39 92h29m-30 9h29m-29 9h28m-28 9h27m-27 9h26" stroke="#111f24" stroke-width="3" opacity=".55"/><rect x="8" y="8" width="92" height="76" rx="22" fill="url(#kkShell)" stroke="#8c9d9e" stroke-width="2"/><rect x="17" y="17" width="74" height="35" rx="11" fill="#0b1b23" stroke="#597982"/><path d="M23 23h59" stroke="#9ad7de" stroke-width="3" opacity=".6"/><path d="M24 39h60" stroke="#f17b60" stroke-width="2"/><path d="M29 30v14m7-14v14m4-14v14m7-14v14m8-14v14m4-14v14m7-14v14m6-14v14" stroke="#91c5ce" opacity=".45"/><circle class="kk-reader-led" cx="79" cy="65" r="4" fill="#80d7b0"/><text x="48" y="68" font-size="8" font-weight="700" letter-spacing="1" fill="#dceae8" text-anchor="middle">KITA SCAN</text></svg><span>AMBIL & IMBAS</span></button>`}</div><p class="payment-hint kk-qr-hint">${working?'Kod dibaca. Scanner disimpan secara automatik.':'Seret scanner ke kod QR, atau tekan scanner kemudian tekan kod QR.'}</p>`;
  if(!working)bindQrScanner();
 }
 const CARD_DECLINE_MESSAGES={
@@ -961,6 +961,8 @@ function applyMachineSpeeds(){
  $('scaleZone').setAttribute('title','Penimbang · '+speed.weighMs/1000+' saat');
 }
 function machineUpgradeInfo(id,level,max){
+ if(id==='comfort')return `<span class="machine-speed">Kesabaran biasa: ${20+5*level}s → ${20+5*Math.min(max,level+1)}s</span>`;
+ if(id==='riderPatience')return `<span class="machine-speed">Masa rider: ${30+5*level}s → ${30+5*Math.min(max,level+1)}s</span>`;
  if(id==='rushBoost')return `<span class="machine-speed">Bonus Rush Hour: ×${rushHourMultiplier(progress.upgrades).toFixed(1)} → ×${rushHourMultiplier({...progress.upgrades,rushBoost:Math.min(max,level+1)}).toFixed(1)} · ${level>=max?'Maksimum':'Tambah +0.3 setiap tahap'}</span>`;
  if(id==='storage')return `<span class="machine-speed">Had stok: ${stockCapacity(progress)} → ${level<max?stockCapacity({upgrades:{storage:level+1}}):stockCapacity(progress)} unit/kg</span>`;
  if(!['scanner','scale','conveyor'].includes(id))return '';
@@ -988,14 +990,15 @@ function scanQrTarget(){
  customer.qrScanned=true;startDigital();
 }
 function bindQrScanner(){
- const scanner=$('qrScanner'),target=$('qrTarget');let origin=null,moved=false;
- target.onclick=()=>{if(!customer.qrArmed){toast('Ambil scanner dahulu, kemudian tekan kod QR.');return}scanQrTarget()};
- scanner.onclick=()=>{if(!moved)armQrScanner()};
- scanner.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();armQrScanner()}};
- scanner.onpointerdown=e=>{if(paused||busy||e.button>0)return;origin={x:e.clientX,y:e.clientY};moved=false;scanner.setPointerCapture(e.pointerId);armQrScanner();e.preventDefault()};
- scanner.onpointermove=e=>{if(!origin)return;const dx=e.clientX-origin.x,dy=e.clientY-origin.y;moved||=Math.hypot(dx,dy)>7;scanner.style.transform=`translate(${dx}px,${dy}px) rotate(-22deg)`;target.classList.toggle('qr-target-hit',inside(e,target.getBoundingClientRect()))};
- scanner.onpointerup=e=>{if(!origin)return;origin=null;scanner.style.transform='';target.classList.remove('qr-target-hit');if(moved&&inside(e,target.getBoundingClientRect()))scanQrTarget();else if(moved)toast('Halakan scanner tepat pada kod QR.');};
- scanner.onpointercancel=()=>{origin=null;moved=false;scanner.style.transform='';target.classList.remove('qr-target-hit')};
+ const scanner=$('qrScanner'),target=$('qrTarget'),transaction=customer;let dragState=null,suppressClick=false;
+ const allowed=()=>transaction===customer&&!paused&&!busy&&phase==='offer'&&customer.method==='qr';
+ const reset=()=>{dragState=null;scanner.style.removeProperty('--qr-dx');scanner.style.removeProperty('--qr-dy');scanner.classList.remove('dragging');target.classList.remove('qr-target-hit')};
+ target.onclick=()=>{if(!allowed())return;if(!customer.qrArmed){toast('Ambil scanner dahulu, kemudian tekan kod QR.');return}scanQrTarget()};
+ scanner.onclick=()=>{if(suppressClick){suppressClick=false;return}if(allowed())armQrScanner()};
+ scanner.onpointerdown=e=>{if(!allowed()||e.button>0)return;const rect=scanner.getBoundingClientRect();dragState={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false,scale:rect.width/scanner.offsetWidth||1};suppressClick=false;scanner.setPointerCapture(e.pointerId);scanner.classList.add('dragging');armQrScanner();e.preventDefault()};
+ scanner.onpointermove=e=>{const d=dragState;if(!d||e.pointerId!==d.id)return;if(!allowed()){reset();return}const dx=e.clientX-d.x,dy=e.clientY-d.y;d.moved||=Math.hypot(dx,dy)>6;scanner.style.setProperty('--qr-dx',dx/d.scale+'px');scanner.style.setProperty('--qr-dy',dy/d.scale+'px');target.classList.toggle('qr-target-hit',inside(e,target.getBoundingClientRect()))};
+ scanner.onpointerup=e=>{const d=dragState;if(!d||e.pointerId!==d.id)return;const hit=inside(e,target.getBoundingClientRect()),valid=allowed();suppressClick=d.moved;reset();if(valid&&d.moved&&hit)scanQrTarget();else if(valid&&d.moved)toast('Halakan scanner tepat pada kod QR.')};
+ scanner.onpointercancel=reset;scanner.onlostpointercapture=()=>{if(dragState)reset()};
 }
 
 function setScaleReading(product,fraction=1){const grams=product?Math.max(0,Math.round(product.grams*fraction)):0;$('weightDisplay').textContent=(grams/1000).toFixed(3)}

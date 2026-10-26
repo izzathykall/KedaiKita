@@ -425,421 +425,6 @@
     });
   }
 
-  // delivery.mjs
-  function createDelivery({ getProgress, getSession, getMode, save: save2, notify, money: money2, products, categories = [], productArt: productArt2, icon: icon2, openModal: openModal2, closeModal: closeModal2, receiveCash, onFinish = () => {
-  }, isClockPaused = () => false }) {
-    const safe = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-    const people = [
-      { name: "Amir", skin: "#cf9570", hair: "#322d2a", shirt: "#27785d", scarf: false },
-      { name: "Sofia", skin: "#ddad89", hair: "#3a3030", shirt: "#27785d", scarf: true, scarfColor: "#32645d" },
-      { name: "Hafiz", skin: "#bd835f", hair: "#272827", shirt: "#27785d", scarf: false },
-      { name: "Nadia", skin: "#cf987c", hair: "#44352f", shirt: "#27785d", scarf: true, scarfColor: "#337768" },
-      { name: "Faris", skin: "#d09d78", hair: "#292d2f", shirt: "#27785d", scarf: false }
-    ];
-    const pmap = new Map(products.map((x) => [x.id, x]));
-    const foodCategories = /* @__PURE__ */ new Set(["essentials", "snacks", "meals", "bakery", "frozen", "beverages", "pantry", "kuih"]);
-    const statsDefault = () => ({ completed: 0, cancelled: 0, revenue: 0, bonus: 0, late: 0, starsTotal: 0 });
-    let activeId = null, stage = "list", search = "", filter = "all", lastPicked = null, clockHandle = null, lastSavedAt = 0, resultPending = null;
-    const RIDER_TIME_LIMIT = 30, URGENT_TIME_LIMIT = 10;
-    const timeLimit = (day) => RIDER_TIME_LIMIT;
-    const pending = (d) => d.orders.filter((o) => ["new", "packing", "ready"].includes(o.status) && Array.isArray(o.items));
-    const picked = (o) => o.items.filter((x) => x.packed).length;
-    const ready = (o) => !!o.items.length && o.items.every((x) => x.packed);
-    const due = remainingSeconds;
-    const clockText2 = (o) => `${Math.floor(due(o) / 60)}:${String(due(o) % 60).padStart(2, "0")}`;
-    const total = (o) => o.items.reduce((n, x) => n + (Number(x.price) || pmap.get(x.id)?.price || 0), 0);
-    const unlocked = () => getMode() === "career" && getProgress().day >= 3;
-    function ensure() {
-      const p = getProgress();
-      if (!p.delivery || typeof p.delivery !== "object") p.delivery = { orders: [], nextId: 1, stats: statsDefault(), upgrades: { rack: 0 } };
-      const d = p.delivery;
-      if (!Array.isArray(d.orders)) d.orders = [];
-      d.nextId = Math.max(1, Math.floor(Number(d.nextId) || 1));
-      d.stats = { ...statsDefault(), ...d.stats || {} };
-      if (!d.upgrades) d.upgrades = { rack: 0 };
-      for (const o of d.orders) {
-        if (!Array.isArray(o.items)) o.items = [];
-        if (o.items.length && ready(o) && ["new", "packing"].includes(o.status)) o.status = "ready";
-        o.platform = "KitaFood";
-        o.timeLimit ??= timeLimit(o.day || p.day);
-        o.elapsedSeconds = Number(o.elapsedSeconds) || 0;
-        if (["new", "packing", "ready"].includes(o.status)) {
-          if (!Number.isFinite(o.deadlineAt)) o.deadlineAt = Date.now() + Math.max(0, o.timeLimit - o.elapsedSeconds) * 1e3;
-          o.elapsedSeconds = Math.max(0, o.timeLimit - remainingMs(o) / 1e3);
-        }
-      }
-      syncClock();
-      updateIndicator(d);
-      if (pending(d).length) startClock();
-      else stopClock();
-      return d;
-    }
-    function updateIndicator(d) {
-      const b = document.getElementById("deliveryBtn");
-      if (!b) return;
-      const orders = pending(d), n = orders.length;
-      b.dataset.pending = String(n);
-      b.classList.toggle("delivery-alert", n > 0);
-      b.querySelector(".kf-nav-timer")?.remove();
-      b.title = n ? `KitaFood \xB7 ${n} pesanan aktif` : "KitaFood";
-      b.setAttribute("aria-label", n ? `KitaFood, ${n} pesanan aktif` : "KitaFood");
-    }
-    function personFor(order) {
-      const normalized = people.find((x) => x.name === order?.rider) || people[0];
-      return { ...normalized, id: "rider-kita-food", role: "KitaFood \xB7 Rakan Penghantar" };
-    }
-    function newOrder() {
-      if (!unlocked()) return null;
-      const p = getProgress(), d = ensure();
-      if (pending(d).length) return pending(d)[0];
-      const pool = products.filter((x) => foodCategories.has(x.category) && p.unlocked.includes(x.category) && !x.weighted && (Number(p.inventory?.[x.id]) || 0) > 0);
-      if (pool.length < 2) return null;
-      const count = Math.min(pool.length, Math.min(6, 2 + Math.floor((p.day - 1) / 3))), items = [];
-      const candidates = pool.slice();
-      while (items.length < count && candidates.length) {
-        const i = Math.floor(Math.random() * candidates.length), x = candidates.splice(i, 1)[0];
-        items.push({ id: x.id, name: x.name, price: x.price, packed: false });
-      }
-      const id = d.nextId++, rider = people[id % people.length].name;
-      const order = { id: `KF-${String(id).padStart(4, "0")}`, platform: "KitaFood", rider, code: String(1e3 + Math.floor(Math.random() * 9e3)), items, status: "new", day: p.day, timeLimit: timeLimit(p.day), elapsedSeconds: 0, wrongPicks: 0 };
-      order.deadlineAt = Date.now() + order.timeLimit * 1e3;
-      d.orders.push(order);
-      startClock();
-      activeId = order.id;
-      stage = "list";
-      search = "";
-      filter = "all";
-      save2();
-      updateIndicator(d);
-      return order;
-    }
-    function maybeArrive(index) {
-      if (!unlocked() || !getSession()) return null;
-      const s = getSession(), existing = pending(ensure());
-      if (existing.length) return existing[0];
-      if (index < 2 || index % 3 !== 2 || s.kitaFoodLastSpawn === index || s.rushSecondsRemaining > 0) return null;
-      const order = newOrder();
-      if (order) {
-        s.kitaFoodLastSpawn = index;
-        save2();
-      }
-      return order;
-    }
-    function syncClock() {
-      const orders = getProgress()?.delivery?.orders;
-      if (!Array.isArray(orders)) return false;
-      let changed = false;
-      const now = Date.now(), paused2 = isClockPaused();
-      for (const o of orders) {
-        if (["new", "packing", "ready"].includes(o.status)) {
-          if (setClockPaused(o, paused2, now)) changed = true;
-          o.elapsedSeconds = Math.max(0, (Number(o.timeLimit) || 30) - remainingMs(o, now) / 1e3);
-        }
-      }
-      return changed;
-    }
-    function stopClock() {
-      if (clockHandle !== null) {
-        clearInterval(clockHandle);
-        clockHandle = null;
-      }
-    }
-    function reset() {
-      stopClock();
-      activeId = null;
-      resultPending = null;
-      stage = "list";
-      lastPicked = null;
-      search = "";
-      filter = "all";
-      lastSavedAt = 0;
-    }
-    function validAction(o) {
-      const d = ensure();
-      if (!pending(d).includes(o) || isClockPaused()) return false;
-      if (due(o) <= 0) {
-        expireOrder(o.id);
-        return false;
-      }
-      return true;
-    }
-    function tickClock() {
-      const changed = syncClock(), d = ensure();
-      if (!isClockPaused()) {
-        const expired = pending(d).find((o2) => due(o2) <= 0);
-        if (expired) {
-          expireOrder(expired.id);
-          return;
-        }
-      }
-      const o = pending(d).find((x) => x.id === activeId), e = document.getElementById("kfTimer");
-      if (e && o) {
-        e.textContent = clockText2(o);
-        e.closest(".kf-timer")?.classList.toggle("urgent", due(o) <= URGENT_TIME_LIMIT);
-      }
-      if (pending(d).length && (changed || Date.now() - lastSavedAt >= 5e3)) {
-        lastSavedAt = Date.now();
-        save2();
-      }
-    }
-    function startClock() {
-      if (clockHandle === null) clockHandle = setInterval(tickClock, 250);
-    }
-    function shelfHTML(o) {
-      const p = getProgress(), term = search.toLocaleLowerCase("ms");
-      const list = products.filter((x) => foodCategories.has(x.category) && p.unlocked.includes(x.category) && !x.weighted && (filter === "all" || x.category === filter) && (!term || x.name.toLocaleLowerCase("ms").includes(term)));
-      if (!list.length) return '<div class="kf-no-products">Tiada produk sepadan. Cuba carian lain.</div>';
-      return list.map((x) => {
-        const packed = o.items.some((y) => y.id === x.id && y.packed), stock = p.inventory?.[x.id] || 0;
-        return `<button type="button" class="kf-shelf-product ${packed ? "picked" : ""}" data-kf-pick="${safe(x.id)}" ${stock <= 0 ? "disabled" : ""} aria-label="Ambil ${safe(x.name)}"><span class="kf-product-art">${productArt2(x.id)}</span><strong>${safe(x.name)}</strong><small>${money2(x.price)}</small><span class="kf-stock">${stock <= 0 ? "HABIS" : `STOK ${stock}`}</span>${packed ? `<span class="kf-product-check">${icon2("check")}</span>` : ""}</button>`;
-      }).join("");
-    }
-    function orderRows(o) {
-      return o.items.map((x, i) => `<div class="kf-order-row ${x.packed ? "done" : ""}"><span class="kf-item-number">${x.packed ? icon2("check") : String(i + 1).padStart(2, "0")}</span><div><b>${safe(x.name)}</b><small>1 unit \xB7 ${money2(x.price)}</small></div><span class="kf-row-status">${x.packed ? "Dalam beg" : "Belum ambil"}</span></div>`).join("");
-    }
-    function ticket(o) {
-      return `<section class="kf-ticket"><div class="kf-section-heading"><div><small>SENARAI BARANGAN</small><h3>Pesanan ${safe(o.id)}</h3></div><b>${picked(o)}/${o.items.length}</b></div><div class="kf-order-rows">${orderRows(o)}</div><div class="kf-ticket-total"><span>DIBAYAR DALAM APLIKASI</span><strong>${money2(total(o))}</strong></div></section>`;
-    }
-    function riderHeader(o) {
-      return `<div class="kf-rider"><div class="kf-rider-badge">${icon2("delivery")}</div><div class="kf-rider-info"><small>RIDER KITAFOOD DI KAUNTER</small><h3>${safe(o.rider)} <span>\xB7 ${safe(o.id)}</span></h3><p>\u201CHai! Saya datang ambil pesanan pelanggan.\u201D</p></div><div class="kf-timer ${due(o) <= URGENT_TIME_LIMIT ? "urgent" : ""}"><small>MASA BAKI</small><strong id="kfTimer">${Math.floor(due(o) / 60)}:${String(due(o) % 60).padStart(2, "0")}</strong></div></div>`;
-    }
-    function render2(id = activeId, { preserve = false } = {}) {
-      const d = ensure(), p = getProgress(), o = pending(d).find((x) => x.id === id) || pending(d)[0] || null;
-      activeId = o?.id || null;
-      const dialog = document.getElementById("modal"), oldScroll = preserve ? dialog.scrollTop : 0, oldShelf = preserve ? document.getElementById("kfShelf")?.scrollTop || 0 : 0;
-      const s = d.stats;
-      const head = `<header class="kf-head"><div class="kf-logo">${icon2("delivery")}</div><div><small>KEDAI KITA \xB7 PENGHANTARAN TEMPATAN</small><h2>Kita<em>Food</em></h2><p>Pesanan pelanggan, disiapkan di kaunter.</p></div><button id="kfClose" class="icon-btn" aria-label="Tutup KitaFood">${icon2("close")}</button></header>`;
-      const stats = `<div class="kf-stats"><div><small>DIHANTAR</small><strong>${s.completed || 0}</strong></div><div><small>JUALAN KITAFOOD</small><strong>${money2(s.revenue || 0)}</strong></div><div><small>GANJARAN PANTAS</small><strong>${money2(s.bonus || 0)}</strong></div></div>`;
-      const content = !o ? `<div class="kf-welcome"><div class="kf-welcome-graphic">${icon2("delivery")}</div><h3>${unlocked() ? "Kaunter KitaFood sedia!" : "KitaFood dibuka pada Hari 3"}</h3>${unlocked() ? "" : "<p>Teruskan Mod Kerjaya sehingga Hari 3 untuk menerima pesanan penghantaran.</p>"}<div class="kf-mini-steps"><span>Rider tiba</span><span>Cari barang</span><span>Sahkan kod</span></div></div>` : `${riderHeader(o)}<nav class="kf-steps" aria-label="Proses pesanan"><span class="done">1. Semak</span><span class="${stage === "pick" || stage === "verify" ? "done" : ""}">2. Cari barang</span><span class="${stage === "verify" ? "done" : ""}">3. Serah</span></nav>
-   ${stage === "list" ? `<div class="kf-intro-stage">${ticket(o)}<aside class="kf-tip-card"><div class="kf-tip-symbol">${icon2("basket")}</div><h3>Cari sendiri barang pesanan</h3><p>Lihat senarai di sebelah. Pilih barang yang betul pada rak kedai dan masukkan ke beg sebelum menyerahkannya kepada rider.</p><div class="kf-tip-note">Bayaran pelanggan sudah diterima melalui KitaFood. Tiada perlu kutip tunai.</div><button class="primary-btn kf-big-button" id="kfStart">Mula Cari Barang ${icon2("arrow")}</button></aside></div>` : stage === "pick" ? `<div class="kf-pick-layout">${ticket(o)}<section class="kf-shop"><div class="kf-section-heading"><div><small>RAK PRODUK KEDAI KITA</small><h3>Pilih barang yang diminta</h3></div><span class="kf-scan-label">${icon2("scan")} IMBAS</span></div><div class="kf-filter"><input id="kfSearch" type="search" placeholder="Cari nama produk..." aria-label="Cari barang" autocomplete="off"><select id="kfCategory" aria-label="Kategori barang"><option value="all">Semua kategori</option>${categories.filter((c) => p.unlocked.includes(c.id) && foodCategories.has(c.id)).map((c) => `<option value="${safe(c.id)}">${safe(c.name)}</option>`).join("")}</select></div><div class="kf-shelf" id="kfShelf">${shelfHTML(o)}</div></section></div><div class="kf-bag"><div class="kf-bag-head">${icon2("basket")} <div><small>BEG PESANAN</small><strong>${picked(o)} daripada ${o.items.length} barang</strong></div><div class="kf-progress"><i style="width:${Math.round(100 * picked(o) / o.items.length)}%"></i></div></div><div class="kf-packed">${picked(o) ? o.items.filter((x) => x.packed).map((x) => `<div class="kf-packed-product">${productArt2(x.id)}<span>${safe(x.name)}</span><button data-kf-remove="${safe(x.id)}" type="button">Keluarkan</button></div>`).join("") : "<p>Beg masih kosong. Tekan barang yang betul di rak untuk mengisi beg.</p>"}</div><button class="primary-btn kf-big-button" id="kfDone" ${ready(o) ? "" : "disabled"}>${ready(o) ? "Barang Sudah Siap" : "Lengkapkan Semua Barang"} ${icon2("check")}</button></div>` : `<div class="kf-verify-stage"><div class="kf-sealed"><span class="kf-seal-art">${icon2("basket")}<i>${icon2("check")}</i></span><h3>Semua barang telah dibungkus!</h3><p>Beg pesanan <b>${safe(o.id)}</b> telah dimeterai. Pastikan kod pengambilan sepadan sebelum serahkan kepada rider.</p><div class="kf-review-list">${o.items.map((x) => `<span class="kf-review-product">${productArt2(x.id)}<b>${safe(x.name)}</b>${icon2("check")}</span>`).join("")}</div><button class="kf-back" id="kfEdit">${icon2("undo")} Semak semula beg</button></div><div class="kf-phone"><small>KOD PENGAMBILAN PADA TELEFON RIDER</small><strong>${safe(o.code)}</strong><span>KITAFOOD \xB7 ${safe(o.rider)}</span><label for="kfCode">Masukkan kod 4 digit rider</label><input id="kfCode" maxlength="4" inputmode="none" readonly placeholder="\u2212 \u2212 \u2212 \u2212" autocomplete="off" aria-describedby="kfCodeError"><div class="kf-keypad" role="group" aria-label="Pad nombor kod rider">${["1", "2", "3", "4", "5", "6", "7", "8", "9", "clear", "0", "back"].map((key) => `<button type="button" data-kf-key="${key}" aria-label="${key === "clear" ? "Kosongkan kod" : key === "back" ? "Padam digit terakhir" : key}">${key === "clear" ? "Padam semua" : key === "back" ? icon2("undo") : key}</button>`).join("")}</div><p id="kfCodeError" class="kf-code-error" role="status" aria-live="polite"></p><button class="primary-btn kf-big-button" id="kfHandoff">Sahkan & Serah Kepada Rider ${icon2("check")}</button></div></div>`}
-   <div class="kf-cancel-line"><button id="kfCancel" class="kf-cancel">Batalkan pesanan</button><div id="kfConfirmCancel" class="kf-cancel-confirm" hidden><p>Batalkan pesanan ${safe(o.id)}? Stok tidak akan ditolak.</p><button type="button" id="kfKeep">Kembali</button><button type="button" id="kfCancelYes">Ya, batalkan</button></div></div>`;
-      openModal2("delivery", `<div class="modal-pad kf-ui kf-state-${o ? stage : "empty"}">${head}${stats}${content}<footer class="kf-footer">KITAFOOD \xB7 Hanya stok pesanan yang berjaya diserahkan akan ditolak.</footer></div>`);
-      document.getElementById("kfClose").onclick = () => closeModal2();
-      if (!o) return;
-      if (stage === "list") document.getElementById("kfStart").onclick = () => {
-        stage = "pick";
-        render2(o.id);
-      };
-      if (stage === "pick") {
-        const inp = document.getElementById("kfSearch"), sel = document.getElementById("kfCategory");
-        inp.value = search;
-        sel.value = filter;
-        inp.oninput = () => {
-          search = inp.value;
-          refreshShelf(o);
-        };
-        sel.onchange = () => {
-          filter = sel.value;
-          refreshShelf(o);
-        };
-        document.getElementById("kfShelf").onclick = (e) => {
-          const btn = e.target.closest("[data-kf-pick]");
-          if (btn) pick(o, btn.dataset.kfPick);
-        };
-        document.querySelectorAll("[data-kf-remove]").forEach((b) => b.onclick = () => removePick(o, b.dataset.kfRemove));
-        document.getElementById("kfDone").onclick = () => {
-          if (!validAction(o)) return;
-          if (!ready(o)) {
-            notify("Masih ada barang yang belum diambil.", true);
-            return;
-          }
-          o.sealed = true;
-          stage = "verify";
-          save2();
-          render2(o.id);
-        };
-      }
-      if (stage === "verify") {
-        document.getElementById("kfEdit").onclick = () => {
-          if (!validAction(o)) return;
-          o.sealed = false;
-          stage = "pick";
-          save2();
-          render2(o.id);
-        };
-        document.getElementById("kfHandoff").onclick = () => handoff(o);
-        const input = document.getElementById("kfCode");
-        const enterKey = (key) => {
-          input.value = key === "clear" ? "" : key === "back" ? input.value.slice(0, -1) : (input.value + key).slice(0, 4);
-          input.removeAttribute("aria-invalid");
-          document.getElementById("kfCodeError").textContent = "";
-        };
-        document.querySelectorAll("[data-kf-key]").forEach((b) => b.onclick = () => enterKey(b.dataset.kfKey));
-        document.querySelector(".kf-verify-stage").onkeydown = (e) => {
-          if (/^[0-9]$/.test(e.key)) {
-            e.preventDefault();
-            enterKey(e.key);
-          } else if (e.key === "Backspace" || e.key === "Delete") {
-            e.preventDefault();
-            enterKey(e.key === "Delete" ? "clear" : "back");
-          } else if (e.key === "Enter" && e.target === input) {
-            e.preventDefault();
-            handoff(o);
-          }
-        };
-      }
-      document.getElementById("kfCancel").onclick = () => {
-        document.getElementById("kfConfirmCancel").hidden = false;
-      };
-      document.getElementById("kfKeep").onclick = () => {
-        document.getElementById("kfConfirmCancel").hidden = true;
-      };
-      document.getElementById("kfCancelYes").onclick = () => finish(o, false);
-      if (preserve) {
-        dialog.scrollTop = oldScroll;
-        if (document.getElementById("kfShelf")) document.getElementById("kfShelf").scrollTop = oldShelf;
-      }
-      startClock(o);
-    }
-    function refreshShelf(o) {
-      const e = document.getElementById("kfShelf");
-      if (e) e.innerHTML = shelfHTML(o);
-    }
-    function pick(o, id) {
-      if (!validAction(o) || stage !== "pick") return;
-      const x = o.items.find((y) => y.id === id && !y.packed), p = pmap.get(id);
-      if (!x) {
-        if (!o.items.some((y) => y.id === id)) o.wrongPicks = (o.wrongPicks || 0) + 1;
-        notify((p?.name || "Barang") + " tidak diperlukan atau sudah dimasukkan ke beg.", true);
-        return;
-      }
-      if ((getProgress().inventory?.[id] || 0) < 1) {
-        notify("Stok " + safe(x.name) + " tidak cukup.", true);
-        return;
-      }
-      x.packed = true;
-      o.status = ready(o) ? "ready" : "packing";
-      lastPicked = id;
-      save2();
-      render2(o.id, { preserve: true });
-      if (ready(o)) notify("Bagus! Semua barang lengkap. Tekan Barang Sudah Siap.");
-    }
-    function removePick(o, id) {
-      if (!validAction(o)) return;
-      const x = o.items.find((y) => y.id === id && y.packed);
-      if (!x) return;
-      x.packed = false;
-      o.status = picked(o) ? "packing" : "new";
-      o.sealed = false;
-      save2();
-      render2(o.id, { preserve: true });
-    }
-    function handoff(o) {
-      if (!validAction(o)) return;
-      if (!ready(o) || !o.sealed) {
-        notify("Sediakan semua barang dahulu.", true);
-        return;
-      }
-      const code = document.getElementById("kfCode")?.value.trim();
-      if (code !== String(o.code)) {
-        notify("Kod rider tidak sepadan. Semak semula.", true);
-        document.getElementById("kfCodeError").textContent = "Kod tidak sepadan. Cuba semula.";
-        document.getElementById("kfCode").setAttribute("aria-invalid", "true");
-        document.getElementById("kfCode")?.focus();
-        return;
-      }
-      const p = getProgress(), counts = {};
-      for (const x of o.items) counts[x.id] = (counts[x.id] || 0) + 1;
-      if (Object.entries(counts).some(([id, n]) => (p.inventory?.[id] || 0) < n)) {
-        notify("Stok tidak mencukupi untuk serahan. Semak Inventori.", true);
-        return;
-      }
-      for (const [id, n] of Object.entries(counts)) p.inventory[id] -= n;
-      const amount = total(o), bonus = Math.round(amount * 0.1), earn = Math.round(amount * 0.25) + bonus;
-      receiveCash(p, earn);
-      p.lifetime = (p.lifetime || 0) + amount;
-      const d = ensure(), s = d.stats;
-      o.status = "completed";
-      o.completedDay = p.day;
-      o.rating = o.wrongPicks ? 4 : 5;
-      o.bonus = bonus;
-      o.earned = earn;
-      s.completed++;
-      s.revenue += amount;
-      s.bonus += bonus;
-      s.starsTotal = (s.starsTotal || 0) + o.rating;
-      const session2 = getSession();
-      if (session2) {
-        session2.served = (session2.served || 0) + 1;
-        session2.deliveryCompleted = (session2.deliveryCompleted || 0) + 1;
-        session2.deliveryRevenue = (session2.deliveryRevenue || 0) + amount;
-        session2.deliveryBonus = (session2.deliveryBonus || 0) + bonus;
-        session2.totalSales = (session2.totalSales || 0) + amount;
-        session2.earned = (session2.earned || 0) + earn;
-      }
-      archive(d);
-      save2();
-      updateIndicator(d);
-      showResult(o, true);
-    }
-    function finish(o, success, reason = "cancelled") {
-      if (success) return handoff(o);
-      if (!pending(ensure()).includes(o)) return;
-      o.status = "cancelled";
-      o.cancelReason = reason;
-      const stats = ensure().stats;
-      stats.cancelled++;
-      if (reason === "timeout") stats.late++;
-      archive(ensure());
-      save2();
-      updateIndicator(ensure());
-      showResult(o, false);
-    }
-    function archive(d) {
-      const done = d.orders.filter((x) => ["completed", "cancelled"].includes(x.status));
-      if (done.length > 50) {
-        const old = new Set(done.slice(0, done.length - 50));
-        d.orders = d.orders.filter((x) => !old.has(x));
-      }
-    }
-    function showResult(o, success) {
-      resultPending = { o, success };
-      const owner = getProgress();
-      stopClock();
-      activeId = null;
-      stage = "list";
-      lastPicked = null;
-      search = "";
-      filter = "all";
-      const stars = success ? "\u2605".repeat(o.rating) + "\u2606".repeat(5 - o.rating) : "\u2014";
-      openModal2("delivery", `<div class="modal-pad kf-ui kf-result"><section class="kf-result-story"><div class="kf-result-emblem">${icon2(success ? "check" : "close")}</div><small>KITAFOOD \xB7 ${safe(o.id)}</small><h2>${success ? "Pesanan berjaya diserahkan!" : o.cancelReason === "timeout" ? "Masa rider tamat" : "Pesanan dibatalkan"}</h2><p>${success ? `Terima kasih! Rider ${safe(o.rider)} sudah mengambil beg dan bersedia membuat penghantaran.` : "Rider telah dimaklumkan. Stok kekal dan tiada bayaran direkodkan."}</p></section><section class="kf-result-summary">${success ? `<div class="kf-result-stars">${stars} <small>Penilaian perkhidmatan</small></div><div class="kf-result-table"><div>Nilai pesanan <b>${money2(total(o))}</b></div><div>Untung kedai <b>${money2(o.earned - o.bonus)}</b></div><div>Bonus pantas <b>${money2(o.bonus)}</b></div><div class="total">Jumlah diterima <b>${money2(o.earned)}</b></div></div>` : '<div class="kf-cancel-summary">Tiada stok ditolak.<br>Kaunter sedia untuk pelanggan seterusnya.</div>'}</section><button id="kfNext" class="primary-btn kf-big-button">${success ? "Rider Beredar \xB7 Pelanggan Seterusnya" : "Teruskan Layan Pelanggan"} ${icon2("arrow")}</button></div>`);
-      document.getElementById("kfNext").onclick = () => {
-        if (getProgress() !== owner || resultPending?.o !== o) return;
-        resultPending = null;
-        closeModal2();
-        onFinish(o, success);
-      };
-    }
-    function expireOrder(id) {
-      const orders = pending(ensure()), o = id ? orders.find((x) => x.id === id) : orders[0];
-      if (!o) return;
-      finish(o, false, "timeout");
-    }
-    function open(id) {
-      if (resultPending) {
-        showResult(resultPending.o, resultPending.success);
-        return;
-      }
-      const doneOrder = ensure().orders.find((x) => x.id === id && ["completed", "cancelled"].includes(x.status));
-      if (id && doneOrder) {
-        showResult(doneOrder, doneOrder.status === "completed");
-        return;
-      }
-      const o = pending(ensure()).find((x) => x.id === id) || pending(ensure())[0] || null;
-      if (o && o.id !== activeId) {
-        stage = o.sealed ? "verify" : picked(o) ? "pick" : "list";
-        search = "";
-        filter = "all";
-      }
-      render2(o?.id || null);
-    }
-    function resumeOrder(id) {
-      activeId = null;
-      open(id);
-    }
-    return { open, ensure, maybeArrive, personFor, resumeOrder, stopClock, reset, syncClock, expireOrder, spawnTestOrder: newOrder };
-  }
-
   // engine.mjs
   var PRODUCTS = [
     { id: "milk", name: "Susu segar", price: 680, color: "#dceefa" },
@@ -1567,7 +1152,8 @@
     { id: "conveyor", name: "Motor conveyor", icon: "arrow", cost: 1500, max: 5, desc: "Barang maju dan tali sawat bergerak lebih pantas." },
     { id: "scale", name: "Penimbang pantas", icon: "scale", cost: 1800, max: 5, desc: "Bacaan berat stabil lebih cepat." },
     { id: "scanner", name: "Scanner pantas", icon: "scan", cost: 2e3, max: 5, desc: "Scan barang lebih pantas." },
-    { id: "comfort", name: "Pendingin hawa", icon: "snow", cost: 2500, max: 5, desc: "Pelanggan lebih sabar (+15 saat)." },
+    { id: "riderPatience", name: "Kesabaran KitaFood", icon: "delivery", cost: 2e3, max: 5, desc: "Rider menunggu +5 saat setiap tahap. 30 \u2192 55 saat." },
+    { id: "comfort", name: "Pendingin hawa", icon: "snow", cost: 2500, max: 5, desc: "Pelanggan biasa lebih sabar (+5 saat setiap tahap)." },
     { id: "tips", name: "Kaunter premium", icon: "spark", cost: 3e3, max: 5, desc: "Tip pelanggan bertambah 25%." }
   ];
   var DENOMS = [1e4, 5e3, 2e3, 1e3, 500, 100, 50, 20, 10, 5];
@@ -1633,7 +1219,7 @@
     return Math.min(20, 4 + Math.max(1, Math.floor(Number(day) || 1)));
   }
   function createProgress() {
-    return { version: 1, day: 1, wallet: 0, lifetime: 0, served: 0, bestCombo: 0, upgrades: { scanner: 0, scale: 0, conveyor: 0, comfort: 0, tips: 0, storage: 0, card: 0, qr: 0, rushBoost: 0 }, history: [], unlocked: ["essentials"], settings: { motion: true, theme: "mint", volume: 0.6, music: true, musicVolume: 0.2, musicTrack: "random" } };
+    return { version: 1, day: 1, wallet: 0, lifetime: 0, served: 0, bestCombo: 0, upgrades: { scanner: 0, scale: 0, conveyor: 0, comfort: 0, riderPatience: 0, tips: 0, storage: 0, card: 0, qr: 0, rushBoost: 0 }, history: [], unlocked: ["essentials"], settings: { motion: true, theme: "mint", volume: 0.6, music: true, musicVolume: 0.2, musicTrack: "random" } };
   }
   function restoreProgress(raw) {
     try {
@@ -1692,7 +1278,7 @@
     const fail = challenges && method === "card" && day >= 11 && rng() < declineChance;
     const declineRoll = rng();
     const cardDeclineReason = fail ? declineRoll < 0.45 ? "insufficient" : declineRoll < 0.75 ? "technical" : "expired" : null;
-    return { person, items, method, willTip: rng() < 0.4, dialogueSeed: Math.floor(rng() * 1e4), cardFailure: false, cardDeclineReason, cardDeclineHandled: false, total: basketTotal(items), tender: tenderFor(basketTotal(items)), patience: 20, patienceRulesVersion: 46, elapsed: 0, kind, hasCoupon: index % 3 === 1, couponApplied: false, discount: 0, requiresPin: method === "card" && rng() < 0.5, cardPin: String(1e3 + Math.floor(rng() * 9e3)), cardStage: "ready", pinInput: "" };
+    return { person, items, method, willTip: rng() < 0.4, dialogueSeed: Math.floor(rng() * 1e4), cardFailure: false, cardDeclineReason, cardDeclineHandled: false, total: basketTotal(items), tender: tenderFor(basketTotal(items)), patience: 20, patienceRulesVersion: 65, elapsed: 0, kind, hasCoupon: index % 3 === 1, couponApplied: false, discount: 0, requiresPin: method === "card" && rng() < 0.5, cardPin: String(1e3 + Math.floor(rng() * 9e3)), cardStage: "ready", pinInput: "" };
   }
   function unlockCategory(progress2, id) {
     const c = CATEGORIES.find((c2) => c2.id === id);
@@ -1946,6 +1532,452 @@
   function returnMatches(record, claim, item, day) {
     const rule = returnPolicy(item);
     return !!(record && claim && rule && !record.returned && record.paid > 0 && day >= record.day && day - record.day <= rule.days && claim.receipt === record.receipt && claim.day === record.day && claim.productId === record.productId && claim.quantity === 1 && claim.paid === record.paid && item.id === record.productId);
+  }
+
+  // delivery.mjs
+  function createDelivery({ getProgress, getSession, getMode, save: save2, notify, money: money2, products, categories = [], productArt: productArt2, icon: icon2, openModal: openModal2, closeModal: closeModal2, receiveCash, onFinish = () => {
+  }, isClockPaused = () => false }) {
+    const safe = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+    const people = [
+      { name: "Amir", skin: "#cf9570", hair: "#322d2a", shirt: "#27785d", scarf: false },
+      { name: "Sofia", skin: "#ddad89", hair: "#3a3030", shirt: "#27785d", scarf: true, scarfColor: "#32645d" },
+      { name: "Hafiz", skin: "#bd835f", hair: "#272827", shirt: "#27785d", scarf: false },
+      { name: "Nadia", skin: "#cf987c", hair: "#44352f", shirt: "#27785d", scarf: true, scarfColor: "#337768" },
+      { name: "Faris", skin: "#d09d78", hair: "#292d2f", shirt: "#27785d", scarf: false }
+    ];
+    const pmap = new Map(products.map((x) => [x.id, x]));
+    const foodCategories = /* @__PURE__ */ new Set(["essentials", "snacks", "meals", "bakery", "frozen", "beverages", "pantry", "kuih"]);
+    const statsDefault = () => ({ completed: 0, cancelled: 0, revenue: 0, bonus: 0, late: 0, starsTotal: 0 });
+    let clearSearchOnFocus = false;
+    let activeId = null, stage = "list", search = "", filter = "all", lastPicked = null, clockHandle = null, lastSavedAt = 0, resultPending = null;
+    const RIDER_TIME_LIMIT = 30, URGENT_TIME_LIMIT = 10;
+    const timeLimit = () => RIDER_TIME_LIMIT + 5 * Math.max(0, Math.min(5, Number(getProgress().upgrades?.riderPatience) || 0));
+    const pending = (d) => d.orders.filter((o) => ["new", "packing", "ready"].includes(o.status) && Array.isArray(o.items));
+    const picked = (o) => o.items.filter((x) => x.packed).length;
+    const ready = (o) => !!o.items.length && o.items.every((x) => x.packed);
+    const due = remainingSeconds;
+    const clockText2 = (o) => `${Math.floor(due(o) / 60)}:${String(due(o) % 60).padStart(2, "0")}`;
+    const total = (o) => o.items.reduce((n, x) => n + (Number(x.price) || pmap.get(x.id)?.price || 0), 0);
+    const unlocked = () => getMode() === "career" && getProgress().day >= 3;
+    function ensure() {
+      const p = getProgress();
+      if (!p.delivery || typeof p.delivery !== "object") p.delivery = { orders: [], nextId: 1, stats: statsDefault(), upgrades: { rack: 0 } };
+      const d = p.delivery;
+      if (!Array.isArray(d.orders)) d.orders = [];
+      d.nextId = Math.max(1, Math.floor(Number(d.nextId) || 1));
+      d.stats = { ...statsDefault(), ...d.stats || {} };
+      if (!d.upgrades) d.upgrades = { rack: 0 };
+      for (const o of d.orders) {
+        if (!Array.isArray(o.items)) o.items = [];
+        if (o.items.length && ready(o) && ["new", "packing"].includes(o.status)) o.status = "ready";
+        o.platform = "KitaFood";
+        o.timeLimit ??= timeLimit(o.day || p.day);
+        o.elapsedSeconds = Number(o.elapsedSeconds) || 0;
+        if (["new", "packing", "ready"].includes(o.status)) {
+          if (!Number.isFinite(o.deadlineAt)) o.deadlineAt = Date.now() + Math.max(0, o.timeLimit - o.elapsedSeconds) * 1e3;
+          o.elapsedSeconds = Math.max(0, o.timeLimit - remainingMs(o) / 1e3);
+        }
+      }
+      syncClock();
+      updateIndicator(d);
+      if (pending(d).length) startClock();
+      else stopClock();
+      return d;
+    }
+    function updateIndicator(d) {
+      const b = document.getElementById("deliveryBtn");
+      if (!b) return;
+      const orders = pending(d), n = orders.length;
+      b.dataset.pending = String(n);
+      b.classList.toggle("delivery-alert", n > 0);
+      b.querySelector(".kf-nav-timer")?.remove();
+      b.title = n ? `KitaFood \xB7 ${n} pesanan aktif` : "KitaFood";
+      b.setAttribute("aria-label", n ? `KitaFood, ${n} pesanan aktif` : "KitaFood");
+    }
+    function personFor(order) {
+      const normalized = people.find((x) => x.name === order?.rider) || people[0];
+      return { ...normalized, id: "rider-kita-food", role: "KitaFood \xB7 Rakan Penghantar" };
+    }
+    function newOrder() {
+      if (!unlocked()) return null;
+      const p = getProgress(), d = ensure();
+      if (pending(d).length) return pending(d)[0];
+      const pool = products.filter((x) => foodCategories.has(x.category) && p.unlocked.includes(x.category) && !x.weighted && (Number(p.inventory?.[x.id]) || 0) > 0);
+      if (pool.length < 2) return null;
+      const count = Math.min(pool.length, Math.min(6, 2 + Math.floor((p.day - 1) / 3))), items = [];
+      const candidates = pool.slice();
+      while (items.length < count && candidates.length) {
+        const i = Math.floor(Math.random() * candidates.length), x = candidates.splice(i, 1)[0];
+        items.push({ id: x.id, name: x.name, price: x.price, packed: false });
+      }
+      const id = d.nextId++, rider = people[id % people.length].name;
+      const order = { id: `KF-${String(id).padStart(4, "0")}`, platform: "KitaFood", rider, code: String(1e3 + Math.floor(Math.random() * 9e3)), items, status: "new", day: p.day, timeLimit: timeLimit(p.day), arrivalQuota: normalCustomerCount(getSession()), elapsedSeconds: 0, wrongPicks: 0 };
+      order.deadlineAt = Date.now() + order.timeLimit * 1e3;
+      d.orders.push(order);
+      startClock();
+      activeId = order.id;
+      stage = "list";
+      search = "";
+      filter = "all";
+      clearSearchOnFocus = false;
+      save2();
+      updateIndicator(d);
+      return order;
+    }
+    function maybeArrive(index) {
+      if (!unlocked() || !getSession()) return null;
+      const s = getSession(), existing = pending(ensure());
+      if (existing.length) return existing[0];
+      const today = ensure().orders.filter((o) => o.day === getProgress().day);
+      const target = dayTarget(getProgress().day), limit = target <= 8 ? 1 : target <= 14 ? 2 : 3;
+      const quota = normalCustomerCount(s);
+      if (today.length && s.kitaFoodLastQuota === void 0) s.kitaFoodLastQuota = today[today.length - 1].arrivalQuota ?? quota;
+      const slot = Math.max(2, Math.floor(target * (today.length + 1) / (limit + 1)));
+      if (today.length >= limit || quota >= target || quota < slot || s.rushSecondsRemaining > 0) return null;
+      if (s.kitaFoodLastQuota !== void 0 && quota - s.kitaFoodLastQuota < 3) return null;
+      const order = newOrder();
+      if (order) {
+        s.kitaFoodLastSpawn = index;
+        s.kitaFoodLastQuota = quota;
+        save2();
+      }
+      return order;
+    }
+    function syncClock() {
+      const orders = getProgress()?.delivery?.orders;
+      if (!Array.isArray(orders)) return false;
+      let changed = false;
+      const now = Date.now(), paused2 = isClockPaused();
+      for (const o of orders) {
+        if (["new", "packing", "ready"].includes(o.status)) {
+          if (setClockPaused(o, paused2, now)) changed = true;
+          o.elapsedSeconds = Math.max(0, (Number(o.timeLimit) || 30) - remainingMs(o, now) / 1e3);
+        }
+      }
+      return changed;
+    }
+    function stopClock() {
+      if (clockHandle !== null) {
+        clearInterval(clockHandle);
+        clockHandle = null;
+      }
+    }
+    function reset() {
+      clearSearchOnFocus = false;
+      stopClock();
+      activeId = null;
+      resultPending = null;
+      stage = "list";
+      lastPicked = null;
+      search = "";
+      filter = "all";
+      lastSavedAt = 0;
+    }
+    function validAction(o) {
+      const d = ensure();
+      if (!pending(d).includes(o) || isClockPaused()) return false;
+      if (due(o) <= 0) {
+        expireOrder(o.id);
+        return false;
+      }
+      return true;
+    }
+    function tickClock() {
+      const changed = syncClock(), d = ensure();
+      if (!isClockPaused()) {
+        const expired = pending(d).find((o2) => due(o2) <= 0);
+        if (expired) {
+          expireOrder(expired.id);
+          return;
+        }
+      }
+      const o = pending(d).find((x) => x.id === activeId), e = document.getElementById("kfTimer");
+      if (e && o) {
+        e.textContent = clockText2(o);
+        e.closest(".kf-timer")?.classList.toggle("urgent", due(o) <= URGENT_TIME_LIMIT);
+      }
+      if (pending(d).length && (changed || Date.now() - lastSavedAt >= 5e3)) {
+        lastSavedAt = Date.now();
+        save2();
+      }
+    }
+    function startClock() {
+      if (clockHandle === null) clockHandle = setInterval(tickClock, 250);
+    }
+    function shelfHTML(o) {
+      const p = getProgress(), term = search.toLocaleLowerCase("ms");
+      const list = products.filter((x) => foodCategories.has(x.category) && p.unlocked.includes(x.category) && !x.weighted && (filter === "all" || x.category === filter) && (!term || x.name.toLocaleLowerCase("ms").includes(term)));
+      if (!list.length) return '<div class="kf-no-products">Tiada produk sepadan. Cuba carian lain.</div>';
+      return list.map((x) => {
+        const packed = o.items.some((y) => y.id === x.id && y.packed), stock = p.inventory?.[x.id] || 0;
+        return `<button type="button" class="kf-shelf-product ${packed ? "picked" : ""}" data-kf-pick="${safe(x.id)}" ${stock <= 0 ? "disabled" : ""} aria-label="Ambil ${safe(x.name)}"><span class="kf-product-art">${productArt2(x.id)}</span><strong>${safe(x.name)}</strong><small>${money2(x.price)}</small><span class="kf-stock">${stock <= 0 ? "HABIS" : `STOK ${stock}`}</span>${packed ? `<span class="kf-product-check">${icon2("check")}</span>` : ""}</button>`;
+      }).join("");
+    }
+    function orderRows(o) {
+      return o.items.map((x, i) => `<div class="kf-order-row ${x.packed ? "done" : ""}"><span class="kf-item-number">${x.packed ? icon2("check") : String(i + 1).padStart(2, "0")}</span><div><b>${safe(x.name)}</b><small>1 unit \xB7 ${money2(x.price)}</small></div><span class="kf-row-status">${x.packed ? "Dalam beg" : "Belum ambil"}</span></div>`).join("");
+    }
+    function ticket(o) {
+      return `<section class="kf-ticket"><div class="kf-section-heading"><div><small>SENARAI BARANGAN</small><h3>Pesanan ${safe(o.id)}</h3></div><b>${picked(o)}/${o.items.length}</b></div><div class="kf-order-rows">${orderRows(o)}</div><div class="kf-ticket-total"><span>DIBAYAR DALAM APLIKASI</span><strong>${money2(total(o))}</strong></div></section>`;
+    }
+    function riderHeader(o) {
+      return `<div class="kf-rider"><div class="kf-rider-badge">${icon2("delivery")}</div><div class="kf-rider-info"><small>RIDER KITAFOOD DI KAUNTER</small><h3>${safe(o.rider)} <span>\xB7 ${safe(o.id)}</span></h3><p>\u201CHai! Saya datang ambil pesanan pelanggan.\u201D</p></div><div class="kf-timer ${due(o) <= URGENT_TIME_LIMIT ? "urgent" : ""}"><small>MASA BAKI</small><strong id="kfTimer">${Math.floor(due(o) / 60)}:${String(due(o) % 60).padStart(2, "0")}</strong></div></div>`;
+    }
+    function render2(id = activeId, { preserve = false } = {}) {
+      const d = ensure(), p = getProgress(), o = pending(d).find((x) => x.id === id) || pending(d)[0] || null;
+      activeId = o?.id || null;
+      const dialog = document.getElementById("modal"), oldScroll = preserve ? dialog.scrollTop : 0, oldShelf = preserve ? document.getElementById("kfShelf")?.scrollTop || 0 : 0;
+      const s = d.stats;
+      const head = `<header class="kf-head"><div class="kf-logo">${icon2("delivery")}</div><div><small>KEDAI KITA \xB7 PENGHANTARAN TEMPATAN</small><h2>Kita<em>Food</em></h2><p>Pesanan pelanggan, disiapkan di kaunter.</p></div><button id="kfClose" class="icon-btn" aria-label="Tutup KitaFood">${icon2("close")}</button></header>`;
+      const stats = `<div class="kf-stats"><div><small>DIHANTAR</small><strong>${s.completed || 0}</strong></div><div><small>JUALAN KITAFOOD</small><strong>${money2(s.revenue || 0)}</strong></div><div><small>GANJARAN PANTAS</small><strong>${money2(s.bonus || 0)}</strong></div></div>`;
+      const content = !o ? `<div class="kf-welcome"><div class="kf-welcome-graphic">${icon2("delivery")}</div><h3>${unlocked() ? "Kaunter KitaFood sedia!" : "KitaFood dibuka pada Hari 3"}</h3>${unlocked() ? "" : "<p>Teruskan Mod Kerjaya sehingga Hari 3 untuk menerima pesanan penghantaran.</p>"}<div class="kf-mini-steps"><span>Rider tiba</span><span>Cari barang</span><span>Sahkan kod</span></div></div>` : `${riderHeader(o)}<nav class="kf-steps" aria-label="Proses pesanan"><span class="done">1. Semak</span><span class="${stage === "pick" || stage === "verify" ? "done" : ""}">2. Cari barang</span><span class="${stage === "verify" ? "done" : ""}">3. Serah</span></nav>
+   ${stage === "list" ? `<div class="kf-intro-stage">${ticket(o)}<aside class="kf-tip-card"><div class="kf-tip-symbol">${icon2("basket")}</div><h3>Cari sendiri barang pesanan</h3><p>Lihat senarai di sebelah. Pilih barang yang betul pada rak kedai dan masukkan ke beg sebelum menyerahkannya kepada rider.</p><div class="kf-tip-note">Bayaran pelanggan sudah diterima melalui KitaFood. Tiada perlu kutip tunai.</div><button class="primary-btn kf-big-button" id="kfStart">Mula Cari Barang ${icon2("arrow")}</button></aside></div>` : stage === "pick" ? `<div class="kf-pick-layout">${ticket(o)}<section class="kf-shop"><div class="kf-section-heading"><div><small>RAK PRODUK KEDAI KITA</small><h3>Pilih barang yang diminta</h3></div><span class="kf-scan-label">${icon2("scan")} IMBAS</span></div><div class="kf-filter"><input id="kfSearch" type="search" placeholder="Cari nama produk..." aria-label="Cari barang" autocomplete="off"><select id="kfCategory" aria-label="Kategori barang"><option value="all">Semua kategori</option>${categories.filter((c) => p.unlocked.includes(c.id) && foodCategories.has(c.id)).map((c) => `<option value="${safe(c.id)}">${safe(c.name)}</option>`).join("")}</select></div><div class="kf-shelf" id="kfShelf">${shelfHTML(o)}</div></section></div><div class="kf-bag"><div class="kf-bag-head">${icon2("basket")} <div><small>BEG PESANAN</small><strong>${picked(o)} daripada ${o.items.length} barang</strong></div><div class="kf-progress"><i style="width:${Math.round(100 * picked(o) / o.items.length)}%"></i></div></div><div class="kf-packed">${picked(o) ? o.items.filter((x) => x.packed).map((x) => `<div class="kf-packed-product">${productArt2(x.id)}<span>${safe(x.name)}</span><button data-kf-remove="${safe(x.id)}" type="button">Keluarkan</button></div>`).join("") : "<p>Beg masih kosong. Tekan barang yang betul di rak untuk mengisi beg.</p>"}</div><button class="primary-btn kf-big-button" id="kfDone" ${ready(o) ? "" : "disabled"}>${ready(o) ? "Barang Sudah Siap" : "Lengkapkan Semua Barang"} ${icon2("check")}</button></div>` : `<div class="kf-verify-stage"><div class="kf-sealed"><span class="kf-seal-art">${icon2("basket")}<i>${icon2("check")}</i></span><h3>Semua barang telah dibungkus!</h3><p>Beg pesanan <b>${safe(o.id)}</b> telah dimeterai. Pastikan kod pengambilan sepadan sebelum serahkan kepada rider.</p><div class="kf-review-list">${o.items.map((x) => `<span class="kf-review-product">${productArt2(x.id)}<b>${safe(x.name)}</b>${icon2("check")}</span>`).join("")}</div><button class="kf-back" id="kfEdit">${icon2("undo")} Semak semula beg</button></div><div class="kf-phone"><small>KOD PENGAMBILAN PADA TELEFON RIDER</small><strong>${safe(o.code)}</strong><span>KITAFOOD \xB7 ${safe(o.rider)}</span><label for="kfCode">Masukkan kod 4 digit rider</label><input id="kfCode" maxlength="4" inputmode="none" readonly placeholder="\u2212 \u2212 \u2212 \u2212" autocomplete="off" aria-describedby="kfCodeError"><div class="kf-keypad" role="group" aria-label="Pad nombor kod rider">${["1", "2", "3", "4", "5", "6", "7", "8", "9", "clear", "0", "back"].map((key) => `<button type="button" data-kf-key="${key}" aria-label="${key === "clear" ? "Kosongkan kod" : key === "back" ? "Padam digit terakhir" : key}">${key === "clear" ? "Padam semua" : key === "back" ? icon2("undo") : key}</button>`).join("")}</div><p id="kfCodeError" class="kf-code-error" role="status" aria-live="polite"></p><button class="primary-btn kf-big-button" id="kfHandoff">Sahkan & Serah Kepada Rider ${icon2("check")}</button></div></div>`}
+   <div class="kf-cancel-line"><button id="kfCancel" class="kf-cancel">Batalkan pesanan</button><div id="kfConfirmCancel" class="kf-cancel-confirm" hidden><p>Batalkan pesanan ${safe(o.id)}? Stok tidak akan ditolak.</p><button type="button" id="kfKeep">Kembali</button><button type="button" id="kfCancelYes">Ya, batalkan</button></div></div>`;
+      openModal2("delivery", `<div class="modal-pad kf-ui kf-state-${o ? stage : "empty"}">${head}${stats}${content}<footer class="kf-footer">KITAFOOD \xB7 Hanya stok pesanan yang berjaya diserahkan akan ditolak.</footer></div>`);
+      document.getElementById("kfClose").onclick = () => closeModal2();
+      if (!o) return;
+      if (stage === "list") document.getElementById("kfStart").onclick = () => {
+        stage = "pick";
+        render2(o.id);
+      };
+      if (stage === "pick") {
+        const inp = document.getElementById("kfSearch"), sel = document.getElementById("kfCategory");
+        inp.value = search;
+        sel.value = filter;
+        inp.onfocus = () => {
+          if (clearSearchOnFocus) {
+            search = "";
+            inp.value = "";
+            clearSearchOnFocus = false;
+            refreshShelf(o);
+          }
+        };
+        inp.oninput = () => {
+          clearSearchOnFocus = false;
+          search = inp.value;
+          refreshShelf(o);
+        };
+        sel.onchange = () => {
+          filter = sel.value;
+          refreshShelf(o);
+        };
+        document.getElementById("kfShelf").onclick = (e) => {
+          const btn = e.target.closest("[data-kf-pick]");
+          if (btn) pick(o, btn.dataset.kfPick);
+        };
+        document.querySelectorAll("[data-kf-remove]").forEach((b) => b.onclick = () => removePick(o, b.dataset.kfRemove));
+        document.getElementById("kfDone").onclick = () => {
+          if (!validAction(o)) return;
+          if (!ready(o)) {
+            notify("Masih ada barang yang belum diambil.", true);
+            return;
+          }
+          o.sealed = true;
+          stage = "verify";
+          save2();
+          render2(o.id);
+        };
+      }
+      if (stage === "verify") {
+        document.getElementById("kfEdit").onclick = () => {
+          if (!validAction(o)) return;
+          o.sealed = false;
+          stage = "pick";
+          save2();
+          render2(o.id);
+        };
+        document.getElementById("kfHandoff").onclick = () => handoff(o);
+        const input = document.getElementById("kfCode");
+        const enterKey = (key) => {
+          input.value = key === "clear" ? "" : key === "back" ? input.value.slice(0, -1) : (input.value + key).slice(0, 4);
+          input.removeAttribute("aria-invalid");
+          document.getElementById("kfCodeError").textContent = "";
+        };
+        document.querySelectorAll("[data-kf-key]").forEach((b) => b.onclick = () => enterKey(b.dataset.kfKey));
+        document.querySelector(".kf-verify-stage").onkeydown = (e) => {
+          if (/^[0-9]$/.test(e.key)) {
+            e.preventDefault();
+            enterKey(e.key);
+          } else if (e.key === "Backspace" || e.key === "Delete") {
+            e.preventDefault();
+            enterKey(e.key === "Delete" ? "clear" : "back");
+          } else if (e.key === "Enter" && e.target === input) {
+            e.preventDefault();
+            handoff(o);
+          }
+        };
+      }
+      document.getElementById("kfCancel").onclick = () => {
+        document.getElementById("kfConfirmCancel").hidden = false;
+      };
+      document.getElementById("kfKeep").onclick = () => {
+        document.getElementById("kfConfirmCancel").hidden = true;
+      };
+      document.getElementById("kfCancelYes").onclick = () => finish(o, false);
+      if (preserve) {
+        dialog.scrollTop = oldScroll;
+        if (document.getElementById("kfShelf")) document.getElementById("kfShelf").scrollTop = oldShelf;
+      }
+      startClock(o);
+    }
+    function refreshShelf(o) {
+      const e = document.getElementById("kfShelf");
+      if (e) e.innerHTML = shelfHTML(o);
+    }
+    function pick(o, id) {
+      if (!validAction(o) || stage !== "pick") return;
+      const x = o.items.find((y) => y.id === id && !y.packed), p = pmap.get(id);
+      if (!x) {
+        if (!o.items.some((y) => y.id === id)) o.wrongPicks = (o.wrongPicks || 0) + 1;
+        notify((p?.name || "Barang") + " tidak diperlukan atau sudah dimasukkan ke beg.", true);
+        return;
+      }
+      if ((getProgress().inventory?.[id] || 0) < 1) {
+        notify("Stok " + safe(x.name) + " tidak cukup.", true);
+        return;
+      }
+      x.packed = true;
+      o.status = ready(o) ? "ready" : "packing";
+      lastPicked = id;
+      clearSearchOnFocus = !!search;
+      save2();
+      render2(o.id, { preserve: true });
+      if (ready(o)) notify("Bagus! Semua barang lengkap. Tekan Barang Sudah Siap.");
+    }
+    function removePick(o, id) {
+      if (!validAction(o)) return;
+      const x = o.items.find((y) => y.id === id && y.packed);
+      if (!x) return;
+      x.packed = false;
+      o.status = picked(o) ? "packing" : "new";
+      o.sealed = false;
+      save2();
+      render2(o.id, { preserve: true });
+    }
+    function handoff(o) {
+      if (!validAction(o)) return;
+      if (!ready(o) || !o.sealed) {
+        notify("Sediakan semua barang dahulu.", true);
+        return;
+      }
+      const code = document.getElementById("kfCode")?.value.trim();
+      if (code !== String(o.code)) {
+        notify("Kod rider tidak sepadan. Semak semula.", true);
+        document.getElementById("kfCodeError").textContent = "Kod tidak sepadan. Cuba semula.";
+        document.getElementById("kfCode").setAttribute("aria-invalid", "true");
+        document.getElementById("kfCode")?.focus();
+        return;
+      }
+      const p = getProgress(), counts = {};
+      for (const x of o.items) counts[x.id] = (counts[x.id] || 0) + 1;
+      if (Object.entries(counts).some(([id, n]) => (p.inventory?.[id] || 0) < n)) {
+        notify("Stok tidak mencukupi untuk serahan. Semak Inventori.", true);
+        return;
+      }
+      for (const [id, n] of Object.entries(counts)) p.inventory[id] -= n;
+      const amount = total(o), bonus = Math.round(amount * 0.1), earn = Math.round(amount * 0.25) + bonus;
+      receiveCash(p, earn);
+      p.lifetime = (p.lifetime || 0) + amount;
+      const d = ensure(), s = d.stats;
+      o.status = "completed";
+      o.completedDay = p.day;
+      o.rating = o.wrongPicks ? 4 : 5;
+      o.bonus = bonus;
+      o.earned = earn;
+      s.completed++;
+      s.revenue += amount;
+      s.bonus += bonus;
+      s.starsTotal = (s.starsTotal || 0) + o.rating;
+      const session2 = getSession();
+      if (session2) {
+        session2.served = (session2.served || 0) + 1;
+        session2.deliveryCompleted = (session2.deliveryCompleted || 0) + 1;
+        session2.deliveryRevenue = (session2.deliveryRevenue || 0) + amount;
+        session2.deliveryBonus = (session2.deliveryBonus || 0) + bonus;
+        session2.totalSales = (session2.totalSales || 0) + amount;
+        session2.earned = (session2.earned || 0) + earn;
+      }
+      archive(d);
+      save2();
+      updateIndicator(d);
+      showResult(o, true);
+    }
+    function finish(o, success, reason = "cancelled") {
+      if (success) return handoff(o);
+      if (!pending(ensure()).includes(o)) return;
+      o.status = "cancelled";
+      o.cancelReason = reason;
+      const stats = ensure().stats;
+      stats.cancelled++;
+      if (reason === "timeout") stats.late++;
+      archive(ensure());
+      save2();
+      updateIndicator(ensure());
+      showResult(o, false);
+    }
+    function archive(d) {
+      const done = d.orders.filter((x) => ["completed", "cancelled"].includes(x.status));
+      if (done.length > 50) {
+        const old = new Set(done.slice(0, done.length - 50));
+        d.orders = d.orders.filter((x) => !old.has(x));
+      }
+    }
+    function showResult(o, success) {
+      resultPending = { o, success };
+      const owner = getProgress();
+      stopClock();
+      activeId = null;
+      stage = "list";
+      lastPicked = null;
+      search = "";
+      filter = "all";
+      const stars = success ? "\u2605".repeat(o.rating) + "\u2606".repeat(5 - o.rating) : "\u2014";
+      openModal2("delivery", `<div class="modal-pad kf-ui kf-result"><section class="kf-result-story"><div class="kf-result-emblem">${icon2(success ? "check" : "close")}</div><small>KITAFOOD \xB7 ${safe(o.id)}</small><h2>${success ? "Pesanan berjaya diserahkan!" : o.cancelReason === "timeout" ? "Masa rider tamat" : "Pesanan dibatalkan"}</h2><p>${success ? `Terima kasih! Rider ${safe(o.rider)} sudah mengambil beg dan bersedia membuat penghantaran.` : "Rider telah dimaklumkan. Stok kekal dan tiada bayaran direkodkan."}</p></section><section class="kf-result-summary">${success ? `<div class="kf-result-stars">${stars} <small>Penilaian perkhidmatan</small></div><div class="kf-result-table"><div>Nilai pesanan <b>${money2(total(o))}</b></div><div>Untung kedai <b>${money2(o.earned - o.bonus)}</b></div><div>Bonus pantas <b>${money2(o.bonus)}</b></div><div class="total">Jumlah diterima <b>${money2(o.earned)}</b></div></div>` : '<div class="kf-cancel-summary">Tiada stok ditolak.<br>Kaunter sedia untuk pelanggan seterusnya.</div>'}</section><button id="kfNext" class="primary-btn kf-big-button">${success ? "Rider Beredar \xB7 Pelanggan Seterusnya" : "Teruskan Layan Pelanggan"} ${icon2("arrow")}</button></div>`);
+      document.getElementById("kfNext").onclick = () => {
+        if (getProgress() !== owner || resultPending?.o !== o) return;
+        resultPending = null;
+        closeModal2();
+        onFinish(o, success);
+      };
+    }
+    function expireOrder(id) {
+      const orders = pending(ensure()), o = id ? orders.find((x) => x.id === id) : orders[0];
+      if (!o) return;
+      finish(o, false, "timeout");
+    }
+    function open(id) {
+      if (resultPending) {
+        showResult(resultPending.o, resultPending.success);
+        return;
+      }
+      const doneOrder = ensure().orders.find((x) => x.id === id && ["completed", "cancelled"].includes(x.status));
+      if (id && doneOrder) {
+        showResult(doneOrder, doneOrder.status === "completed");
+        return;
+      }
+      const o = pending(ensure()).find((x) => x.id === id) || pending(ensure())[0] || null;
+      if (o && o.id !== activeId) {
+        stage = o.sealed ? "verify" : picked(o) ? "pick" : "list";
+        search = "";
+        filter = "all";
+      }
+      render2(o?.id || null);
+    }
+    function resumeOrder(id) {
+      activeId = null;
+      open(id);
+    }
+    function extendPatience(seconds = 5) {
+      const now = Date.now();
+      for (const o of pending(ensure())) {
+        if (remainingMs(o, now) <= 0) continue;
+        o.timeLimit += seconds;
+        if (Number.isFinite(o.pausedRemainingMs)) o.pausedRemainingMs += seconds * 1e3;
+        else o.deadlineAt += seconds * 1e3;
+      }
+      syncClock();
+      save2();
+    }
+    return { extendPatience, open, ensure, maybeArrive, personFor, resumeOrder, stopClock, reset, syncClock, expireOrder, spawnTestOrder: newOrder };
   }
 
   // product-details.mjs
@@ -3193,7 +3225,7 @@
   var calculatorResult = "";
   var advancePending = false;
   var STORAGE = "kedai-kita-v1";
-  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-26-v64-kitakasih";
+  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v65-rider-qr";
   var UPDATE_CHECK_URL = "./version.json";
   var storageOK = true;
   var progress = createProgress();
@@ -3557,7 +3589,7 @@
     prepareReturnCustomer();
     prepareKasihCustomer(rush);
     session.seenPeople.push(customer.person.id);
-    customer.patience += (progress.upgrades.comfort || 0) * 15;
+    customer.patience += (progress.upgrades.comfort || 0) * 5;
     if (rush) applyRushPatience(customer);
     $("customerArt").className = "customer arrive";
     const incomingCustomer = customer;
@@ -4435,7 +4467,11 @@
       {
         const previous = progress.upgrades[b.dataset.upgrade] || 0;
         if (buyUpgrade(progress, b.dataset.upgrade)) {
-          if (b.dataset.upgrade === "comfort" && customer) customer.patience += 15;
+          if (b.dataset.upgrade === "comfort" && customer && customer.kind !== "kitafood" && !customer.rushCustomer && customer.rushOriginalPatience === void 0) customer.patience += 5;
+          if (b.dataset.upgrade === "riderPatience") {
+            delivery?.extendPatience(5);
+            if (customer?.kind === "kitafood") customer.patience = kitaFoodOrderState(customer.orderId)?.timeLimit || customer.patience;
+          }
           save();
           if (cloud?.getUser?.()) cloud.flush().catch(() => toast("Upgrade BELUM disimpan dalam Firebase. Jangan log keluar dahulu.", true));
           renderHeader();
@@ -5432,12 +5468,12 @@
       session.seenPeople ??= [];
       return;
     }
-    if (mode === "career" && phase === "scan" && !customer.rushCustomer && customer.rushOriginalPatience === void 0 && customer.patienceRulesVersion !== 46) {
+    if (mode === "career" && ["scan", "offer", "change"].includes(phase) && !customer.rushCustomer && customer.rushOriginalPatience === void 0 && customer.patienceRulesVersion !== 65) {
       const oldTotal = Math.max(1, Number(customer.patience) || 20);
       const progressRatio = Math.max(0, Math.min(1, (Number(customer.elapsed) || 0) / oldTotal));
-      customer.patience = 20 + Math.max(0, Number(progress.upgrades?.comfort) || 0) * 15;
+      customer.patience = 20 + Math.max(0, Math.min(5, Number(progress.upgrades?.comfort) || 0)) * 5 + (customer.kasih ? 15 : 0);
       customer.elapsed = Math.min(customer.patience - 1, Math.round(progressRatio * customer.patience));
-      customer.patienceRulesVersion = 46;
+      customer.patienceRulesVersion = 65;
     }
     if (!Array.isArray(customer.items)) {
       customer = null;
@@ -5506,7 +5542,7 @@
       return;
     }
     const stage = customer.cardStage || "ready", working = stage === "processing";
-    $("paymentArea").innerHTML = `<div id="payDevice" class="payment-scene qr-scene qr-balanced stage-${stage}"><div class="customer-phone iphone-pro-pay"><div class="iphone18-sidekey" aria-hidden="true"></div><div class="phone-camera iphone18-island" aria-hidden="true"></div><div class="iphone18-status" aria-hidden="true"><span>9:41</span><span>\u25B0 \u25B0 \u25B4</span></div><div class="iphone18-wallet-head"><span class="iphone18-paymark">K</span><div><small class="qr-wallet-brand">KITA PAY</small><b>${customer.person.name}</b></div></div><small class="iphone18-amount-label">JUMLAH BAYARAN</small><span class="iphone18-amount">${money(amountDue(customer))}</span><button class="phone-qr" id="qrTarget" aria-label="Imbas kod QR pada telefon" ${working ? "disabled" : ""}>${qrArt()}<i class="qr-scan-line"></i></button><small class="qr-wallet-status">${working ? "Mengesahkan pembayaran\u2026" : "Imbas kod untuk bayar"}</small><div class="iphone18-home" aria-hidden="true"></div></div><div class="qr-hand-scanner qr-pro-scanner" id="qrScanner" role="button" tabindex="0" aria-label="Ambil scanner kemudian imbas QR"><div class="qr-pro-lens" aria-hidden="true">${icon("scan")}<i></i></div><div class="qr-pro-led" aria-hidden="true"></div><span class="qr-scanner-label">IMBAS QR</span></div><div class="qr-light-cone"></div></div><p class="payment-hint qr-instructions">${working ? "Mengesahkan bayaran\u2026" : "Seret scanner ke kod QR pada telefon, atau tekan scanner kemudian tekan kod QR."}</p>`;
+    $("paymentArea").innerHTML = `<div id="payDevice" class="payment-scene qr-scene kk-qr-stage stage-${stage}"><div class="kk-qr-phone"><div class="kk-phone-island" aria-hidden="true"></div><div class="kk-phone-status"><span>9:41</span><span>\u25B0 \u25B0</span></div><div class="kk-wallet-brand"><span>K</span><div><small>KITA PAY</small><b>${customer.person.name}</b></div></div><small class="kk-amount-label">JUMLAH BAYARAN</small><strong class="kk-amount">${money(amountDue(customer))}</strong><button class="kk-qr-code" id="qrTarget" aria-label="Imbas kod QR pada telefon" ${working ? "disabled" : ""}>${qrArt()}<i></i></button><span class="kk-wallet-status">${working ? "Mengesahkan bayaran\u2026" : "Imbas kod untuk bayar"}</span><div class="kk-home-indicator"></div></div>${working ? "" : `<button type="button" class="kk-qr-reader" id="qrScanner" aria-label="Seret scanner ke kod QR atau tekan untuk mengambilnya"><svg viewBox="0 0 108 164" aria-hidden="true"><defs><linearGradient id="kkShell" x2="1" y2="1"><stop stop-color="#52656b"/><stop offset=".48" stop-color="#25383f"/><stop offset="1" stop-color="#12262c"/></linearGradient><linearGradient id="kkGrip" x2="1"><stop stop-color="#172b31"/><stop offset=".5" stop-color="#3c5257"/><stop offset="1" stop-color="#20363c"/></linearGradient></defs><path d="M38 74h36l-5 65q-1 12-14 12H44q-12-1-10-14Z" fill="url(#kkGrip)" stroke="#71858a" stroke-width="2"/><path d="M39 92h29m-30 9h29m-29 9h28m-28 9h27m-27 9h26" stroke="#111f24" stroke-width="3" opacity=".55"/><rect x="8" y="8" width="92" height="76" rx="22" fill="url(#kkShell)" stroke="#8c9d9e" stroke-width="2"/><rect x="17" y="17" width="74" height="35" rx="11" fill="#0b1b23" stroke="#597982"/><path d="M23 23h59" stroke="#9ad7de" stroke-width="3" opacity=".6"/><path d="M24 39h60" stroke="#f17b60" stroke-width="2"/><path d="M29 30v14m7-14v14m4-14v14m7-14v14m8-14v14m4-14v14m7-14v14m6-14v14" stroke="#91c5ce" opacity=".45"/><circle class="kk-reader-led" cx="79" cy="65" r="4" fill="#80d7b0"/><text x="48" y="68" font-size="8" font-weight="700" letter-spacing="1" fill="#dceae8" text-anchor="middle">KITA SCAN</text></svg><span>AMBIL & IMBAS</span></button>`}</div><p class="payment-hint kk-qr-hint">${working ? "Kod dibaca. Scanner disimpan secara automatik." : "Seret scanner ke kod QR, atau tekan scanner kemudian tekan kod QR."}</p>`;
     if (!working) bindQrScanner();
   }
   var CARD_DECLINE_MESSAGES = {
@@ -5648,6 +5684,8 @@
     $("scaleZone").setAttribute("title", "Penimbang \xB7 " + speed.weighMs / 1e3 + " saat");
   }
   function machineUpgradeInfo(id, level, max) {
+    if (id === "comfort") return `<span class="machine-speed">Kesabaran biasa: ${20 + 5 * level}s \u2192 ${20 + 5 * Math.min(max, level + 1)}s</span>`;
+    if (id === "riderPatience") return `<span class="machine-speed">Masa rider: ${30 + 5 * level}s \u2192 ${30 + 5 * Math.min(max, level + 1)}s</span>`;
     if (id === "rushBoost") return `<span class="machine-speed">Bonus Rush Hour: \xD7${rushHourMultiplier(progress.upgrades).toFixed(1)} \u2192 \xD7${rushHourMultiplier({ ...progress.upgrades, rushBoost: Math.min(max, level + 1) }).toFixed(1)} \xB7 ${level >= max ? "Maksimum" : "Tambah +0.3 setiap tahap"}</span>`;
     if (id === "storage") return `<span class="machine-speed">Had stok: ${stockCapacity(progress)} \u2192 ${level < max ? stockCapacity({ upgrades: { storage: level + 1 } }) : stockCapacity(progress)} unit/kg</span>`;
     if (!["scanner", "scale", "conveyor"].includes(id)) return "";
@@ -5689,9 +5727,18 @@
     startDigital();
   }
   function bindQrScanner() {
-    const scanner = $("qrScanner"), target = $("qrTarget");
-    let origin = null, moved = false;
+    const scanner = $("qrScanner"), target = $("qrTarget"), transaction = customer;
+    let dragState = null, suppressClick = false;
+    const allowed = () => transaction === customer && !paused && !busy && phase === "offer" && customer.method === "qr";
+    const reset = () => {
+      dragState = null;
+      scanner.style.removeProperty("--qr-dx");
+      scanner.style.removeProperty("--qr-dy");
+      scanner.classList.remove("dragging");
+      target.classList.remove("qr-target-hit");
+    };
     target.onclick = () => {
+      if (!allowed()) return;
       if (!customer.qrArmed) {
         toast("Ambil scanner dahulu, kemudian tekan kod QR.");
         return;
@@ -5699,42 +5746,47 @@
       scanQrTarget();
     };
     scanner.onclick = () => {
-      if (!moved) armQrScanner();
-    };
-    scanner.onkeydown = (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        armQrScanner();
+      if (suppressClick) {
+        suppressClick = false;
+        return;
       }
+      if (allowed()) armQrScanner();
     };
     scanner.onpointerdown = (e) => {
-      if (paused || busy || e.button > 0) return;
-      origin = { x: e.clientX, y: e.clientY };
-      moved = false;
+      if (!allowed() || e.button > 0) return;
+      const rect2 = scanner.getBoundingClientRect();
+      dragState = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false, scale: rect2.width / scanner.offsetWidth || 1 };
+      suppressClick = false;
       scanner.setPointerCapture(e.pointerId);
+      scanner.classList.add("dragging");
       armQrScanner();
       e.preventDefault();
     };
     scanner.onpointermove = (e) => {
-      if (!origin) return;
-      const dx = e.clientX - origin.x, dy = e.clientY - origin.y;
-      moved ||= Math.hypot(dx, dy) > 7;
-      scanner.style.transform = `translate(${dx}px,${dy}px) rotate(-22deg)`;
+      const d = dragState;
+      if (!d || e.pointerId !== d.id) return;
+      if (!allowed()) {
+        reset();
+        return;
+      }
+      const dx = e.clientX - d.x, dy = e.clientY - d.y;
+      d.moved ||= Math.hypot(dx, dy) > 6;
+      scanner.style.setProperty("--qr-dx", dx / d.scale + "px");
+      scanner.style.setProperty("--qr-dy", dy / d.scale + "px");
       target.classList.toggle("qr-target-hit", inside(e, target.getBoundingClientRect()));
     };
     scanner.onpointerup = (e) => {
-      if (!origin) return;
-      origin = null;
-      scanner.style.transform = "";
-      target.classList.remove("qr-target-hit");
-      if (moved && inside(e, target.getBoundingClientRect())) scanQrTarget();
-      else if (moved) toast("Halakan scanner tepat pada kod QR.");
+      const d = dragState;
+      if (!d || e.pointerId !== d.id) return;
+      const hit = inside(e, target.getBoundingClientRect()), valid = allowed();
+      suppressClick = d.moved;
+      reset();
+      if (valid && d.moved && hit) scanQrTarget();
+      else if (valid && d.moved) toast("Halakan scanner tepat pada kod QR.");
     };
-    scanner.onpointercancel = () => {
-      origin = null;
-      moved = false;
-      scanner.style.transform = "";
-      target.classList.remove("qr-target-hit");
+    scanner.onpointercancel = reset;
+    scanner.onlostpointercapture = () => {
+      if (dragState) reset();
     };
   }
   function setScaleReading(product, fraction = 1) {

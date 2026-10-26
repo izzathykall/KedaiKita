@@ -1,3 +1,4 @@
+import {dayTarget,normalCustomerCount} from './engine.mjs';
 import {remainingMs,remainingSeconds,setClockPaused} from './delivery-clock.mjs';
 /* KitaFood v30 — rider at the normal checkout counter.
  * Items are selected from a shelf, staged in a bag and only deducted from
@@ -15,9 +16,10 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
  const pmap=new Map(products.map(x=>[x.id,x]));
  const foodCategories=new Set(['essentials','snacks','meals','bakery','frozen','beverages','pantry','kuih']);
  const statsDefault=()=>({completed:0,cancelled:0,revenue:0,bonus:0,late:0,starsTotal:0});
+ let clearSearchOnFocus=false;
  let activeId=null,stage='list',search='',filter='all',lastPicked=null,clockHandle=null,lastSavedAt=0,resultPending=null;
  const RIDER_TIME_LIMIT=30,URGENT_TIME_LIMIT=10;
- const timeLimit=day=>RIDER_TIME_LIMIT;
+ const timeLimit=()=>RIDER_TIME_LIMIT+5*Math.max(0,Math.min(5,Number(getProgress().upgrades?.riderPatience)||0));
  const pending=d=>d.orders.filter(o=>['new','packing','ready'].includes(o.status)&&Array.isArray(o.items));
  const picked=o=>o.items.filter(x=>x.packed).length;
  const ready=o=>!!o.items.length&&o.items.every(x=>x.packed);
@@ -63,18 +65,24 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   const candidates=pool.slice();
   while(items.length<count&&candidates.length){const i=Math.floor(Math.random()*candidates.length),x=candidates.splice(i,1)[0];items.push({id:x.id,name:x.name,price:x.price,packed:false});}
   const id=d.nextId++,rider=people[id%people.length].name;
-  const order={id:`KF-${String(id).padStart(4,'0')}`,platform:'KitaFood',rider,code:String(1000+Math.floor(Math.random()*9000)),items,status:'new',day:p.day,timeLimit:timeLimit(p.day),elapsedSeconds:0,wrongPicks:0};
-  order.deadlineAt=Date.now()+order.timeLimit*1000;d.orders.push(order);startClock();activeId=order.id;stage='list';search='';filter='all';save();updateIndicator(d);
+  const order={id:`KF-${String(id).padStart(4,'0')}`,platform:'KitaFood',rider,code:String(1000+Math.floor(Math.random()*9000)),items,status:'new',day:p.day,timeLimit:timeLimit(p.day),arrivalQuota:normalCustomerCount(getSession()),elapsedSeconds:0,wrongPicks:0};
+  order.deadlineAt=Date.now()+order.timeLimit*1000;d.orders.push(order);startClock();activeId=order.id;stage='list';search='';filter='all';clearSearchOnFocus=false;save();updateIndicator(d);
   return order;
  }
  function maybeArrive(index){
   if(!unlocked()||!getSession())return null;
   const s=getSession(),existing=pending(ensure());
   if(existing.length)return existing[0];
-  // One visit every three counter visitors, with a second half-day visit
-  // when the shift is long. No visits during Rush Hour.
-  if(index<2||index%3!==2||s.kitaFoodLastSpawn===index||s.rushSecondsRemaining>0)return null;
-  const order=newOrder();if(order){s.kitaFoodLastSpawn=index;save();}return order;
+  const today=ensure().orders.filter(o=>o.day===getProgress().day);
+  const target=dayTarget(getProgress().day),limit=target<=8?1:target<=14?2:3;
+  const quota=normalCustomerCount(s);
+  // Persisted order history counts all arrivals, including cancelled/expired riders.
+  // Legacy orders have no quota marker: anchor the spacing once at the current point.
+  if(today.length&&s.kitaFoodLastQuota===undefined)s.kitaFoodLastQuota=today[today.length-1].arrivalQuota??quota;
+  const slot=Math.max(2,Math.floor(target*(today.length+1)/(limit+1)));
+  if(today.length>=limit||quota>=target||quota<slot||s.rushSecondsRemaining>0)return null;
+  if(s.kitaFoodLastQuota!==undefined&&quota-s.kitaFoodLastQuota<3)return null;
+  const order=newOrder();if(order){s.kitaFoodLastSpawn=index;s.kitaFoodLastQuota=quota;save();}return order;
  }
  function syncClock(){
   const orders=getProgress()?.delivery?.orders;
@@ -89,7 +97,7 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   return changed;
  }
  function stopClock(){if(clockHandle!==null){clearInterval(clockHandle);clockHandle=null}}
- function reset(){stopClock();activeId=null;resultPending=null;stage='list';lastPicked=null;search='';filter='all';lastSavedAt=0}
+ function reset(){clearSearchOnFocus=false;stopClock();activeId=null;resultPending=null;stage='list';lastPicked=null;search='';filter='all';lastSavedAt=0}
  function validAction(o){
   const d=ensure();
   if(!pending(d).includes(o)||isClockPaused())return false;
@@ -138,7 +146,8 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   if(stage==='list')document.getElementById('kfStart').onclick=()=>{stage='pick';render(o.id)};
   if(stage==='pick'){
    const inp=document.getElementById('kfSearch'),sel=document.getElementById('kfCategory');inp.value=search;sel.value=filter;
-   inp.oninput=()=>{search=inp.value;refreshShelf(o)};sel.onchange=()=>{filter=sel.value;refreshShelf(o)};
+   inp.onfocus=()=>{if(clearSearchOnFocus){search='';inp.value='';clearSearchOnFocus=false;refreshShelf(o)}};
+   inp.oninput=()=>{clearSearchOnFocus=false;search=inp.value;refreshShelf(o)};sel.onchange=()=>{filter=sel.value;refreshShelf(o)};
    document.getElementById('kfShelf').onclick=e=>{const btn=e.target.closest('[data-kf-pick]');if(btn)pick(o,btn.dataset.kfPick)};
    document.querySelectorAll('[data-kf-remove]').forEach(b=>b.onclick=()=>removePick(o,b.dataset.kfRemove));
    document.getElementById('kfDone').onclick=()=>{if(!validAction(o))return;if(!ready(o)){notify('Masih ada barang yang belum diambil.',true);return}o.sealed=true;stage='verify';save();render(o.id)};
@@ -163,7 +172,7 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   const x=o.items.find(y=>y.id===id&&!y.packed),p=pmap.get(id);
   if(!x){if(!o.items.some(y=>y.id===id))o.wrongPicks=(o.wrongPicks||0)+1;notify((p?.name||'Barang')+' tidak diperlukan atau sudah dimasukkan ke beg.',true);return}
   if((getProgress().inventory?.[id]||0)<1){notify('Stok '+safe(x.name)+' tidak cukup.',true);return}
-  x.packed=true;o.status=ready(o)?'ready':'packing';lastPicked=id;save();render(o.id,{preserve:true});
+  x.packed=true;o.status=ready(o)?'ready':'packing';lastPicked=id;clearSearchOnFocus=!!search;save();render(o.id,{preserve:true});
   if(ready(o))notify('Bagus! Semua barang lengkap. Tekan Barang Sudah Siap.');
  }
  function removePick(o,id){if(!validAction(o))return;const x=o.items.find(y=>y.id===id&&y.packed);if(!x)return;x.packed=false;o.status=picked(o)?'packing':'new';o.sealed=false;save();render(o.id,{preserve:true})}
@@ -209,5 +218,15 @@ export function createDelivery({getProgress,getSession,getMode,save,notify,money
   render(o?.id||null);
  }
  function resumeOrder(id){activeId=null;open(id)}
- return {open,ensure,maybeArrive,personFor,resumeOrder,stopClock,reset,syncClock,expireOrder,spawnTestOrder:newOrder};
+ function extendPatience(seconds=5){
+  const now=Date.now();
+  for(const o of pending(ensure())){
+   if(remainingMs(o,now)<=0)continue;
+   o.timeLimit+=seconds;
+   if(Number.isFinite(o.pausedRemainingMs))o.pausedRemainingMs+=seconds*1000;
+   else o.deadlineAt+=seconds*1000;
+  }
+  syncClock();save();
+ }
+ return {extendPatience,open,ensure,maybeArrive,personFor,resumeOrder,stopClock,reset,syncClock,expireOrder,spawnTestOrder:newOrder};
 }
