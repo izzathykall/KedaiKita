@@ -2323,3 +2323,6 @@ body[data-theme="dark"] .kasih-pro-hardware{background:radial-gradient(ellipse,#
 @media(max-height:600px) and (min-width:601px){.pro-reader-screen.awaiting-card{min-height:95px}.kasih-pro .pro-reader-screen .pro-reader-instruction{min-height:38px;font-size:12px}}
 @media(max-width:600px){.kasih-pro-grid{grid-template-columns:minmax(0,1fr)}.kasih-pro-hardware{grid-template-columns:minmax(0,1fr) var(--kk-physical-card-width);min-width:0}.kasih-pro .pro-reader{max-width:100%;min-width:0}.kasih-pro-receipt{min-width:0}}
 @media(max-width:350px){.kasih-pro .pro-reader{padding:6px}.pro-reader-screen{padding:6px}.kasih-pro .pro-reader-screen .pro-reader-instruction{font-size:10px}.kasih-pro .pro-reader-screen small{font-size:5px;letter-spacing:.4px}.pro-reader-brand{font-size:5px;letter-spacing:.5px}.pro-reader-screen>i{font-size:6px}}
+.aid-id-chip {
+  display: none !important;
+}
