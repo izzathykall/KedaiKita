@@ -1,10 +1,10 @@
 /* Only public game files and immutable Firebase SDK code are cached. */
-const RELEASE='2026-10-27-v72-offline-counter';
+const RELEASE='2026-10-28-v73-device-responsive';
 const PREFIX='kedai-kita-shell-';
 const CACHE=PREFIX+RELEASE;
 const SDK_CACHE='kedai-kita-public-sdk-v1';
 const ROOT=new URL('./',self.location.href);
-const CORE=['index.html','style.css','design.css','app.bundle.js','firebase-config.js','developer-config.js','version.json'];
+const CORE=['index.html','style.css','design.css','responsive.css','app.bundle.js','firebase-config.js','developer-config.js','version.json'];
 const AUDIO=['scanner-beep.wav','digital-scale.wav','cha-ching.wav','drawer-open.mp3','scale-place.mp3','gameplay-music.mp3','music-2-tomato-farm.mp3','music-3-taiyaki.mp3','music-4-2am.mp3'];
 const urlFor=(name,version=RELEASE)=>new URL(name+(name==='index.html'||name==='version.json'?'':'?v='+version),ROOT).href;
 self.addEventListener('install',event=>event.waitUntil((async()=>{

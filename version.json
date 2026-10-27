@@ -1,8 +1,9 @@
 {
-  "version": "2026-10-27-v72-offline-counter",
-  "title": "Kedai offline & kaunter lebih kemas",
+  "version": "2026-10-28-v73-device-responsive",
+  "title": "Penyesuaian paparan semua peranti",
   "notes": [
-    "Main dan simpan pada peranti tanpa internet; segerak semula dengan semakan konflik.",
-    "Scanner minimalis, terminal potret di bawah dan overview naik taraf seragam."
+    "Rupa dan fungsi asal dikekalkan: pembetulan lebar, susunan portrait, landscape, resit, dan dialog.",
+    "Maklumat pelanggan kekal di tengah; popup, menu dan kaunter boleh dicapai di skrin kecil.",
+    "Fail responsive.css turut dicache untuk permainan offline."
   ]
 }

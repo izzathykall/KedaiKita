@@ -31,7 +31,7 @@ let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=nu
 let chaChingSequence=0,chaChingFallbackNodes=[];
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-27-v72-offline-counter';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-28-v73-device-responsive';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
@@ -1551,17 +1551,19 @@ function positionCustomerDialogue(){
  if(!scene||!art||!bubble||!info||!customer)return;
  const sceneBox=scene.getBoundingClientRect();if(!sceneBox.width||!sceneBox.height)return;
  const compact=sceneBox.width<520,veryNarrow=sceneBox.width<390;
- // The character is centered using translateX(-50%). offsetLeft is the
- // stable untransformed center, unlike getBoundingClientRect during animation.
- art.style.left=compact?'34%':'';
+ // Keep the customer centered at every viewport size. The speech bubble
+ // may overlap only the edge of the character on extremely narrow phones.
+ art.style.left='50%';
  const center=art.offsetLeft,half=art.offsetWidth/2;
  const charLeft=center-half,charRight=center+half;
  const gap=compact?12:22,edge=compact?9:15;
  const rightRoom=sceneBox.width-charRight-gap-edge,leftRoom=charLeft-gap-edge;
  const onRight=rightRoom>=112||rightRoom>=leftRoom;
  const free=Math.max(1,onRight?rightRoom:leftRoom);
- const width=Math.max(1,Math.min(compact?(veryNarrow?148:185):240,free));
- const left=onRight?charRight+gap:charLeft-gap-width;
+ const width=veryNarrow?Math.min(140,Math.max(108,sceneBox.width*.4))
+    :Math.max(1,Math.min(compact?185:240,free));
+ const preferredLeft=onRight?charRight+gap:charLeft-gap-width;
+ const left=Math.max(edge,Math.min(preferredLeft,sceneBox.width-width-edge));
  bubble.classList.toggle('speech-left',!onRight);
  bubble.style.left=Math.round(Math.max(edge,left))+'px';bubble.style.right='auto';
  bubble.style.width=Math.floor(width)+'px';bubble.style.maxWidth=Math.floor(width)+'px';bubble.style.minWidth='0';

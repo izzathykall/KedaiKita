@@ -68,7 +68,7 @@
       if (active) return;
       if (document.activeElement?.matches('input,textarea,[contenteditable="true"]')) return;
       const viewport = screen();
-      if (viewport.height >= viewport.width) {
+      if (window.matchMedia("(orientation: portrait)").matches) {
         app.classList.remove("game-tight");
         app.dataset.fitOverflow = "false";
         apply(1, viewport.height);
@@ -3465,7 +3465,7 @@
   var calculatorResult = "";
   var advancePending = false;
   var STORAGE = "kedai-kita-v1";
-  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v72-offline-counter";
+  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-28-v73-device-responsive";
   var UPDATE_CHECK_URL = "./version.json";
   var storageOK = true;
   var progress = createProgress();
@@ -7318,15 +7318,16 @@
     const sceneBox = scene.getBoundingClientRect();
     if (!sceneBox.width || !sceneBox.height) return;
     const compact = sceneBox.width < 520, veryNarrow = sceneBox.width < 390;
-    art.style.left = compact ? "34%" : "";
+    art.style.left = "50%";
     const center = art.offsetLeft, half = art.offsetWidth / 2;
     const charLeft = center - half, charRight = center + half;
     const gap = compact ? 12 : 22, edge = compact ? 9 : 15;
     const rightRoom = sceneBox.width - charRight - gap - edge, leftRoom = charLeft - gap - edge;
     const onRight = rightRoom >= 112 || rightRoom >= leftRoom;
     const free = Math.max(1, onRight ? rightRoom : leftRoom);
-    const width = Math.max(1, Math.min(compact ? veryNarrow ? 148 : 185 : 240, free));
-    const left = onRight ? charRight + gap : charLeft - gap - width;
+    const width = veryNarrow ? Math.min(140, Math.max(108, sceneBox.width * 0.4)) : Math.max(1, Math.min(compact ? 185 : 240, free));
+    const preferredLeft = onRight ? charRight + gap : charLeft - gap - width;
+    const left = Math.max(edge, Math.min(preferredLeft, sceneBox.width - width - edge));
     bubble.classList.toggle("speech-left", !onRight);
     bubble.style.left = Math.round(Math.max(edge, left)) + "px";
     bubble.style.right = "auto";
