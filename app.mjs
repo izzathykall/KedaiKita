@@ -31,7 +31,7 @@ let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=nu
 let chaChingSequence=0,chaChingFallbackNodes=[];
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-27-v73-portrait-fit';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-27-v72-offline-counter';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
@@ -262,7 +262,7 @@ function renderProducts(){
    el.classList.toggle('scanned',!!p.scanned);el.classList.toggle('damaged',!!p.damaged&&!p.repaired&&!!p.barcodeFailTriggered);el.classList.remove('busy');el.disabled=!!p.scanned;
    el.setAttribute('aria-label',p.name+', '+(p.scanned?'sudah dalam beg':p.damaged&&!p.repaired&&p.barcodeFailTriggered?'kod manual '+p.manualCode:p.weighted?'tekan untuk timbang':'tekan untuk scan'));
  }
- $('beltHint').textContent=!customer&&session?'Menunggu pelanggan · tiada barang di conveyor':scanned===items.length?'Semua siap. Teruskan bayaran!':'';
+ $('beltHint').textContent=!customer&&session?'Menunggu pelanggan · tiada barang di conveyor':scanned===items.length?'Semua siap. Teruskan bayaran!':slot>5?slot+' barang menunggu · bergerak ke depan automatik':'Scan barang · conveyor bergerak automatik';
  $('undoScanBtn').disabled=!customer||phase!=='scan'||busy||!scanned;
 }
 function productHTML(p,i){return `<button id="product-${p.uid}" class="product ${p.scanned?'scanned':''}" data-uid="${p.uid}" style="--product-bg:${p.color};--item-index:${i};--slot:${i}" aria-label="${p.name}" ${p.scanned?'disabled':''}><span class="product-illustration">${productArt(p.id)}</span><span class="product-name">${p.name}</span>${kasihEligible(p)?'<span class="kasih-tag">KitaKasih</span>':''}<span class="product-price">${money(p.price)}${p.weighted?'/kg':''}</span><span class="mini-barcode" aria-hidden="true"></span>${p.weighted?'<span class="weight-tag">'+icon('scale')+'</span>':''}<span class="damaged-tag"><small>KOD MANUAL</small>${p.manualCode||''}</span></button>`}
@@ -1546,24 +1546,14 @@ function bindBankCardDrag(){
  el.onclick=()=>{};
  el.onkeydown=e=>{if(!allowed())return;const shifts={ArrowLeft:[-12,0],ArrowRight:[12,0],ArrowUp:[0,-12],ArrowDown:[0,12]};if(e.key==='Escape'){e.preventDefault();reset();return}if(e.key==='Enter'||e.key===' '){e.preventDefault();finish(keyPose);return}if(!shifts[e.key])return;e.preventDefault();const base=cardGeometry();base.c.left-=keyPose.x;base.c.right-=keyPose.x;base.c.top-=keyPose.y;base.c.bottom-=keyPose.y;keyPose=move(keyPose.x+shifts[e.key][0],keyPose.y+shifts[e.key][1],base)};
 }
-function fitWallSign(){
- const scene=document.querySelector('.store-scene'),sign=scene?.querySelector('.wall-note'),shelf=scene?.querySelector('.shelf-right');
- if(!scene||!sign||!shelf)return;
- const available=Math.max(12,shelf.offsetTop-22),width=Math.max(48,Math.min(150,shelf.offsetWidth*.82));
- sign.style.width=width+'px';sign.style.height=available+'px';
- sign.style.fontSize=Math.max(5,Math.min(8,available/5,width/15))+'px';
- sign.style.right=Math.max(8,(scene.clientWidth-shelf.offsetLeft-shelf.offsetWidth)+shelf.offsetWidth*.09)+'px';
-}
 function positionCustomerDialogue(){
- fitWallSign();
  const scene=document.querySelector('.store-scene'),art=$('customerArt'),bubble=$('speech'),info=$('customerInfo');
  if(!scene||!art||!bubble||!info||!customer)return;
  const sceneBox=scene.getBoundingClientRect();if(!sceneBox.width||!sceneBox.height)return;
  const compact=sceneBox.width<520,veryNarrow=sceneBox.width<390;
  // The character is centered using translateX(-50%). offsetLeft is the
  // stable untransformed center, unlike getBoundingClientRect during animation.
- const portrait=window.matchMedia('(orientation:portrait)').matches;
- art.style.left=portrait?'50%':compact?'34%':'';
+ art.style.left=compact?'34%':'';
  const center=art.offsetLeft,half=art.offsetWidth/2;
  const charLeft=center-half,charRight=center+half;
  const gap=compact?12:22,edge=compact?9:15;
@@ -1735,9 +1725,9 @@ function renderKasih(){
 }
 function showKasihHistory(){
  const store=operatingStore(),receipts=store.kitaKasih?.receipts||[];
- openModal('kasih-history',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">SIMULASI BANTUAN DALAM PERMAINAN</div><h2>Sejarah bantuan</h2></div><button class="icon-btn" id="closeKasihHistory" aria-label="Tutup">${icon('close')}</button></div><p>Rekod 20 transaksi terkini. Bantuan rawak RM10–RM100 bagi setiap kunjungan. Baki transaksi tidak dibawa ke kunjungan seterusnya.</p><div class="kasih-history">${receipts.length?receipts.map(r=>`<article><b>${r.name} · ${r.card}</b><small>Hari ${r.day} · ${r.id}</small><div><span>Jumlah belian</span><b>${money(r.total)}</b></div><div><span>KitaKasih</span><b>${money(r.aid)}</b></div><div><span>Tambahan (${{cash:'tunai',card:'kad',qr:'QR',kasih:'tiada'}[r.method]||r.method})</span><b>${money(r.extra)}</b></div><div><span>Baki bantuan</span><b>${money(r.balance)}</b></div></article>`).join(''):'<p>Belum ada transaksi. Pelanggan KitaKasih pertama muncul sebagai pelanggan kedua syif biasa. Dalam latihan, pelanggan pertama menggunakan KitaKasih.</p>'}</div></div>`);
+ openModal('kasih-history',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">SIMULASI BANTUAN DALAM PERMAINAN</div><h2>Resit KitaKasih</h2></div><button class="icon-btn" id="closeKasihHistory" aria-label="Tutup">${icon('close')}</button></div><p>Rekod 20 transaksi terkini. Bantuan rawak RM10–RM100 bagi setiap kunjungan. Baki transaksi tidak dibawa ke kunjungan seterusnya.</p><div class="kasih-history">${receipts.length?receipts.map(r=>`<article><b>${r.name} · ${r.card}</b><small>Hari ${r.day} · ${r.id}</small><div><span>Jumlah belian</span><b>${money(r.total)}</b></div><div><span>KitaKasih</span><b>${money(r.aid)}</b></div><div><span>Tambahan (${{cash:'tunai',card:'kad',qr:'QR',kasih:'tiada'}[r.method]||r.method})</span><b>${money(r.extra)}</b></div><div><span>Baki bantuan</span><b>${money(r.balance)}</b></div></article>`).join(''):'<p>Belum ada transaksi. Pelanggan KitaKasih pertama muncul sebagai pelanggan kedua syif biasa. Dalam latihan, pelanggan pertama menggunakan KitaKasih.</p>'}</div></div>`);
  $('closeKasihHistory').onclick=closeModal;
 }
 // Keep the top navigation unchanged; expose receipt history in the existing receipt header.
-const kasihHistoryButton=document.createElement('button');kasihHistoryButton.type='button';kasihHistoryButton.className='text-btn kasih-history-button';kasihHistoryButton.innerHTML=icon('receipt');kasihHistoryButton.setAttribute('aria-label','Sejarah bantuan');kasihHistoryButton.title='Sejarah bantuan';kasihHistoryButton.onclick=showKasihHistory;
-document.querySelector('.receipt-title>span').replaceWith(kasihHistoryButton);
+const kasihHistoryButton=document.createElement('button');kasihHistoryButton.type='button';kasihHistoryButton.className='text-btn kasih-history-button';kasihHistoryButton.textContent='Resit KitaKasih';kasihHistoryButton.onclick=showKasihHistory;
+$('receiptSub').parentElement.append(kasihHistoryButton);

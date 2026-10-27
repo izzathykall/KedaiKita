@@ -331,127 +331,21 @@ body.reduced-motion .store-scene .customer:not(.arrive):not(.leaving) > svg{tran
 .upgrade-row .machine-speed{display:block;margin:0;font-size:12px;line-height:1.6}
 .upgrade-row>.primary-btn{flex-shrink:0;min-width:112px}
 .scanner-glass .barcode-mark{font-size:24px;letter-spacing:3px;white-space:nowrap;line-height:1}
+@media(orientation:portrait){
+ html,body{height:auto!important;min-height:100%;overflow-x:hidden!important;overflow-y:auto!important}
+ .app.game-viewport-fit{height:auto!important;min-height:100dvh!important;max-height:none!important;overflow:visible!important;zoom:1!important;transform:none!important;padding-bottom:24px!important}
+ .app .game-grid{display:flex!important;flex-direction:column!important;flex:none!important;min-height:0!important;height:auto!important;gap:16px!important}
+ .app .game-grid>.work-area,body.view-payment .app .work-area{display:flex!important;flex:none!important;height:auto!important;order:0}
+ .app .store-scene{height:280px!important;min-height:250px!important;flex:none!important}
+ .app .game-grid>.pos-panel,body.view-payment .app .pos-panel{display:flex!important;order:1;flex:none!important;width:100%!important;height:auto!important;min-height:420px!important;max-height:none!important}
+ .app .receipt-list{flex:1!important;min-height:100px;max-height:260px!important;overflow-y:auto}
+ .app .mobile-tabs{display:none!important}
+ .app .stations{flex:none!important}
+ .app .shift-footer{flex:none!important}
+}
 @media(max-width:480px){
  .upgrade-row{display:grid!important;grid-template-columns:40px minmax(0,1fr);gap:12px!important}
  .upgrade-row>.primary-btn{grid-column:2;justify-self:start;min-width:120px}
  .scanner-glass .barcode-mark{font-size:18px;letter-spacing:1px}
 }
 .pos-foot{flex-wrap:wrap}.offline-status{display:block;flex-basis:100%;font-size:9px;text-align:center;color:var(--muted);padding-top:4px}
-
-/* V73: portrait fills the viewport; receipt rows scroll independently. */
-#beltHint{display:none!important}
-.kasih-history-button{display:grid;place-items:center;width:32px;height:32px;padding:5px;margin-left:auto!important;flex:none}
-.store-scene .wall-note{display:block;top:17px;right:5%;transform:none;box-sizing:border-box;max-width:25%;padding:4px;border-width:2px;line-height:1.2;overflow:hidden}
-.store-scene .wall-note b{font-size:1.15em;margin-top:2px;line-height:1.2}
-@media(orientation:portrait){
- html,body{height:100%;overflow:hidden!important}
- .app.game-viewport-fit{height:var(--game-layout-height)!important;min-height:0!important;max-height:none!important;overflow:hidden!important;padding-bottom:max(6px,env(safe-area-inset-bottom))!important}
- .app .game-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1.1fr) minmax(0,1fr);flex:1!important;min-height:0!important;gap:8px!important}
- .app .game-grid>.work-area,body.view-payment .app .work-area{display:flex!important;min-height:0!important;height:100%!important;order:0;overflow:hidden}
- .app .game-grid>.pos-panel,body.view-payment .app .pos-panel{display:flex!important;order:1;width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;overflow:hidden!important}
- .app .store-scene,.app.game-tight .store-scene{flex:1!important;height:auto!important;min-height:86px!important}
- .store-scene #customerArt{left:50%!important;bottom:10px!important;height:calc(100% - 22px)!important;max-height:245px!important;width:clamp(90px,20vw,190px)!important}
- .app .mobile-tabs{display:none!important}
- .app .belt-section{padding:5px 8px 7px!important;flex:none!important}
- .app .section-heading{margin-bottom:4px!important;min-height:20px}
- .app .conveyor{height:clamp(67px,8.5dvh,108px)!important;padding:4px 8px!important;border-width:5px}
- .app .product{height:100%!important;min-height:0!important}
- .app .product .product-art{height:clamp(28px,4dvh,52px)!important;max-height:65%;width:auto}
- .app .stations{height:clamp(74px,9.5dvh,126px)!important;min-height:0!important;padding:5px 0!important;gap:6px!important;flex:none!important}
- .app .station,.app .bag-zone{height:100%!important;min-height:0!important;padding:7px!important}
- .app .scanner-glass{height:clamp(28px,4.4dvh,56px)!important;margin:5px auto 3px!important;border-width:3px}
- .app .station-label{font-size:7px!important;letter-spacing:.5px!important}
- .app .station>small{font-size:8px!important;bottom:4px!important}
- .app .scale-platform{width:42%!important;height:40%!important;left:4%!important;top:27%!important;bottom:auto!important}
- .app .scale-screen{width:48%!important;height:38%!important;left:auto!important;right:4%!important;top:29%!important;bottom:auto!important}
- .app .scale-screen>span{font-size:clamp(15px,2.5vw,26px)!important}
- .app .bag-art{transform:scale(.65);transform-origin:center; margin:-10px 0!important}
- .app .bag-zone>b{font-size:9px!important}.app .bag-zone>small{display:none}
- .app .shift-footer,.app.game-tight .shift-footer{height:24px!important;min-height:0!important;margin:0!important;padding:3px 5px!important;flex:none!important}
- .app .shift-footer small{display:none}
- .app .pos-top{min-height:0!important;padding:6px 14px!important;height:26px;flex:none}
- .app .payment-availability{padding:4px 12px 0!important;gap:4px}
- .app .payment-chip{padding:3px!important;font-size:8px}
- .app .receipt-title{margin:5px 12px!important;gap:7px;flex:none}
- .app .receipt-title h2{font-size:17px!important}
- .app .receipt-title .step-no{height:24px;width:23px}
- .app .receipt-title p{margin:2px 0 0;font-size:8px!important}
- .app .receipt-list{flex:1 1 0!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden;padding:0 12px!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
- .app .receipt-empty{height:100%;min-height:0!important;padding:5px;gap:4px}
- .app .receipt-empty>small{display:none}.app .receipt-empty svg{width:20px;height:20px}
- .app .receipt-row{padding:5px 0!important}.app .receipt-row .row-emoji{width:23px;height:23px}
- .app .receipt-total{padding:4px 12px 0!important;flex:none}
- .app .receipt-total>div:first-child{padding-top:4px!important}
- .app .grand-total{margin-top:3px!important}.app .grand-total strong{font-size:25px!important}.app .grand-total strong span{font-size:19px}
- .app #paymentHome{flex:none;min-height:0}.app #paymentHome .payment-area{margin:4px 12px 0!important}
- .app #paymentHome .method-preview{margin-bottom:3px;font-size:8px}
- .app #paymentHome .primary-btn{min-height:32px!important;padding:6px!important;font-size:11px}
- .app #paymentHome .payment-hint{margin:3px 0!important;font-size:7px}
- .app #paymentHome .coupon-btn{padding:4px 7px;margin-bottom:3px;gap:5px}.app #paymentHome .coupon-btn small{display:none}
- .app .pos-foot{margin:3px 12px 0!important;padding:4px 0!important;flex:none;font-size:6px!important}
- .app .resume-payment{padding:6px;min-height:32px;margin:4px 12px}
- .store-scene .customer-info{min-height:28px!important;padding:3px 7px!important;bottom:3px!important;left:8px!important;right:8px!important}
- .store-scene .customer-info .mini-avatar{width:20px;height:20px}
- .store-scene .customer-info strong{font-size:10px!important}
- .store-scene .customer-info .customer-occupation{font-size:7px!important;max-width:100px}
- .store-scene .speech{font-size:clamp(8px,1.25vw,11px)!important;line-height:1.35!important;padding:6px 8px!important}
- .app .topbar{height:64px;min-height:0;gap:12px}
- .app .utility-bar{margin-bottom:4px}
-}
-@media(orientation:portrait) and (max-width:600px){
- .app .topbar{height:52px!important;min-height:0!important}
- .app .operations-bar{margin:3px 0!important;min-height:26px}
- .app .game-grid{grid-template-rows:minmax(0,1fr) minmax(0,1.08fr)}
- .app .station-label{font-size:5.5px!important;letter-spacing:0!important;gap:3px}
- .app .station-label svg{width:10px;height:10px}
- .app .scanner-glass .barcode-mark{font-size:14px;letter-spacing:0}
- .app .customer-info .customer-occupation{max-width:65px}
-}
-@media(orientation:portrait){
- .app .conveyor{min-height:0!important}
- .store-scene #customerArt{min-height:0!important}
- .app #scannerZone>.station-label,.app #scaleZone>.station-label{top:4px;left:7px;right:7px;min-height:12px;line-height:12px}
- .app #scannerZone .scanner-glass{position:absolute;top:20px;bottom:17px;left:50%;transform:translateX(-50%);height:auto!important;margin:0!important;width:85%}
- .app #scannerZone>#scannerStatus,.app #scaleZone>#scaleCaption{bottom:2px;min-height:11px;line-height:11px;font-size:7px!important}
-}
-@media(orientation:portrait) and (max-height:700px){
- .app .game-grid{grid-template-rows:minmax(0,.9fr) minmax(0,1.15fr)}
- .app .store-scene,.app.game-tight .store-scene{min-height:72px!important}
- .app .conveyor{height:54px!important}
- .app .stations{height:64px!important}
- .app .shift-footer,.app.game-tight .shift-footer{height:18px!important}
- .app .shift-footer strong{font-size:8px}
- .app .section-heading{min-height:16px}.app .step-no{height:18px}
- .app #paymentHome .method-preview,.app #paymentHome .payment-hint{display:none}
- .app .receipt-title{margin:3px 10px!important}.app .receipt-title h2{font-size:15px!important}
- .app .pos-foot{font-size:5px!important;padding:2px 0!important}
- .app .receipt-empty>b{font-size:9px}
-}
-
-@media(orientation:portrait){
- .app .product-illustration{height:auto!important;min-height:0!important;flex:1;max-height:calc(100% - 22px)}
- .app .product .product-art{height:100%!important;max-height:100%!important;width:100%}
- .app .product .product-name{font-size:7px;margin-top:2px;flex:none}
- .app .product .product-price{font-size:7px;margin-top:1px;flex:none}
- .app .product .mini-barcode{display:none}
-}
-@media(orientation:portrait){
- .app .game-grid{grid-template-rows:minmax(250px,1.1fr) minmax(285px,1fr)}
-}
-@media(orientation:portrait) and (max-width:600px){
- .app .game-grid{grid-template-rows:minmax(250px,1fr) minmax(285px,1.08fr)}
-}
-@media(orientation:portrait) and (max-height:700px){
- .app .game-grid{grid-template-rows:minmax(250px,.9fr) minmax(285px,1.15fr)}
-}
-@media(orientation:portrait){
- .app .product{padding:5px 3px 3px!important}
- .app .product-illustration{height:clamp(18px,3dvh,40px)!important;min-height:14px!important;flex:0 1 auto;max-height:48%}
- .app .product .kasih-tag{font-size:5px;line-height:1;padding:2px;top:2px;left:2px;border-radius:3px}
- .app .product .product-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;line-height:1.2}
- .app .scale-screen>b{display:none}
- .app .scale-screen small{font-size:6px!important}
-}
-@media(orientation:portrait){
- .app .product-illustration{display:block;width:100%!important}
-}
