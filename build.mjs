@@ -11,5 +11,8 @@ await writeFile(new URL('index.html',import.meta.url),html);
 let app=await readFile(new URL('app.mjs',import.meta.url),'utf8');
 app=app.replace(/window\.__KEDAI_ACTIVE_VERSION__\|\|'[^']*'/,`window.__KEDAI_ACTIVE_VERSION__||'${version}'`);
 await writeFile(new URL('app.mjs',import.meta.url),app);
+let worker=await readFile(new URL('sw.js',import.meta.url),'utf8');
+worker=worker.replace(/const RELEASE='[^']+'/,`const RELEASE='${version}'`);
+await writeFile(new URL('sw.js',import.meta.url),worker);
 await build({absWorkingDir:root,entryPoints:['entry.mjs'],bundle:true,format:'iife',target:['safari15'],outfile:'app.bundle.js'});
 console.log('Built KedaiKita '+version);

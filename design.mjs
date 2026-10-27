@@ -1,7 +1,7 @@
 // Presentation only: moving existing controls preserves their IDs and event bindings.
 const selectedTabs=new Map();
 function tabbed(root, groups, after, initial=0){
- const key=root.closest('dialog')?.dataset.kind||'menu';initial=key==='settings'?0:Math.min(selectedTabs.get(key)||initial,groups.length-1);
+ const key=root.closest('dialog')?.dataset.kind||'menu';initial=['settings','developer'].includes(key)?0:Math.min(selectedTabs.get(key)||initial,groups.length-1);
  const nav=document.createElement('div');nav.className='studio-tabs';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Bahagian menu');
  after.after(nav);
  const panels=groups.map(([name,nodes],i)=>{

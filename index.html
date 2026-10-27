@@ -5,8 +5,8 @@
 <meta name="theme-color" content="#173f37"><meta name="description" content="Jaga kaunter pasar mini anda. Scan barang, timbang hasil segar, kira baki dan bina Kedai Kita!">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Outfit:wght@400;500;600;700;800&amp;display=swap">
 <title>Kedai Kita — Cashier Simulator</title>
-<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-27-v71-kasih-reader">
-<link id="designStyles" rel="stylesheet" href="design.css?v=2026-10-27-v71-kasih-reader">
+<link id="gameStyles" rel="stylesheet" href="style.css?v=2026-10-27-v72-offline-counter">
+<link id="designStyles" rel="stylesheet" href="design.css?v=2026-10-27-v72-offline-counter">
 </head>
 <body>
 <div class="app" id="gameApp">
@@ -49,7 +49,7 @@
         <div class="conveyor"><div class="belt-lines"></div><div id="products" class="products"></div><span class="belt-arrow" data-icon="arrow"></span></div>
       </div>
       <div class="stations">
-        <button class="station scanner" id="scannerZone" aria-label="Scanner barcode, seret barang berbungkus ke sini"><span class="station-label"><span data-icon="scan"></span> BARCODE SCANNER <i id="scannerLight"></i></span><div class="scanner-glass"><span class="scan-line"></span><span class="barcode-mark">▥▥▥▥</span></div><small id="scannerStatus">Sedia untuk scan</small></button>
+        <button class="station scanner" id="scannerZone" aria-label="Scanner barcode, seret barang berbungkus ke sini"><span class="station-label"><span data-icon="scan"></span> BARCODE SCANNER <i id="scannerLight"></i></span><div class="scanner-glass"><span class="scan-line"></span><span class="barcode-mark">▥▥▥▥▥▥</span></div><small id="scannerStatus">Sedia untuk scan</small></button>
         <button class="station scale" id="scaleZone" aria-label="Penimbang, seret barang segar ke sini"><span class="station-label"><span data-icon="scale"></span> PENIMBANG DIGITAL<i></i></span><div class="scale-platform"><span id="scaleItem"></span><div class="scale-rings"></div></div><div class="scale-screen"><span id="weightDisplay">0.000</span><small>kg</small><b id="scaleState">READY</b></div><div class="weight-progress"><i id="weightProgress"></i></div><small class="scale-caption" id="scaleCaption">Sedia untuk ditimbang</small></button>
         <button class="bag-zone" id="bagZone" aria-label="Lihat barang dalam beg"><span class="bag-art"><i>kita.</i></span><b id="bagCount">0 barang</b><small>Tekan untuk semak</small></button>
       </div>
@@ -62,7 +62,7 @@
       <div class="receipt-list" id="receiptList"><div class="receipt-empty"><span data-icon="basket"></span><b>Barang belum discan</b><small>Tekan barang di conveyor untuk mula.</small></div></div>
       <div class="receipt-total"><div><span>Subtotal <small id="receiptQuantity">(0 barang)</small></span><b id="subtotal">RM 0.00</b></div><div class="grand-total"><span>Jumlah</span><strong id="total">RM 0<span>.00</span></strong></div></div>
       <div id="paymentHome"><div class="payment-area" id="paymentArea"></div></div><button id="resumePayment" class="secondary-btn resume-payment" hidden>Sambung pembayaran</button>
-      <div class="pos-foot"><span data-icon="lock"></span> KEDAI KITA <span>•</span> <span id="saveStatus">Disimpan pada peranti ini</span></div>
+      <div class="pos-foot"><span data-icon="lock"></span> KEDAI KITA <span>•</span> <span id="saveStatus" role="status">Disimpan pada peranti ini</span><span id="offlineStatus" class="offline-status" role="status">Menyediakan cache offline…</span></div>
     </aside>
   </main>
 </div>
@@ -127,7 +127,7 @@
 <script>
 (function(){
  'use strict';
- var build='2026-10-27-v71-kasih-reader',detail='',stopped=false;
+ var build='2026-10-27-v72-offline-counter',detail='',stopped=false;
  var currentURL=new URL(location.href),retry=currentURL.searchParams.get('boot')||'';
  window.__KEDAI_ACTIVE_VERSION__=build;
  window.__KEDAI_GAME_READY__=false;

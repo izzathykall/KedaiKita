@@ -31,7 +31,7 @@ let calculatorPosition=null,calculatorDrag=null,musicStarting=false,musicGain=nu
 let chaChingSequence=0,chaChingFallbackNodes=[];
 let renderedBasket=null,renderedSceneCustomer=undefined,selectedCodeItem=null,calculatorInput='',calculatorResult='',advancePending=false;
 const STORAGE='kedai-kita-v1';
-const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-27-v71-kasih-reader';
+const APP_BUILD=window.__KEDAI_ACTIVE_VERSION__||'2026-10-27-v72-offline-counter';
 const UPDATE_CHECK_URL='./version.json';
 let storageOK=true,progress=createProgress(),session=null,phase='scan',customer=null,mode='career',combo=0,busy=false,paused=true,modalKind='intro',cashPicked=[],lastTip=0,lastEarned=0,toastTimer,audioCtx,scannerBuffer=null,scannerBufferPromise=null,scannerSource=null,sound=true,drag=null,scanToken=0;
 let updatePrompt=null,updateCheckTimer=null;
@@ -396,7 +396,7 @@ function restoreCareer(){practiceStore=null;scanToken++;busy=false;advancePendin
 function showShop(returnTo='game'){
  if(mode==='practice'){toast('Semua kategori dibuka untuk latihan. Upgrade tersedia dalam kerjaya.');return}
  const destination=returnTo==='summary'||modalKind==='summary'?'summary':'game';
- openModal('shop',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">KEMBANGKAN PASAR MINI ANDA</div><h2>Naik Taraf & Kategori</h2></div><button class="icon-btn" id="closeShop" aria-label="Tutup">${icon('close')}</button></div><div class="shop-wallet"><small>Duit kedai anda</small><b>${money(progress.wallet)}</b></div><h3 class="shop-section-title">Buka kelas barangan</h3><div class="category-shop">${CATEGORIES.map(c=>{const owned=progress.unlocked.includes(c.id),count=PRODUCTS.filter(p=>p.category===c.id).length;return `<div class="category-card ${owned?'owned':''}"><div class="category-art">${productArt(c.art)}<span>${count} barang</span></div><div><h3>${c.name}</h3><p>Kelas ini mengandungi ${count} jenis barangan. ${owned?'Semua barangan sudah tersedia.':'Buka kelas untuk menjual barangan ini.'}</p></div><button data-category="${c.id}" class="secondary-btn" ${owned||progress.wallet<c.cost?'disabled':''}>${owned?'✓ Dibuka':money(c.cost)}</button><button type="button" class="secondary-btn category-preview-open" data-preview-category="${c.id}" aria-label="Lihat senarai barangan ${c.name}">${icon('book')} Lihat senarai barangan (${count})</button></div>`}).join('')}</div>${paymentUpgradeCards()}<h3 class="shop-section-title">Peralatan kedai & bonus Rush Hour</h3>${UPGRADES.filter(u=>u.type!=='payment').map(u=>{const level=progress.upgrades[u.id]||0,cost=u.cost*(level+1),maxed=level>=u.max;return `<div class="upgrade-row"><span class="upgrade-icon">${icon(u.icon)}</span><div class="upgrade-info"><b>${u.name}</b><span class="level-dots">${'●'.repeat(level)+'○'.repeat(u.max-level)}</span><small>${u.desc}${machineUpgradeInfo(u.id,level,u.max)}</small></div><button class="primary-btn" data-upgrade="${u.id}" ${maxed||progress.wallet<cost?'disabled':''}>${maxed?'Maksimum':money(cost)}</button></div>`}).join('')}</div>`);
+ openModal('shop',`<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">KEMBANGKAN PASAR MINI ANDA</div><h2>Naik Taraf & Kategori</h2></div><button class="icon-btn" id="closeShop" aria-label="Tutup">${icon('close')}</button></div><div class="shop-wallet"><small>Duit kedai anda</small><b>${money(progress.wallet)}</b></div><h3 class="shop-section-title">Buka kelas barangan</h3><div class="category-shop">${CATEGORIES.map(c=>{const owned=progress.unlocked.includes(c.id),count=PRODUCTS.filter(p=>p.category===c.id).length;return `<div class="category-card ${owned?'owned':''}"><div class="category-art">${productArt(c.art)}<span>${count} barang</span></div><div><h3>${c.name}</h3><p>Kelas ini mengandungi ${count} jenis barangan. ${owned?'Semua barangan sudah tersedia.':'Buka kelas untuk menjual barangan ini.'}</p></div><button data-category="${c.id}" class="secondary-btn" ${owned||progress.wallet<c.cost?'disabled':''}>${owned?'✓ Dibuka':money(c.cost)}</button><button type="button" class="secondary-btn category-preview-open" data-preview-category="${c.id}" aria-label="Lihat senarai barangan ${c.name}">${icon('book')} Lihat senarai barangan (${count})</button></div>`}).join('')}</div>${paymentUpgradeCards()}<h3 class="shop-section-title">Peralatan kedai & bonus Rush Hour</h3>${UPGRADES.filter(u=>u.type!=='payment').map(u=>{const level=progress.upgrades[u.id]||0,cost=u.cost*(level+1),maxed=level>=u.max;return `<div class="upgrade-row"><span class="upgrade-icon">${icon(u.icon)}</span><div class="upgrade-info"><div class="upgrade-title"><b>${u.name}</b><span class="upgrade-level">Tahap ${level} / ${u.max}</span></div><small>${u.desc}</small>${machineUpgradeInfo(u.id,level,u.max)}</div><button class="primary-btn" data-upgrade="${u.id}" ${maxed||progress.wallet<cost?'disabled':''}>${maxed?'Maksimum':money(cost)}</button></div>`}).join('')}</div>`);
  const back=()=>destination==='summary'?showSummary():closeModal();$('closeShop').onclick=back;
  $('modalContent').querySelectorAll('[data-preview-category]').forEach(b=>b.onclick=()=>showCategoryProducts(b.dataset.previewCategory));
  $('modalContent').querySelectorAll('[data-upgrade]').forEach(b=>b.onclick=()=>{{const previous=progress.upgrades[b.dataset.upgrade]||0;if(buyUpgrade(progress,b.dataset.upgrade)){if(b.dataset.upgrade==='comfort'&&customer&&customer.kind!=='kitafood'&&!customer.rushCustomer&&customer.rushOriginalPatience===undefined)customer.patience+=5;if(b.dataset.upgrade==='riderPatience'){delivery?.extendPatience(5);if(customer?.kind==='kitafood')customer.patience=kitaFoodOrderState(customer.orderId)?.timeLimit||customer.patience;}save();if(cloud?.getUser?.())cloud.flush().catch(()=>toast('Upgrade BELUM disimpan dalam Firebase. Jangan log keluar dahulu.',true));renderHeader();beep('success');showShop(destination);if(['card','qr'].includes(b.dataset.upgrade))toast(previous===0?'Bayaran '+(b.dataset.upgrade==='card'?'kad':'QR')+' dibuka untuk pelanggan seterusnya!':'Peralatan pembayaran dinaik taraf ke tahap '+(previous+1));else if(b.dataset.upgrade==='storage')toast('Kapasiti stor kini '+stockCapacity(progress)+' unit / kg setiap produk.')}}});
@@ -636,7 +636,12 @@ developerAccessChanged(false);
 cloud=createCloudSync({
  capture:captureGame,
  hydrate:hydrateGame,
- pauseForAccount:()=>{if(!paused&&modalKind!=='intro')showPause()},
+ pauseForAccount:()=>{
+  if(modalKind==='pause'){$('modal').close();modalKind=null}
+  paused=true;explicitPause=true;document.body.classList.add('paused');
+  cancelDrag();cancelBankCardDrag();stopScaleSound();delivery?.syncClock();syncBackgroundMusic();
+ },
+ afterAccountClose:()=>{if(session&&!['intro','summary','stars-empty'].includes(modalKind)){showPause()}},
  report:label=>{if($('saveStatus'))$('saveStatus').textContent=label},
  onDeveloperChanged:developerAccessChanged
 });
@@ -969,14 +974,16 @@ function applyMachineSpeeds(){
  $('scaleZone').setAttribute('title','Penimbang · '+speed.weighMs/1000+' saat');
 }
 function machineUpgradeInfo(id,level,max){
- if(id==='comfort')return `<span class="machine-speed">Kesabaran biasa: ${20+5*level}s → ${20+5*Math.min(max,level+1)}s</span>`;
- if(id==='riderPatience')return `<span class="machine-speed">Masa rider: ${30+5*level}s → ${30+5*Math.min(max,level+1)}s</span>`;
- if(id==='rushBoost')return `<span class="machine-speed">Bonus Rush Hour: ×${rushHourMultiplier(progress.upgrades).toFixed(1)} → ×${rushHourMultiplier({...progress.upgrades,rushBoost:Math.min(max,level+1)}).toFixed(1)} · ${level>=max?'Maksimum':'Tambah +0.3 setiap tahap'}</span>`;
- if(id==='storage')return `<span class="machine-speed">Had stok: ${stockCapacity(progress)} → ${level<max?stockCapacity({upgrades:{storage:level+1}}):stockCapacity(progress)} unit/kg</span>`;
- if(!['scanner','scale','conveyor'].includes(id))return '';
- const current=machineTimings(progress.upgrades),next=machineTimings({...progress.upgrades,[id]:Math.min(max,level+1)});
+ const nextLevel=Math.min(max,level+1);
+ const metric=(label,current,next)=>`<span class="machine-speed">${label}: ${current}${level>=max?' · Maksimum':' → '+next}</span>`;
+ if(id==='comfort')return metric('Bonus kesabaran','+'+(5*level)+'s','+'+(5*nextLevel)+'s');
+ if(id==='riderPatience')return metric('Masa rider',(30+5*level)+'s',(30+5*nextLevel)+'s');
+ if(id==='rushBoost')return metric('Bonus Rush Hour','×'+rushHourMultiplier(progress.upgrades).toFixed(1),'×'+rushHourMultiplier({...progress.upgrades,rushBoost:nextLevel}).toFixed(1));
+ if(id==='storage')return metric('Had stok',stockCapacity(progress)+' unit/kg',stockCapacity({upgrades:{storage:nextLevel}})+' unit/kg');
+ if(id==='tips')return metric('Bonus tip','+'+(25*level)+'%','+'+(25*nextLevel)+'%');
+ const current=machineTimings(progress.upgrades),next=machineTimings({...progress.upgrades,[id]:nextLevel});
  const key={scanner:'scanMs',scale:'weighMs',conveyor:'slideMs'}[id];
- return `<span class="machine-speed">${id==='conveyor'?'Gerakan barang':'Masa proses'}: ${(current[key]/1000).toFixed(2)}s${level<max?' → '+(next[key]/1000).toFixed(2)+'s':' · Maksimum'}</span>`;
+ return key?metric(id==='conveyor'?'Gerakan barang':'Masa proses',(current[key]/1000).toFixed(2)+'s',(next[key]/1000).toFixed(2)+'s'):'';
 }
 function returnCash(index,transaction,button){
  if(paused||busy||phase!=='change'||transaction!==customer||!Number.isInteger(index)||index<0||index>=cashPicked.length)return;
@@ -1015,7 +1022,14 @@ function renderPaymentAvailability(){
  $('paymentAvailability').innerHTML=['cash','card','qr'].map(id=>`<button class="payment-chip ${enabled.includes(id)?'enabled':'locked'}" data-payment-upgrade="${id}" ${id==='cash'||enabled.includes(id)?'disabled':''} aria-label="${{cash:'Tunai',card:'Kad',qr:'QR'}[id]} ${enabled.includes(id)?'tersedia':'terkunci, buka melalui upgrade'}">${icon(id)}<span>${{cash:'Tunai',card:'Kad',qr:'QR'}[id]}</span>${enabled.includes(id)?'<i></i>':icon('lock')}</button>`).join('');
  $('paymentAvailability').querySelectorAll('[data-payment-upgrade]').forEach(b=>b.onclick=()=>{if(session&&modalKind!=='intro')showShop()});
 }
-function paymentUpgradeCards(){return `<h3 class="shop-section-title">Terminal pembayaran</h3><p class="muted">Naik taraf ketahanan kad dan kelajuan bacaan QR atau KitaKasih. KitaKasih tersedia sejak awal.</p><div class="payment-upgrade-grid">${UPGRADES.filter(u=>u.type==='payment').map(u=>{const level=progress.upgrades[u.id]||0,owned=u.id==='kasihSpeed'||level>=1,maxed=level>=u.max,cost=u.cost*(level+1);return `<div class="payment-upgrade-card ${owned?'owned':''}"><span class="payment-upgrade-art">${icon(u.icon)}<i>${icon(owned?'check':'lock')}</i></span><h3>${u.name}</h3><span class="payment-level">Tahap ${level} / ${u.max}</span><p>${u.desc}${u.id==='kasihSpeed'?`<span class="machine-speed">${(kasihReadMs(level)/1000).toFixed(2)}s${maxed?' · Maksimum':' → '+(kasihReadMs(level+1)/1000).toFixed(2)+'s'}</span>`:''}</p><button class="primary-btn" data-upgrade="${u.id}" ${maxed||progress.wallet<cost?'disabled':''}>${maxed?'✓ Maksimum':owned?'Upgrade · '+money(cost):'Buka · '+money(cost)}</button><small>${maxed?'Semua 5 tahap lengkap':owned?'Pembayaran aktif · upgrade pilihan':progress.wallet<cost?'Perlu lagi '+money(cost-progress.wallet):'Sedia dibuka'}</small></div>`}).join('')}</div>`}
+function paymentUpgradeCards(){return `<h3 class="shop-section-title">Terminal pembayaran</h3><p class="muted">Naik taraf peralatan pembayaran anda. KitaKasih tersedia sejak awal.</p><div class="payment-upgrade-grid">${UPGRADES.filter(u=>u.type==='payment').map(u=>{
+ const level=progress.upgrades[u.id]||0,owned=u.id==='kasihSpeed'||level>=1,maxed=level>=u.max,cost=u.cost*(level+1);
+ let detail;
+ if(u.id==='kasihSpeed')detail=`Bacaan: ${(kasihReadMs(level)/1000).toFixed(2)}s${maxed?' · Maksimum':' → '+(kasihReadMs(level+1)/1000).toFixed(2)+'s'}`;
+ else if(u.id==='qr'){const ms=n=>Math.max(580,1400-(Math.max(1,n)-1)*205);detail=owned?`Pengesahan: ${(ms(level)/1000).toFixed(2)}s${maxed?' · Maksimum':' → '+(ms(level+1)/1000).toFixed(2)+'s'}`:'Tahap 1 · Aktifkan bayaran QR'}
+ else detail=owned?(maxed?'Ketahanan terminal · Maksimum':'Tahap '+level+' → '+(level+1)+' · Ketahanan meningkat'):'Tahap 1 · Aktifkan bayaran kad';
+ return `<div class="payment-upgrade-card ${owned?'owned':''}"><span class="payment-upgrade-art">${icon(u.icon)}<i>${icon(owned?'check':'lock')}</i></span><h3>${u.name}</h3><span class="payment-level">Tahap ${level} / ${u.max}</span><p>${u.desc}</p><span class="machine-speed">${detail}</span><button class="primary-btn" data-upgrade="${u.id}" ${maxed||progress.wallet<cost?'disabled':''}>${maxed?'✓ Maksimum':owned?'Naik taraf · '+money(cost):'Buka · '+money(cost)}</button><small>${maxed?'Semua 5 tahap lengkap':owned?'Pembayaran aktif · naik taraf pilihan':progress.wallet<cost?'Perlu lagi '+money(cost-progress.wallet):'Sedia dibuka'}</small></div>`}).join('')}</div>`}
+
 
 function audioVolume(){const n=Number(progress.settings?.volume??.6);return Number.isFinite(n)?Math.max(0,Math.min(1,n)):.6}
 function prepareScannerAudio(){
@@ -1598,6 +1612,10 @@ async function applyRemoteUpdate(){
    await cloud.flush();
    if(!cloud.isSavedRemotely())throw new Error('Progres belum selesai disimpan');
   }else if(cloud&&!cloud.isSavedLocally()){throw new Error('Simpanan peranti belum berjaya')}
+  const registration=await navigator.serviceWorker?.getRegistration?.();
+  if(registration?.waiting){
+   await new Promise(resolve=>{const timer=setTimeout(resolve,2500);navigator.serviceWorker.addEventListener('controllerchange',()=>{clearTimeout(timer);resolve()},{once:true});registration.waiting.postMessage({type:'ACTIVATE_UPDATE'})});
+  }
   const url=new URL(location.href);
   url.searchParams.set('release',targetVersion||String(Date.now()));
   url.searchParams.set('refresh',String(Date.now()));

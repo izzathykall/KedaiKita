@@ -316,3 +316,36 @@ body.reduced-motion .store-scene .customer:not(.arrive):not(.leaving) > svg{tran
 #accountOverlay.account-compact .account-form-side,
 #accountOverlay.account-compact .account-form-inner{display:block!important;min-height:0!important;min-width:0!important;width:100%!important;padding:0!important;margin:0!important}
 #accountOverlay.account-compact .account-logo{display:flex!important}
+
+/* V72 — consistent upgrade summaries and a full portrait counter. */
+.payment-upgrade-grid{align-items:stretch}
+.payment-upgrade-card{display:grid!important;grid-template-rows:auto auto auto 1fr auto auto auto;align-content:start;gap:12px}
+.payment-upgrade-card>h3,.payment-upgrade-card>p,.payment-upgrade-card>.machine-speed{margin:0!important}
+.payment-upgrade-card>.payment-upgrade-art{justify-self:center}
+.payment-upgrade-card>.primary-btn{width:100%;margin:6px 0 0!important}
+.payment-upgrade-card>small{min-height:18px}
+.upgrade-row .upgrade-info{min-width:0;flex:1}
+.upgrade-title{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}
+.upgrade-level{font-size:11px;font-weight:600;white-space:nowrap;color:var(--muted)}
+.upgrade-row .upgrade-info>small{display:block;margin:7px 0;line-height:1.5}
+.upgrade-row .machine-speed{display:block;margin:0;font-size:12px;line-height:1.6}
+.upgrade-row>.primary-btn{flex-shrink:0;min-width:112px}
+.scanner-glass .barcode-mark{font-size:24px;letter-spacing:3px;white-space:nowrap;line-height:1}
+@media(orientation:portrait){
+ html,body{height:auto!important;min-height:100%;overflow-x:hidden!important;overflow-y:auto!important}
+ .app.game-viewport-fit{height:auto!important;min-height:100dvh!important;max-height:none!important;overflow:visible!important;zoom:1!important;transform:none!important;padding-bottom:24px!important}
+ .app .game-grid{display:flex!important;flex-direction:column!important;flex:none!important;min-height:0!important;height:auto!important;gap:16px!important}
+ .app .game-grid>.work-area,body.view-payment .app .work-area{display:flex!important;flex:none!important;height:auto!important;order:0}
+ .app .store-scene{height:280px!important;min-height:250px!important;flex:none!important}
+ .app .game-grid>.pos-panel,body.view-payment .app .pos-panel{display:flex!important;order:1;flex:none!important;width:100%!important;height:auto!important;min-height:420px!important;max-height:none!important}
+ .app .receipt-list{flex:1!important;min-height:100px;max-height:260px!important;overflow-y:auto}
+ .app .mobile-tabs{display:none!important}
+ .app .stations{flex:none!important}
+ .app .shift-footer{flex:none!important}
+}
+@media(max-width:480px){
+ .upgrade-row{display:grid!important;grid-template-columns:40px minmax(0,1fr);gap:12px!important}
+ .upgrade-row>.primary-btn{grid-column:2;justify-self:start;min-width:120px}
+ .scanner-glass .barcode-mark{font-size:18px;letter-spacing:1px}
+}
+.pos-foot{flex-wrap:wrap}.offline-status{display:block;flex-basis:100%;font-size:9px;text-align:center;color:var(--muted);padding-top:4px}

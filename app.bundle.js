@@ -68,6 +68,12 @@
       if (active) return;
       if (document.activeElement?.matches('input,textarea,[contenteditable="true"]')) return;
       const viewport = screen();
+      if (viewport.height >= viewport.width) {
+        app.classList.remove("game-tight");
+        app.dataset.fitOverflow = "false";
+        apply(1, viewport.height);
+        return;
+      }
       if (visual && visual.height < viewport.layoutH * 0.64 && document.activeElement?.isContentEditable) return;
       active = true;
       const paymentView = body.classList.contains("view-payment") && viewport.width <= 760;
@@ -190,7 +196,7 @@
 
   // qr-scanner.mjs
   function qrScannerArt() {
-    return `<svg viewBox="0 0 132 192" aria-hidden="true"><defs><linearGradient id="qr71Body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6c887b"/><stop offset=".4" stop-color="#294c41"/><stop offset="1" stop-color="#17362d"/></linearGradient><linearGradient id="qr71Glass" x2="0" y2="1"><stop stop-color="#17332e"/><stop offset="1" stop-color="#081f1b"/></linearGradient><linearGradient id="qr71Metal"><stop stop-color="#a3b7ac"/><stop offset=".5" stop-color="#ecf3e9"/><stop offset="1" stop-color="#8ba597"/></linearGradient></defs><g transform="rotate(-9 66 96)"><path d="M46 78H83L89 160Q90 177 77 181H56Q44 179 45 165Z" fill="url(#qr71Body)" stroke="#16382c" stroke-width="2"/><path d="M52 100H78L82 164Q82 171 76 173H57Q51 171 51 164Z" fill="#1b392f"/><path d="M57 116H74M57 126H75M57 136H76M57 146H77M57 156H77" stroke="#446155" stroke-width="2" stroke-linecap="round"/><rect x="50" y="92" width="29" height="12" rx="5" fill="#90ac97" stroke="#bdd0bc"/><path d="M16 29Q18 13 34 12H100Q115 13 117 29L114 77Q113 92 99 95H30Q15 91 15 77Z" fill="url(#qr71Body)" stroke="#13362b" stroke-width="2.5"/><path d="M24 28Q25 21 35 20H98Q108 21 109 29" fill="none" stroke="url(#qr71Metal)" stroke-width="3" stroke-linecap="round"/><rect x="24" y="32" width="83" height="43" rx="9" fill="url(#qr71Glass)" stroke="#819e8d" stroke-width="1.5"/><path d="M32 41H42M32 41V49M98 41H88M98 41V49M32 66H42M32 66V58M98 66H88M98 66V58" fill="none" stroke="#a6cdb1" stroke-width="1.5"/><rect x="48" y="43" width="34" height="20" rx="7" fill="#284e40" stroke="#567d66"/><circle cx="65" cy="53" r="8" fill="#102d24" stroke="#87b39a"/><circle cx="65" cy="53" r="4" fill="#3f7c62"/><circle cx="63" cy="51" r="2" fill="#c3ebd0"/><path d="M35 38H92" stroke="#ffffff" stroke-opacity=".09" stroke-width="3"/><circle class="kk-reader-led" cx="99" cy="84" r="2.5" fill="#97e5b0"/><text x="62" y="86" text-anchor="middle" font-family="sans-serif" font-size="6" font-weight="700" letter-spacing="1.6" fill="#deebe0">KITA SCAN</text><path d="M57 176H76" stroke="url(#qr71Metal)" stroke-width="2" stroke-linecap="round"/></g></svg>`;
+    return `<svg viewBox="0 0 132 192" aria-hidden="true"><g transform="rotate(-9 66 96)"><rect x="47" y="75" width="38" height="105" rx="16" fill="#24483e" stroke="#12392f" stroke-width="2"/><path d="M56 107v51" stroke="#668476" stroke-width="2" stroke-linecap="round"/><rect x="12" y="17" width="108" height="78" rx="20" fill="#34594c" stroke="#183e32" stroke-width="2"/><rect x="21" y="26" width="90" height="49" rx="12" fill="#102e28"/><path d="M35 44v-6h12m38 0h12v6M35 57v6h12m38 0h12v-6" fill="none" stroke="#b8d4c2" stroke-width="2" stroke-linecap="round"/><path d="M44 51h44" stroke="#75b899" stroke-width="2" stroke-linecap="round"/><circle class="kk-reader-led" cx="100" cy="84" r="3" fill="#a8e2bd"/><text x="61" y="86" text-anchor="middle" font-family="sans-serif" font-size="6" font-weight="600" letter-spacing="1.5" fill="#e0ece3">KITA SCAN</text></g></svg>`;
   }
 
   // product-migration.mjs
@@ -337,7 +343,7 @@
   var selectedTabs = /* @__PURE__ */ new Map();
   function tabbed(root, groups, after, initial = 0) {
     const key = root.closest("dialog")?.dataset.kind || "menu";
-    initial = key === "settings" ? 0 : Math.min(selectedTabs.get(key) || initial, groups.length - 1);
+    initial = ["settings", "developer"].includes(key) ? 0 : Math.min(selectedTabs.get(key) || initial, groups.length - 1);
     const nav = document.createElement("div");
     nav.className = "studio-tabs";
     nav.setAttribute("role", "tablist");
@@ -2447,6 +2453,9 @@
 
   // cloud.mjs
   var FIREBASE_VERSION = "13.0.0";
+  var LAST_ACCOUNT_KEY = "kedai-kita-last-account";
+  var online = () => globalThis.navigator?.onLine !== false;
+  var networkError = (err) => !online() || /network|offline|unavailable|timeout|failed to fetch|load failed|module script/i.test(String(err?.code || "") + " " + String(err?.message || ""));
   var GUEST_KEY = "kedai-kita-v1";
   var ACCOUNT_KEY = (uid) => `kedai-kita-user-${uid}-v1`;
   var byId = (id) => document.getElementById(id);
@@ -2509,6 +2518,7 @@
   };
   var isMeaningful = (data) => !!(data && (data?.progress?.day > 1 || data?.progress?.served > 0 || data?.progress?.wallet > 0 || data?.session || data?.practiceRun?.session));
   function createCloudSync({ capture, hydrate, pauseForAccount, report, onDeveloperChanged = () => {
+  }, afterAccountClose = () => {
   } }) {
     const overlay = byId("accountOverlay");
     const ui = {
@@ -2543,6 +2553,7 @@
     let developerSandbox = false, baseStamp = null, localSaveFailed = false;
     const DEV_KEY = (uid) => `kedai-kita-dev-sandbox-${uid}-v1`;
     const authorizedDeveloper = (uid) => !!uid && Array.isArray(window.KEDAI_DEVELOPER_UIDS) && window.KEDAI_DEVELOPER_UIDS.some((x) => typeof x === "string" && x.trim().length > 12 && x.trim() === uid);
+    let localOnly = false, reconnecting = false, accountOpened = false, controlsReady = false, sdkLoadFailed = false;
     let bootWatchdog = null, bootSettled = false, bootStalled = false;
     const sessionPath = (uid) => api.ref(db, `activeSessions/${uid}`);
     const browserSessionKey = (uid) => `kk-active-session-${uid}`;
@@ -2561,18 +2572,21 @@
     const clearSessionLocal = (uid) => {
       try {
         sessionStorage.removeItem(browserSessionKey(uid));
+        localStorage.removeItem(browserSessionKey(uid));
+        localStorage.removeItem(LAST_ACCOUNT_KEY);
       } catch {
       }
     };
     const saveSessionLocal = (uid, token) => {
       try {
         sessionStorage.setItem(browserSessionKey(uid), token);
+        localStorage.setItem(browserSessionKey(uid), token);
       } catch {
       }
     };
     const getSessionLocal = (uid) => {
       try {
-        return sessionStorage.getItem(browserSessionKey(uid));
+        return sessionStorage.getItem(browserSessionKey(uid)) || localStorage.getItem(browserSessionKey(uid));
       } catch {
         return null;
       }
@@ -2595,6 +2609,10 @@
       if (overlay.open) overlay.close();
       overlay.classList.remove("account-compact");
       document.body.classList.remove("account-locked");
+      if (accountOpened) {
+        accountOpened = false;
+        afterAccountClose();
+      }
     };
     const showRegion = (region) => {
       overlay.dataset.region = region;
@@ -2625,6 +2643,7 @@
     };
     function showStartupError(step, err) {
       if (bootStalled) return;
+      if (networkError(err) && restoreOffline()) return;
       diagnostic(step, err);
       bootStalled = true;
       bootSettled = true;
@@ -2659,7 +2678,7 @@
       ui.title.textContent = "Akaun Kedai Kita";
       ui.hint.textContent = "Progres kerjaya disimpan mengikut akaun ini.";
       ui.current.textContent = user?.email || "Akaun pemain";
-      message(syncError ? errorMalay(syncError) : "Data akaun anda telah dimuatkan.");
+      message(localOnly ? "Mod offline \xB7 progres disimpan pada peranti ini." : syncError ? errorMalay(syncError) : "Data akaun anda telah dimuatkan.");
       const approved = byId("developerAccessEnabled");
       if (approved) approved.hidden = !developerSandbox;
     };
@@ -2761,17 +2780,108 @@
     const stage = (state) => {
       queued = clone(state);
       delete queued._cloudPending;
+      if (localOnly || !online()) {
+        setStatus("Disimpan pada peranti \xB7 menunggu penyegerakan");
+        return;
+      }
       setStatus("Menyimpan progres\u2026");
       if (!timer) timer = setTimeout(() => flush().catch(() => {
       }), 3e3);
     };
-    window.addEventListener("online", () => {
-      if (queued && !writing && ready && user && activeSessionToken) {
-        syncError = null;
-        flush().catch(() => {
-        });
+    window.addEventListener("offline", () => {
+      localOnly = true;
+      clearTimeout(timer);
+      timer = null;
+      if (ready) {
+        queueSave(capture());
+        setStatus(localSaveFailed ? "Simpanan peranti gagal \xB7 jangan tutup permainan" : "Disimpan pada peranti \xB7 menunggu penyegerakan");
       }
     });
+    window.addEventListener("online", () => reconnect());
+    document.addEventListener?.("visibilitychange", () => {
+      if (!document.hidden) reconnect();
+    });
+    async function reconnect() {
+      if (!online() || reconnecting || kickedForOtherDevice || busy2 || !localOnly) return;
+      reconnecting = true;
+      try {
+        if (writesPending) {
+          try {
+            await withTimeout(writesPending, DATA_TIMEOUT_MS, "menunggu penyegerakan");
+          } catch {
+          }
+          if (writing) return;
+        }
+        if (!auth) {
+          if (guestMode) return;
+          if (ready) queueSave(capture());
+          if (sdkLoadFailed) {
+            try {
+              const path2 = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/`;
+              const responses = await withTimeout(Promise.all(["firebase-app.js", "firebase-auth.js", "firebase-database.js"].map((name) => fetch(path2 + name, { cache: "no-store" }))), BOOT_TIMEOUT_MS, "menyemak sambungan");
+              if (responses.every((response) => response.ok) && !localSaveFailed) {
+                window.location.reload();
+                return;
+              }
+            } catch {
+            }
+            return;
+          }
+          if (ready) {
+            pauseForAccount();
+            accountOpened = true;
+          }
+          started = false;
+          bootStalled = false;
+          bootSettled = false;
+          await start();
+          return;
+        }
+        if (!auth.currentUser) {
+          if (user) {
+            pauseForAccount();
+            showLogin("Log masuk semula untuk menyegerakkan progres peranti.");
+          }
+          return;
+        }
+        if (ready) queueSave(capture());
+        pauseForAccount();
+        accountOpened = true;
+        await onSignedIn(auth.currentUser, ++epoch);
+      } finally {
+        reconnecting = false;
+      }
+    }
+    const reconnectTimer = setInterval(() => {
+      if (!document.hidden) reconnect();
+    }, 3e4);
+    reconnectTimer?.unref?.();
+    function restoreOffline(identity = readLocal(LAST_ACCOUNT_KEY)) {
+      if (!identity?.uid || kickedForOtherDevice) return false;
+      const key = authorizedDeveloper(identity.uid) ? DEV_KEY(identity.uid) : ACCOUNT_KEY(identity.uid);
+      const saved = readLocal(key);
+      if (!saved?.progress) return false;
+      clearTimeout(bootWatchdog);
+      bootWatchdog = null;
+      bootSettled = true;
+      const alreadyPlaying = ready && user?.uid === identity.uid;
+      if (!alreadyPlaying) {
+        try {
+          setIdentity({ uid: identity.uid, email: identity.email || "" });
+          hydrate(saved);
+        } catch {
+          return false;
+        }
+      }
+      baseStamp = saved._cloudPending ? saved._cloudBaseStamp || null : saved._clientStamp || null;
+      localOnly = true;
+      ready = true;
+      activeSessionToken = null;
+      queued = saved._cloudPending ? clone(saved) : null;
+      hide();
+      setStatus("Disimpan pada peranti \xB7 menunggu penyegerakan");
+      return true;
+    }
     async function flush() {
       try {
         return await withTimeout(drainSaves(), DATA_TIMEOUT_MS, "menyimpan progres");
@@ -2789,16 +2899,27 @@
         if (writesPending) await writesPending;
         return queued ? drainSaves() : true;
       }
-      if (!ready || !user || !queued || !api || !activeSessionToken) return !queued;
-      const uid = user.uid, value = queued, key = currentKey, sessionToken = activeSessionToken, writeEpoch = epoch;
+      if (!ready || !user || !queued || !api || !activeSessionToken || localOnly || !online()) return !queued;
+      const uid = user.uid, value = queued, key = currentKey, sessionToken = activeSessionToken, writeEpoch = epoch, writeDeveloper = developerSandbox;
       queued = null;
       writing = true;
       try {
         if (!activeSessionToken) {
           throw new Error("Sesi akaun tidak aktif");
         }
-        writesPending = api.update(currentSnapshotRef(uid), cloudPayload(value, sessionToken));
-        await writesPending;
+        const payload = cloudPayload(value, sessionToken);
+        writesPending = api.runTransaction(currentSnapshotRef(uid), (current) => {
+          if (user?.uid !== uid || epoch !== writeEpoch || activeSessionToken !== sessionToken) return;
+          const remote = writeDeveloper ? current?.developerSandbox?.state : current?.state;
+          if (remote?.progress && remote._clientStamp !== value._clientStamp && (remote._clientStamp || null) !== (value._cloudBaseStamp || null)) return;
+          return { ...current || {}, ...payload };
+        }, { applyLocally: false });
+        const result = await writesPending;
+        if (!result.committed) {
+          const err = new Error("Progres awan berubah semasa penyegerakan");
+          err.code = "KEDAI_CONFLICT";
+          throw err;
+        }
         if (user?.uid === uid && epoch === writeEpoch && activeSessionToken === sessionToken) {
           baseStamp = value._clientStamp || null;
           if (queued) queued._cloudBaseStamp = baseStamp;
@@ -2812,6 +2933,7 @@
           setStatus(queued ? "Menyimpan progres\u2026" : "\u2713 Progres disimpan");
         }
       } catch (err) {
+        if (user?.uid === uid && epoch === writeEpoch && (networkError(err) || err?.code === "KEDAI_CONFLICT")) localOnly = true;
         if (user?.uid === uid && epoch === writeEpoch && activeSessionToken === sessionToken) {
           syncError = err;
           queued = queued || value;
@@ -2827,12 +2949,21 @@
           });
         }, 3e3);
       }
-      return queued && ready && user && activeSessionToken ? drainSaves() : !queued;
+      return queued && ready && user && activeSessionToken && !localOnly ? drainSaves() : !queued;
     }
     async function resetProgress(state) {
       if (!ready) throw new Error("Simpanan akaun belum sedia. Cuba lagi sebentar.");
       const fresh = clone(state);
       if (user) {
+        if (localOnly || !online()) {
+          fresh._cloudPending = true;
+          fresh._clientStamp = makeSessionToken();
+          fresh._cloudBaseStamp = baseStamp;
+          if (!writeLocal(currentKey, fresh)) throw new Error("Tidak dapat menyimpan pada peranti.");
+          queued = fresh;
+          setStatus("Reset disimpan pada peranti \xB7 menunggu penyegerakan");
+          return true;
+        }
         fresh._clientStamp = makeSessionToken();
         fresh._cloudBaseStamp = baseStamp;
         if (!api || !activeSessionToken) throw new Error("Sesi akaun telah tamat. Log masuk semula.");
@@ -2884,7 +3015,7 @@
         data._cloudBaseStamp = baseStamp;
       }
       localSaveFailed = !writeLocal(currentKey, data);
-      if (user && activeSessionToken) stage(data);
+      if (user) stage(data);
       else if (!user) setStatus(localSaveFailed ? "Simpanan peranti gagal \xB7 jangan tutup permainan" : "Disimpan pada peranti \xB7 mod tetamu");
       if (localSaveFailed && user) setStatus("Simpanan peranti gagal \xB7 menunggu simpanan awan");
     }
@@ -2896,6 +3027,12 @@
         throw error;
       }
       ready = true;
+      localOnly = false;
+      syncError = null;
+      if (user) {
+        writeLocal(LAST_ACCOUNT_KEY, { uid: user.uid, email: user.email || "" });
+        if (activeSessionToken) saveSessionLocal(user.uid, activeSessionToken);
+      }
       localSaveFailed = !writeLocal(currentKey, state || capture());
       setStatus("\u2713 Progres akaun dimuatkan");
       hide();
@@ -2904,10 +3041,13 @@
       baseStamp = remote?._clientStamp || null;
       const choice = chooseSave(local, remote);
       if (choice === "conflict") {
+        ready = false;
+        pauseForAccount();
+        accountOpened = true;
         show();
         showRegion("choice");
         ui.title.textContent = "Pilih progres untuk disambung";
-        const summary = (s) => `Hari ${Number(s.progress.day) || 1} \xB7 RM ${((Number(s.progress.wallet) || 0) / 100).toFixed(2)}`;
+        const summary = (s) => `Hari ${Number(s.progress?.day) || 1} \xB7 RM ${((Number(s.progress?.wallet) || 0) / 100).toFixed(2)}`;
         ui.hint.textContent = "Ada dua simpanan berbeza. Pilih dengan teliti; pilihan anda akan digunakan untuk akaun ini.";
         ui.choice.querySelector(".account-choice-label").textContent = "Simpanan peranti dan awan tidak sepadan";
         ui.import.textContent = "Guna peranti \xB7 " + summary(local);
@@ -2936,6 +3076,10 @@
       return true;
     }
     async function onSignedIn(next, token, retryNewSession = false) {
+      queued = null;
+      clearTimeout(timer);
+      timer = null;
+      if (!online() && restoreOffline(next)) return;
       setIdentity(next);
       guestMode = false;
       showLoading("Menyemak sesi dan progres akaun\u2026");
@@ -2993,6 +3137,7 @@
       } catch (err) {
         if (token !== epoch) return;
         newCredentialLogin = false;
+        if (networkError(err) && restoreOffline(next)) return;
         syncError = err;
         setStatus("Simpanan tidak dapat diakses");
         show();
@@ -3015,6 +3160,7 @@
     }
     async function onAuthChange(next) {
       const token = ++epoch;
+      if (!next && !online() && restoreOffline()) return;
       queued = null;
       if (timer) {
         clearTimeout(timer);
@@ -3049,6 +3195,7 @@
       else showLogin();
     }
     function openAccount() {
+      accountOpened = true;
       overlay.classList.add("account-compact");
       pauseForAccount();
       if (user && ready) showOverview();
@@ -3189,15 +3336,20 @@
     async function start() {
       if (started) return;
       started = true;
-      initControls();
-      window.addEventListener("online", () => {
-        if (!user || !ready) return;
-        const pending = readLocal(currentKey);
-        if (pending?._cloudPending) {
-          syncError = null;
-          stage(pending);
-        }
-      });
+      if (!controlsReady) {
+        initControls();
+        controlsReady = true;
+      }
+      if (!online()) {
+        if (restoreOffline()) return;
+        guestMode = true;
+        ready = true;
+        localOnly = true;
+        hydrate(readLocal(GUEST_KEY));
+        hide();
+        setStatus("Disimpan pada peranti \xB7 mod tetamu");
+        return;
+      }
       showLoading("Menyemak sambungan akaun\u2026");
       const config = window.KEDAI_FIREBASE_CONFIG;
       configEnabled = configValid(config);
@@ -3219,7 +3371,7 @@
           import(path2 + "firebase-database.js")
         ]), BOOT_TIMEOUT_MS, "memuatkan komponen akaun");
         if (bootStalled) return;
-        const app = appModule.initializeApp(config);
+        const app = appModule.getApps().length ? appModule.getApp() : appModule.initializeApp(config);
         api = { ...authModule, ...databaseModule };
         try {
           auth = authModule.getAuth(app);
@@ -3242,6 +3394,7 @@
           });
         }, (err) => showStartupError("membaca status log masuk", err));
       } catch (err) {
+        sdkLoadFailed = networkError(err);
         if (!bootStalled) showStartupError("memulakan sistem akaun", err);
       }
     }
@@ -3256,7 +3409,7 @@
       if (local?._clientStamp && saved._clientStamp !== local._clientStamp) throw new Error("Versi Firebase belum sama dengan versi semasa.");
       return { day: saved.progress.day, wallet: saved.progress.wallet, items: Object.keys(saved.progress.inventory || {}).length, categories: saved.progress.unlocked?.length || 0, upgrades: Object.keys(saved.progress.upgrades || {}).length, delivery: saved.progress.delivery?.orders?.length || 0, developer: developerSandbox };
     }
-    return { start, queueSave, flush, resetProgress, verifyFirebase, openAccount, getStorageKey: () => currentKey, getUser: () => user, isDeveloper: () => developerSandbox, isSavedLocally: () => ready && !localSaveFailed, isSavedRemotely: () => !!user && ready && !queued && !writing && !syncError && !!activeSessionToken };
+    return { start, queueSave, flush, resetProgress, verifyFirebase, openAccount, getStorageKey: () => currentKey, getUser: () => user, isDeveloper: () => developerSandbox, isSavedLocally: () => ready && !localSaveFailed, isSavedRemotely: () => !!user && ready && !localOnly && !queued && !writing && !syncError && !!activeSessionToken };
   }
 
   // app.mjs
@@ -3312,7 +3465,7 @@
   var calculatorResult = "";
   var advancePending = false;
   var STORAGE = "kedai-kita-v1";
-  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v71-kasih-reader";
+  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v72-offline-counter";
   var UPDATE_CHECK_URL = "./version.json";
   var storageOK = true;
   var progress = createProgress();
@@ -4575,7 +4728,7 @@
       return `<div class="category-card ${owned ? "owned" : ""}"><div class="category-art">${productArt(c.art)}<span>${count} barang</span></div><div><h3>${c.name}</h3><p>Kelas ini mengandungi ${count} jenis barangan. ${owned ? "Semua barangan sudah tersedia." : "Buka kelas untuk menjual barangan ini."}</p></div><button data-category="${c.id}" class="secondary-btn" ${owned || progress.wallet < c.cost ? "disabled" : ""}>${owned ? "\u2713 Dibuka" : money(c.cost)}</button><button type="button" class="secondary-btn category-preview-open" data-preview-category="${c.id}" aria-label="Lihat senarai barangan ${c.name}">${icon("book")} Lihat senarai barangan (${count})</button></div>`;
     }).join("")}</div>${paymentUpgradeCards()}<h3 class="shop-section-title">Peralatan kedai & bonus Rush Hour</h3>${UPGRADES.filter((u) => u.type !== "payment").map((u) => {
       const level = progress.upgrades[u.id] || 0, cost = u.cost * (level + 1), maxed = level >= u.max;
-      return `<div class="upgrade-row"><span class="upgrade-icon">${icon(u.icon)}</span><div class="upgrade-info"><b>${u.name}</b><span class="level-dots">${"\u25CF".repeat(level) + "\u25CB".repeat(u.max - level)}</span><small>${u.desc}${machineUpgradeInfo(u.id, level, u.max)}</small></div><button class="primary-btn" data-upgrade="${u.id}" ${maxed || progress.wallet < cost ? "disabled" : ""}>${maxed ? "Maksimum" : money(cost)}</button></div>`;
+      return `<div class="upgrade-row"><span class="upgrade-icon">${icon(u.icon)}</span><div class="upgrade-info"><div class="upgrade-title"><b>${u.name}</b><span class="upgrade-level">Tahap ${level} / ${u.max}</span></div><small>${u.desc}</small>${machineUpgradeInfo(u.id, level, u.max)}</div><button class="primary-btn" data-upgrade="${u.id}" ${maxed || progress.wallet < cost ? "disabled" : ""}>${maxed ? "Maksimum" : money(cost)}</button></div>`;
     }).join("")}</div>`);
     const back = () => destination === "summary" ? showSummary() : closeModal();
     $("closeShop").onclick = back;
@@ -5018,7 +5171,23 @@
     capture: captureGame,
     hydrate: hydrateGame,
     pauseForAccount: () => {
-      if (!paused && modalKind !== "intro") showPause();
+      if (modalKind === "pause") {
+        $("modal").close();
+        modalKind = null;
+      }
+      paused = true;
+      explicitPause = true;
+      document.body.classList.add("paused");
+      cancelDrag();
+      cancelBankCardDrag();
+      stopScaleSound();
+      delivery?.syncClock();
+      syncBackgroundMusic();
+    },
+    afterAccountClose: () => {
+      if (session && !["intro", "summary", "stars-empty"].includes(modalKind)) {
+        showPause();
+      }
     },
     report: (label) => {
       if ($("saveStatus")) $("saveStatus").textContent = label;
@@ -5796,14 +5965,16 @@
     $("scaleZone").setAttribute("title", "Penimbang \xB7 " + speed.weighMs / 1e3 + " saat");
   }
   function machineUpgradeInfo(id, level, max) {
-    if (id === "comfort") return `<span class="machine-speed">Kesabaran biasa: ${20 + 5 * level}s \u2192 ${20 + 5 * Math.min(max, level + 1)}s</span>`;
-    if (id === "riderPatience") return `<span class="machine-speed">Masa rider: ${30 + 5 * level}s \u2192 ${30 + 5 * Math.min(max, level + 1)}s</span>`;
-    if (id === "rushBoost") return `<span class="machine-speed">Bonus Rush Hour: \xD7${rushHourMultiplier(progress.upgrades).toFixed(1)} \u2192 \xD7${rushHourMultiplier({ ...progress.upgrades, rushBoost: Math.min(max, level + 1) }).toFixed(1)} \xB7 ${level >= max ? "Maksimum" : "Tambah +0.3 setiap tahap"}</span>`;
-    if (id === "storage") return `<span class="machine-speed">Had stok: ${stockCapacity(progress)} \u2192 ${level < max ? stockCapacity({ upgrades: { storage: level + 1 } }) : stockCapacity(progress)} unit/kg</span>`;
-    if (!["scanner", "scale", "conveyor"].includes(id)) return "";
-    const current = machineTimings(progress.upgrades), next = machineTimings({ ...progress.upgrades, [id]: Math.min(max, level + 1) });
+    const nextLevel = Math.min(max, level + 1);
+    const metric = (label, current2, next2) => `<span class="machine-speed">${label}: ${current2}${level >= max ? " \xB7 Maksimum" : " \u2192 " + next2}</span>`;
+    if (id === "comfort") return metric("Bonus kesabaran", "+" + 5 * level + "s", "+" + 5 * nextLevel + "s");
+    if (id === "riderPatience") return metric("Masa rider", 30 + 5 * level + "s", 30 + 5 * nextLevel + "s");
+    if (id === "rushBoost") return metric("Bonus Rush Hour", "\xD7" + rushHourMultiplier(progress.upgrades).toFixed(1), "\xD7" + rushHourMultiplier({ ...progress.upgrades, rushBoost: nextLevel }).toFixed(1));
+    if (id === "storage") return metric("Had stok", stockCapacity(progress) + " unit/kg", stockCapacity({ upgrades: { storage: nextLevel } }) + " unit/kg");
+    if (id === "tips") return metric("Bonus tip", "+" + 25 * level + "%", "+" + 25 * nextLevel + "%");
+    const current = machineTimings(progress.upgrades), next = machineTimings({ ...progress.upgrades, [id]: nextLevel });
     const key = { scanner: "scanMs", scale: "weighMs", conveyor: "slideMs" }[id];
-    return `<span class="machine-speed">${id === "conveyor" ? "Gerakan barang" : "Masa proses"}: ${(current[key] / 1e3).toFixed(2)}s${level < max ? " \u2192 " + (next[key] / 1e3).toFixed(2) + "s" : " \xB7 Maksimum"}</span>`;
+    return key ? metric(id === "conveyor" ? "Gerakan barang" : "Masa proses", (current[key] / 1e3).toFixed(2) + "s", (next[key] / 1e3).toFixed(2) + "s") : "";
   }
   function returnCash(index, transaction, button) {
     if (paused || busy || phase !== "change" || transaction !== customer || !Number.isInteger(index) || index < 0 || index >= cashPicked.length) return;
@@ -5913,9 +6084,15 @@
     });
   }
   function paymentUpgradeCards() {
-    return `<h3 class="shop-section-title">Terminal pembayaran</h3><p class="muted">Naik taraf ketahanan kad dan kelajuan bacaan QR atau KitaKasih. KitaKasih tersedia sejak awal.</p><div class="payment-upgrade-grid">${UPGRADES.filter((u) => u.type === "payment").map((u) => {
+    return `<h3 class="shop-section-title">Terminal pembayaran</h3><p class="muted">Naik taraf peralatan pembayaran anda. KitaKasih tersedia sejak awal.</p><div class="payment-upgrade-grid">${UPGRADES.filter((u) => u.type === "payment").map((u) => {
       const level = progress.upgrades[u.id] || 0, owned = u.id === "kasihSpeed" || level >= 1, maxed = level >= u.max, cost = u.cost * (level + 1);
-      return `<div class="payment-upgrade-card ${owned ? "owned" : ""}"><span class="payment-upgrade-art">${icon(u.icon)}<i>${icon(owned ? "check" : "lock")}</i></span><h3>${u.name}</h3><span class="payment-level">Tahap ${level} / ${u.max}</span><p>${u.desc}${u.id === "kasihSpeed" ? `<span class="machine-speed">${(kasihReadMs(level) / 1e3).toFixed(2)}s${maxed ? " \xB7 Maksimum" : " \u2192 " + (kasihReadMs(level + 1) / 1e3).toFixed(2) + "s"}</span>` : ""}</p><button class="primary-btn" data-upgrade="${u.id}" ${maxed || progress.wallet < cost ? "disabled" : ""}>${maxed ? "\u2713 Maksimum" : owned ? "Upgrade \xB7 " + money(cost) : "Buka \xB7 " + money(cost)}</button><small>${maxed ? "Semua 5 tahap lengkap" : owned ? "Pembayaran aktif \xB7 upgrade pilihan" : progress.wallet < cost ? "Perlu lagi " + money(cost - progress.wallet) : "Sedia dibuka"}</small></div>`;
+      let detail;
+      if (u.id === "kasihSpeed") detail = `Bacaan: ${(kasihReadMs(level) / 1e3).toFixed(2)}s${maxed ? " \xB7 Maksimum" : " \u2192 " + (kasihReadMs(level + 1) / 1e3).toFixed(2) + "s"}`;
+      else if (u.id === "qr") {
+        const ms = (n) => Math.max(580, 1400 - (Math.max(1, n) - 1) * 205);
+        detail = owned ? `Pengesahan: ${(ms(level) / 1e3).toFixed(2)}s${maxed ? " \xB7 Maksimum" : " \u2192 " + (ms(level + 1) / 1e3).toFixed(2) + "s"}` : "Tahap 1 \xB7 Aktifkan bayaran QR";
+      } else detail = owned ? maxed ? "Ketahanan terminal \xB7 Maksimum" : "Tahap " + level + " \u2192 " + (level + 1) + " \xB7 Ketahanan meningkat" : "Tahap 1 \xB7 Aktifkan bayaran kad";
+      return `<div class="payment-upgrade-card ${owned ? "owned" : ""}"><span class="payment-upgrade-art">${icon(u.icon)}<i>${icon(owned ? "check" : "lock")}</i></span><h3>${u.name}</h3><span class="payment-level">Tahap ${level} / ${u.max}</span><p>${u.desc}</p><span class="machine-speed">${detail}</span><button class="primary-btn" data-upgrade="${u.id}" ${maxed || progress.wallet < cost ? "disabled" : ""}>${maxed ? "\u2713 Maksimum" : owned ? "Naik taraf \xB7 " + money(cost) : "Buka \xB7 " + money(cost)}</button><small>${maxed ? "Semua 5 tahap lengkap" : owned ? "Pembayaran aktif \xB7 naik taraf pilihan" : progress.wallet < cost ? "Perlu lagi " + money(cost - progress.wallet) : "Sedia dibuka"}</small></div>`;
     }).join("")}</div>`;
   }
   function audioVolume() {
@@ -7218,6 +7395,17 @@
       } else if (cloud && !cloud.isSavedLocally()) {
         throw new Error("Simpanan peranti belum berjaya");
       }
+      const registration = await navigator.serviceWorker?.getRegistration?.();
+      if (registration?.waiting) {
+        await new Promise((resolve) => {
+          const timer = setTimeout(resolve, 2500);
+          navigator.serviceWorker.addEventListener("controllerchange", () => {
+            clearTimeout(timer);
+            resolve();
+          }, { once: true });
+          registration.waiting.postMessage({ type: "ACTIVATE_UPDATE" });
+        });
+      }
       const url = new URL(location.href);
       url.searchParams.set("release", targetVersion || String(Date.now()));
       url.searchParams.set("refresh", String(Date.now()));
@@ -7413,6 +7601,32 @@
   kasihHistoryButton.textContent = "Resit KitaKasih";
   kasihHistoryButton.onclick = showKasihHistory;
   $("receiptSub").parentElement.append(kasihHistoryButton);
+
+  // offline.mjs
+  function prepareOfflineGame() {
+    if (!("serviceWorker" in navigator) || !window.isSecureContext) return;
+    const register = () => navigator.serviceWorker.register("./sw.js", { scope: "./", updateViaCache: "none" }).then((reg) => {
+      const announce = () => {
+        const label = document.getElementById("offlineStatus");
+        if (label) {
+          label.textContent = "Sedia dimainkan offline";
+          label.title = "Fail permainan tersedia pada peranti ini. Progres akaun disegerakkan apabila internet kembali.";
+        }
+      };
+      if (reg.active) announce();
+      const track = (worker) => worker?.addEventListener("statechange", () => {
+        if (worker.state === "activated") announce();
+      });
+      track(reg.installing);
+      reg.addEventListener("updatefound", () => track(reg.installing));
+    }).catch(() => {
+      const label = document.getElementById("offlineStatus");
+      if (label) label.textContent = "Cache offline belum tersedia";
+    });
+    register();
+    window.addEventListener("online", register);
+  }
+  prepareOfflineGame();
 
   // entry.mjs
   window.__KEDAI_GAME_READY__ = true;

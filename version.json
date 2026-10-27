@@ -1,8 +1,8 @@
 {
-  "version": "2026-10-27-v71-kasih-reader",
-  "title": "Bacaan KitaKasih & scanner QR baharu",
+  "version": "2026-10-27-v72-offline-counter",
+  "title": "Kedai offline & kaunter lebih kemas",
   "notes": [
-    "Bacaan kad komuniti 0.52s dengan 5 tahap naik taraf hingga 0.22s.",
-    "Paparan membaca kad, arahan huruf besar dan scanner QR baharu."
+    "Main dan simpan pada peranti tanpa internet; segerak semula dengan semakan konflik.",
+    "Scanner minimalis, terminal potret di bawah dan overview naik taraf seragam."
   ]
 }

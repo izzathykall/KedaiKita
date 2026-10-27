@@ -1,5 +1,8 @@
 /* Cloud integration for Kedai Kita. Optional CDN Firebase SDK; local game works without config. */
 const FIREBASE_VERSION = '13.0.0';
+const LAST_ACCOUNT_KEY = 'kedai-kita-last-account';
+const online = () => globalThis.navigator?.onLine !== false;
+const networkError = err => !online() || /network|offline|unavailable|timeout|failed to fetch|load failed|module script/i.test(String(err?.code||'')+' '+String(err?.message||''));
 const GUEST_KEY = 'kedai-kita-v1';
 const ACCOUNT_KEY = uid => `kedai-kita-user-${uid}-v1`;
 const byId = id => document.getElementById(id);
@@ -47,7 +50,7 @@ const readLocal = key => {try {return JSON.parse(localStorage.getItem(key)||'nul
 const writeLocal = (key, state) => {try {localStorage.setItem(key, JSON.stringify(state));return true} catch {return false}};
 const isMeaningful = data => !!(data && (data?.progress?.day > 1 || data?.progress?.served > 0 || data?.progress?.wallet > 0 || data?.session || data?.practiceRun?.session));
 
-export function createCloudSync({capture, hydrate, pauseForAccount, report, onDeveloperChanged=()=>{}}) {
+export function createCloudSync({capture, hydrate, pauseForAccount, report, onDeveloperChanged=()=>{}, afterAccountClose=()=>{}}) {
   const overlay = byId('accountOverlay');
   const ui = {
     title: byId('accountTitle'), hint: byId('accountHint'), message: byId('accountMessage'),
@@ -68,6 +71,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   let developerSandbox=false, baseStamp=null, localSaveFailed=false;
   const DEV_KEY=uid=>`kedai-kita-dev-sandbox-${uid}-v1`;
   const authorizedDeveloper=uid=>!!uid&&Array.isArray(window.KEDAI_DEVELOPER_UIDS)&&window.KEDAI_DEVELOPER_UIDS.some(x=>typeof x==='string'&&x.trim().length>12&&x.trim()===uid);
+  let localOnly=false, reconnecting=false, accountOpened=false, controlsReady=false, sdkLoadFailed=false;
   let bootWatchdog = null, bootSettled = false, bootStalled = false;
   const sessionPath = uid => api.ref(db, `activeSessions/${uid}`);
   const browserSessionKey = uid => `kk-active-session-${uid}`;
@@ -77,9 +81,9 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
   };
   const detachSessionWatch=()=>{if(watchSessionStop){watchSessionStop();watchSessionStop=null}};
-  const clearSessionLocal=uid=>{try{sessionStorage.removeItem(browserSessionKey(uid))}catch{}};
-  const saveSessionLocal=(uid,token)=>{try{sessionStorage.setItem(browserSessionKey(uid),token)}catch{}};
-  const getSessionLocal=uid=>{try{return sessionStorage.getItem(browserSessionKey(uid))}catch{return null}};
+  const clearSessionLocal=uid=>{try{sessionStorage.removeItem(browserSessionKey(uid));localStorage.removeItem(browserSessionKey(uid));localStorage.removeItem(LAST_ACCOUNT_KEY)}catch{}};
+  const saveSessionLocal=(uid,token)=>{try{sessionStorage.setItem(browserSessionKey(uid),token);localStorage.setItem(browserSessionKey(uid),token)}catch{}};
+  const getSessionLocal=uid=>{try{return sessionStorage.getItem(browserSessionKey(uid))||localStorage.getItem(browserSessionKey(uid))}catch{return null}};
 
   const setStatus = value => {report(value);const el=byId('accountSyncLabel');if(el)el.textContent=value;};
   const message = (value='', isError=false) => {ui.message.textContent=value;ui.message.classList.toggle('error', isError)};
@@ -87,7 +91,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     if(overlay.open)overlay.close();
     overlay.showModal();document.body.classList.add('account-locked');
   };
-  const hide = () => {if(overlay.open)overlay.close();overlay.classList.remove('account-compact');document.body.classList.remove('account-locked')};
+  const hide = () => {if(overlay.open)overlay.close();overlay.classList.remove('account-compact');document.body.classList.remove('account-locked');if(accountOpened){accountOpened=false;afterAccountClose()}};
   const showRegion = region => {
     overlay.dataset.region=region;
     ui.authFields.hidden=region!=='auth'; ui.overview.hidden=region!=='overview'; ui.choice.hidden=region!=='choice';
@@ -102,6 +106,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   const showLoading = hint => {show();showRegion('loading');ui.title.textContent='Menyediakan kedai anda';ui.hint.textContent=hint;message('')};
   function showStartupError(step, err) {
     if(bootStalled)return;
+    if(networkError(err)&&restoreOffline())return;
     diagnostic(step,err);
     bootStalled=true;bootSettled=true;
     clearTimeout(bootWatchdog);bootWatchdog=null;
@@ -125,7 +130,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   }
   const showOverview = () => {
     show();showRegion('overview');ui.title.textContent='Akaun Kedai Kita';ui.hint.textContent='Progres kerjaya disimpan mengikut akaun ini.';
-    ui.current.textContent=user?.email||'Akaun pemain';message(syncError?errorMalay(syncError):'Data akaun anda telah dimuatkan.');
+    ui.current.textContent=user?.email||'Akaun pemain';message(localOnly?'Mod offline · progres disimpan pada peranti ini.':syncError?errorMalay(syncError):'Data akaun anda telah dimuatkan.');
     const approved=byId('developerAccessEnabled');
     if(approved)approved.hidden=!developerSandbox;
   };
@@ -202,9 +207,60 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   };
   const stage = state => {
     queued=clone(state);delete queued._cloudPending;
+    if(localOnly||!online()){setStatus('Disimpan pada peranti · menunggu penyegerakan');return}
     setStatus('Menyimpan progres…');if(!timer)timer=setTimeout(()=>flush().catch(()=>{}),3000);
   };
-  window.addEventListener('online',()=>{if(queued&&!writing&&ready&&user&&activeSessionToken){syncError=null;flush().catch(()=>{})}});
+  window.addEventListener('offline',()=>{
+    localOnly=true;clearTimeout(timer);timer=null;
+    if(ready){queueSave(capture());setStatus(localSaveFailed?'Simpanan peranti gagal · jangan tutup permainan':'Disimpan pada peranti · menunggu penyegerakan')}
+  });
+  window.addEventListener('online',()=>reconnect());
+  document.addEventListener?.('visibilitychange',()=>{if(!document.hidden)reconnect()});
+  async function reconnect(){
+    if(!online()||reconnecting||kickedForOtherDevice||busy||!localOnly)return;
+    reconnecting=true;
+    try{
+      // Pending writes are atomic and never duplicated during recovery.
+      if(writesPending){try{await withTimeout(writesPending,DATA_TIMEOUT_MS,'menunggu penyegerakan')}catch{}if(writing)return}
+      if(!auth){
+        if(guestMode)return;
+        if(ready)queueSave(capture());
+        if(sdkLoadFailed){
+          // Browsers can remember rejected dynamic imports until reload.
+          // Confirm actual SDK connectivity before using a fresh module context.
+          try{
+            const path=`https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/`;
+            const responses=await withTimeout(Promise.all(['firebase-app.js','firebase-auth.js','firebase-database.js'].map(name=>fetch(path+name,{cache:'no-store'}))),BOOT_TIMEOUT_MS,'menyemak sambungan');
+            if(responses.every(response=>response.ok)&&!localSaveFailed){window.location.reload();return}
+          }catch{}
+          return;
+        }
+        if(ready){pauseForAccount();accountOpened=true}
+        started=false;bootStalled=false;bootSettled=false;await start();return;
+      }
+      if(!auth.currentUser){if(user){pauseForAccount();showLogin('Log masuk semula untuk menyegerakkan progres peranti.')}return}
+      if(ready)queueSave(capture());
+      pauseForAccount();accountOpened=true;
+      await onSignedIn(auth.currentUser,++epoch);
+    }finally{reconnecting=false}
+  }
+  // Router connectivity is not proof of internet access; retry while visible.
+  const reconnectTimer=setInterval(()=>{if(!document.hidden)reconnect()},30000);
+  reconnectTimer?.unref?.();
+  function restoreOffline(identity=readLocal(LAST_ACCOUNT_KEY)){
+    if(!identity?.uid||kickedForOtherDevice)return false;
+    const key=authorizedDeveloper(identity.uid)?DEV_KEY(identity.uid):ACCOUNT_KEY(identity.uid);
+    const saved=readLocal(key);
+    if(!saved?.progress)return false;
+    clearTimeout(bootWatchdog);bootWatchdog=null;bootSettled=true;
+    const alreadyPlaying=ready&&user?.uid===identity.uid;
+    if(!alreadyPlaying){try{setIdentity({uid:identity.uid,email:identity.email||''});hydrate(saved)}catch{return false}}
+    baseStamp=saved._cloudPending?(saved._cloudBaseStamp||null):(saved._clientStamp||null);
+    localOnly=true;ready=true;activeSessionToken=null;
+    queued=saved._cloudPending?clone(saved):null;
+    hide();setStatus('Disimpan pada peranti · menunggu penyegerakan');
+    return true;
+  }
   async function flush() {
     try { return await withTimeout(drainSaves(),DATA_TIMEOUT_MS,'menyimpan progres'); }
     catch(err) {
@@ -217,13 +273,22 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   async function drainSaves() {
     if(timer){clearTimeout(timer);timer=null}
     if(writing){if(writesPending)await writesPending;return queued?drainSaves():true;}
-    if(!ready||!user||!queued||!api||!activeSessionToken)return !queued;
-    const uid=user.uid, value=queued, key=currentKey, sessionToken=activeSessionToken, writeEpoch=epoch;
+    if(!ready||!user||!queued||!api||!activeSessionToken||localOnly||!online())return !queued;
+    const uid=user.uid, value=queued, key=currentKey, sessionToken=activeSessionToken, writeEpoch=epoch, writeDeveloper=developerSandbox;
     queued=null;writing=true;
     try {
       if(!activeSessionToken){throw new Error('Sesi akaun tidak aktif')}
-      writesPending=api.update(currentSnapshotRef(uid),cloudPayload(value,sessionToken));
-      await writesPending;
+      // Compare the revision within the atomic write, including reconnect races.
+      const payload=cloudPayload(value,sessionToken);
+      writesPending=api.runTransaction(currentSnapshotRef(uid),current=>{
+        if(user?.uid!==uid||epoch!==writeEpoch||activeSessionToken!==sessionToken)return;
+        const remote=writeDeveloper?current?.developerSandbox?.state:current?.state;
+        if(remote?.progress&&remote._clientStamp!==value._clientStamp&&
+           (remote._clientStamp||null)!==(value._cloudBaseStamp||null))return;
+        return {...(current||{}),...payload};
+      },{applyLocally:false});
+      const result=await writesPending;
+      if(!result.committed){const err=new Error('Progres awan berubah semasa penyegerakan');err.code='KEDAI_CONFLICT';throw err}
       if(user?.uid===uid&&epoch===writeEpoch&&activeSessionToken===sessionToken){
         baseStamp=value._clientStamp||null;
         if(queued)queued._cloudBaseStamp=baseStamp;
@@ -236,13 +301,14 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
         syncError=null;setStatus(queued?'Menyimpan progres…':'✓ Progres disimpan');
       }
     } catch(err) {
+      if(user?.uid===uid&&epoch===writeEpoch&&(networkError(err)||err?.code==='KEDAI_CONFLICT'))localOnly=true;
       if(user?.uid===uid&&epoch===writeEpoch&&activeSessionToken===sessionToken){syncError=err;queued=queued||value;setStatus(localSaveFailed?'Simpanan belum berjaya · jangan tutup permainan':'Simpanan belum disegerakkan · progres selamat di peranti');diagnostic('menyimpan progres',err)}
       throw err;
     } finally {
       writing=false;writesPending=null;
       if(queued&&ready&&user&&activeSessionToken&&!syncError)timer=setTimeout(()=>{flush().catch(()=>{})},3000);
     }
-    return queued&&ready&&user&&activeSessionToken?drainSaves():!queued;
+    return queued&&ready&&user&&activeSessionToken&&!localOnly?drainSaves():!queued;
   }
   async function resetProgress(state) {
     // A reset must never accidentally upload an old debounced snapshot later.
@@ -250,6 +316,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     if(!ready)throw new Error('Simpanan akaun belum sedia. Cuba lagi sebentar.');
     const fresh=clone(state);
     if(user){
+      if(localOnly||!online()){fresh._cloudPending=true;fresh._clientStamp=makeSessionToken();fresh._cloudBaseStamp=baseStamp;if(!writeLocal(currentKey,fresh))throw new Error('Tidak dapat menyimpan pada peranti.');queued=fresh;setStatus('Reset disimpan pada peranti · menunggu penyegerakan');return true}
       fresh._clientStamp=makeSessionToken();fresh._cloudBaseStamp=baseStamp;
       if(!api||!activeSessionToken)throw new Error('Sesi akaun telah tamat. Log masuk semula.');
       // Never leave the developer reset spinner hanging on an old network write.
@@ -280,7 +347,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     const data=clone(state);
     if(user){data._cloudPending=true;data._clientStamp=makeSessionToken();data._cloudBaseStamp=baseStamp}
     localSaveFailed=!writeLocal(currentKey,data);
-    if(user&&activeSessionToken)stage(data);
+    if(user)stage(data);
     else if(!user)setStatus(localSaveFailed?'Simpanan peranti gagal · jangan tutup permainan':'Disimpan pada peranti · mod tetamu');
     if(localSaveFailed&&user)setStatus('Simpanan peranti gagal · menunggu simpanan awan');
   }
@@ -293,7 +360,8 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
       error.cloudStage='memaparkan progres permainan';
       throw error;
     }
-    ready=true;
+    ready=true;localOnly=false;syncError=null;
+    if(user){writeLocal(LAST_ACCOUNT_KEY,{uid:user.uid,email:user.email||''});if(activeSessionToken)saveSessionLocal(user.uid,activeSessionToken)}
     localSaveFailed=!writeLocal(currentKey,state||capture());
     setStatus('✓ Progres akaun dimuatkan');
     hide();
@@ -302,9 +370,10 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     baseStamp=remote?._clientStamp||null;
     const choice=chooseSave(local,remote);
     if(choice==='conflict'){
+      ready=false;pauseForAccount();accountOpened=true;
       // Preserve both candidates until the player decides. No automatic upload.
       show();showRegion('choice');ui.title.textContent='Pilih progres untuk disambung';
-      const summary=s=>`Hari ${Number(s.progress.day)||1} · RM ${((Number(s.progress.wallet)||0)/100).toFixed(2)}`;
+      const summary=s=>`Hari ${Number(s.progress?.day)||1} · RM ${((Number(s.progress?.wallet)||0)/100).toFixed(2)}`;
       ui.hint.textContent='Ada dua simpanan berbeza. Pilih dengan teliti; pilihan anda akan digunakan untuk akaun ini.';
       ui.choice.querySelector('.account-choice-label').textContent='Simpanan peranti dan awan tidak sepadan';
       ui.import.textContent='Guna peranti · '+summary(local);
@@ -329,6 +398,9 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     return true;
   }
   async function onSignedIn(next, token, retryNewSession=false) {
+    // Local storage holds the pending state while the authoritative read runs.
+    queued=null;clearTimeout(timer);timer=null;
+    if(!online()&&restoreOffline(next))return;
     setIdentity(next);guestMode=false;showLoading('Menyemak sesi dan progres akaun…');
     let loadStep='membuka sesi akaun';
     try {
@@ -364,6 +436,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     } catch(err) {
       if(token!==epoch)return;
       newCredentialLogin=false;
+      if(networkError(err)&&restoreOffline(next))return;
       syncError=err;setStatus('Simpanan tidak dapat diakses');show();showRegion('error');
       ui.title.textContent='Tidak dapat muat simpanan';ui.hint.textContent='Progres anda tidak dipadam. Semak ralat di bawah atau cuba sambung semula.';
       loadStep=err?.cloudStage||loadStep;
@@ -381,6 +454,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
   }
   async function onAuthChange(next) {
     const token=++epoch;
+    if(!next&&!online()&&restoreOffline())return;
     queued=null;if(timer){clearTimeout(timer);timer=null}
     if(next){await onSignedIn(next,token);return}
     detachSessionWatch();activeSessionToken=null;
@@ -404,6 +478,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     else if(guestMode)hide();else showLogin();
   }
   function openAccount() {
+    accountOpened=true;
     overlay.classList.add('account-compact');
     pauseForAccount();
     if(user&&ready)showOverview();
@@ -469,12 +544,11 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     byId('accountBtn').onclick=openAccount;
   }
   async function start() {
-    if(started)return;started=true;initControls();
-    window.addEventListener('online',()=>{
-      if(!user||!ready)return;
-      const pending=readLocal(currentKey);
-      if(pending?._cloudPending){syncError=null;stage(pending)}
-    });
+    if(started)return;started=true;if(!controlsReady){initControls();controlsReady=true}
+    if(!online()){
+      if(restoreOffline())return;
+      guestMode=true;ready=true;localOnly=true;hydrate(readLocal(GUEST_KEY));hide();setStatus('Disimpan pada peranti · mod tetamu');return;
+    }
     showLoading('Menyemak sambungan akaun…');
     const config=window.KEDAI_FIREBASE_CONFIG;
     configEnabled=configValid(config);
@@ -494,7 +568,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
         import(path+'firebase-app.js'),import(path+'firebase-auth.js'),import(path+'firebase-database.js')
       ]),BOOT_TIMEOUT_MS,'memuatkan komponen akaun');
       if(bootStalled)return;
-      const app=appModule.initializeApp(config);
+      const app=appModule.getApps().length?appModule.getApp():appModule.initializeApp(config);
       api={...authModule,...databaseModule};
       // Email/password login does not require IndexedDB or popup redirects.
       // Using localStorage persistence avoids known Safari IndexedDB auth stalls.
@@ -516,6 +590,7 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
         });
       },err=>showStartupError('membaca status log masuk',err));
     } catch(err) {
+      sdkLoadFailed=networkError(err);
       if(!bootStalled)showStartupError('memulakan sistem akaun',err);
     }
   }
@@ -531,5 +606,5 @@ export function createCloudSync({capture, hydrate, pauseForAccount, report, onDe
     if(local?._clientStamp&&saved._clientStamp!==local._clientStamp)throw new Error('Versi Firebase belum sama dengan versi semasa.');
     return {day:saved.progress.day,wallet:saved.progress.wallet,items:Object.keys(saved.progress.inventory||{}).length,categories:saved.progress.unlocked?.length||0,upgrades:Object.keys(saved.progress.upgrades||{}).length,delivery:saved.progress.delivery?.orders?.length||0,developer:developerSandbox};
   }
-  return {start, queueSave, flush, resetProgress, verifyFirebase, openAccount, getStorageKey:()=>currentKey, getUser:()=>user, isDeveloper:()=>developerSandbox, isSavedLocally:()=>ready&&!localSaveFailed, isSavedRemotely:()=>!!user&&ready&&!queued&&!writing&&!syncError&&!!activeSessionToken};
+  return {start, queueSave, flush, resetProgress, verifyFirebase, openAccount, getStorageKey:()=>currentKey, getUser:()=>user, isDeveloper:()=>developerSandbox, isSavedLocally:()=>ready&&!localSaveFailed, isSavedRemotely:()=>!!user&&ready&&!localOnly&&!queued&&!writing&&!syncError&&!!activeSessionToken};
 }
