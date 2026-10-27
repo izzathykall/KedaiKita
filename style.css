@@ -2343,3 +2343,12 @@ body[data-theme="dark"] .kasih-pro-hardware{background:radial-gradient(ellipse,#
 @media(max-width:350px){.kasih-pro .pro-reader{padding:6px}.pro-reader-brand{font-size:6px}.kasih-pro .pro-reader-screen>b:not(.pro-reader-instruction){font-size:16px}.pro-reader-screen>i{font-size:6px}.pro-reader-contact{font-size:4.5px;letter-spacing:0}}
 @media(max-height:600px) and (min-width:601px){.kasih-pro .pro-reader{padding:8px;gap:5px}.pro-reader-screen{min-height:95px}}
 @media(max-width:350px){.kasih-pro .pro-reader-screen>b:not(.pro-reader-instruction){font-size:13px;white-space:nowrap;letter-spacing:-.5px}}
+
+/* V71: reading feedback stays within the existing terminal display. */
+.kasih-read-track{display:block;width:100%;height:3px;border-radius:3px;background:#a6c5ad;overflow:hidden}
+.kasih-read-track i{display:block;width:0;height:100%;background:#28634c}
+.kasih-pro.is-reading .reader-led{background:#f1ce80;box-shadow:0 0 8px #edca83}
+.kasih-pro.is-reading #kasihCard{opacity:.7;filter:saturate(.7)}
+.kasih-pro.is-reading button:disabled{cursor:wait}
+#qrScanner.kk-qr-reader svg{filter:drop-shadow(0 6px 5px #153c3533)}
+#qrScanner.kk-qr-reader>span{font-weight:800;letter-spacing:.8px}

@@ -685,7 +685,10 @@ export const CATEGORIES = [
 {"id": "accessories", "name": "Aksesori digital", "cost": 16500, "art": "led", "description": "Pengecas, kabel dan aksesori peranti."},
 {"id": "clothing", "name": "Pakaian & tekstil", "cost": 9800, "art": "tissue", "description": "Pakaian ringkas, tuala dan aksesori."}
 ];
+export const CARD_READ_MS=520;
+export const kasihReadMs=(level=0)=>CARD_READ_MS-60*Math.max(0,Math.min(5,Math.floor(Number(level)||0)));
 export const UPGRADES = [
+  {id:'kasihSpeed',name:'Terminal KitaKasih',icon:'card',cost:3500,max:5,type:'payment',desc:'Bacaan kad komuniti lebih pantas. Aktif sejak awal; 5 tahap naik taraf kelajuan.'},
   {id:'card',name:'Terminal kad',icon:'card',cost:3500,max:5,type:'payment',desc:'Tahap 1 membuka kad; tahap lanjut mengurangkan kehausan dan risiko kerosakan.'},
   {id:'qr',name:'Scanner QR',icon:'qr',cost:2500,max:5,type:'payment',desc:'Tahap 1 membuka QR; tahap lanjut mempercepat pengesahan bayaran.'},
   {id:'rushBoost',name:'Pengganda Rush Hour',icon:'spark',cost:100000,max:5,desc:'Untung Rush Hour bermula ×2; setiap tahap +0.3 sehingga ×3.5. Kos upgrade tinggi.'},
@@ -740,7 +743,7 @@ export function tickRushHour(session,seconds){
 }
 // Each day increases the required number of customers; maximum 20 per shift.
 export function dayTarget(day){return Math.min(20,4+Math.max(1,Math.floor(Number(day)||1)))}
-export function createProgress(){return {version:1,day:1,wallet:0,lifetime:0,served:0,bestCombo:0,upgrades:{scanner:0,scale:0,conveyor:0,comfort:0,riderPatience:0,tips:0,storage:0,card:0,qr:0,rushBoost:0},history:[],unlocked:['essentials'],settings:{motion:true,theme:'mint',volume:.6,music:true,musicVolume:.2,musicTrack:'random'}}}
+export function createProgress(){return {version:1,day:1,wallet:0,lifetime:0,served:0,bestCombo:0,upgrades:{scanner:0,scale:0,conveyor:0,comfort:0,riderPatience:0,tips:0,storage:0,card:0,qr:0,kasihSpeed:0,rushBoost:0},history:[],unlocked:['essentials'],settings:{motion:true,theme:'mint',volume:.6,music:true,musicVolume:.2,musicTrack:'random'}}}
 export function restoreProgress(raw){try{const p=JSON.parse(raw);if(p?.version!==1||!Number.isInteger(p.day)||p.day<1||!Number.isFinite(p.wallet))return createProgress();return {...createProgress(),...p,upgrades:{...createProgress().upgrades,...p.upgrades},history:Array.isArray(p.history)?p.history.slice(-20):[],settings:{...createProgress().settings,...p.settings},unlocked:Array.isArray(p.unlocked)?[...new Set(['essentials',...p.unlocked.filter(id=>CATEGORIES.some(c=>c.id===id))])]:['essentials']}}catch{return createProgress()}}
 export function randomManualCode(rng=Math.random){return String(1000+Math.floor(rng()*9000))}
 export function availableProducts(unlocked=['essentials']){return PRODUCTS.filter(p=>unlocked.includes(p.category))}

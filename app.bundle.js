@@ -188,6 +188,11 @@
     mobile.addEventListener?.("change", () => setOpen(false));
   })();
 
+  // qr-scanner.mjs
+  function qrScannerArt() {
+    return `<svg viewBox="0 0 132 192" aria-hidden="true"><defs><linearGradient id="qr71Body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6c887b"/><stop offset=".4" stop-color="#294c41"/><stop offset="1" stop-color="#17362d"/></linearGradient><linearGradient id="qr71Glass" x2="0" y2="1"><stop stop-color="#17332e"/><stop offset="1" stop-color="#081f1b"/></linearGradient><linearGradient id="qr71Metal"><stop stop-color="#a3b7ac"/><stop offset=".5" stop-color="#ecf3e9"/><stop offset="1" stop-color="#8ba597"/></linearGradient></defs><g transform="rotate(-9 66 96)"><path d="M46 78H83L89 160Q90 177 77 181H56Q44 179 45 165Z" fill="url(#qr71Body)" stroke="#16382c" stroke-width="2"/><path d="M52 100H78L82 164Q82 171 76 173H57Q51 171 51 164Z" fill="#1b392f"/><path d="M57 116H74M57 126H75M57 136H76M57 146H77M57 156H77" stroke="#446155" stroke-width="2" stroke-linecap="round"/><rect x="50" y="92" width="29" height="12" rx="5" fill="#90ac97" stroke="#bdd0bc"/><path d="M16 29Q18 13 34 12H100Q115 13 117 29L114 77Q113 92 99 95H30Q15 91 15 77Z" fill="url(#qr71Body)" stroke="#13362b" stroke-width="2.5"/><path d="M24 28Q25 21 35 20H98Q108 21 109 29" fill="none" stroke="url(#qr71Metal)" stroke-width="3" stroke-linecap="round"/><rect x="24" y="32" width="83" height="43" rx="9" fill="url(#qr71Glass)" stroke="#819e8d" stroke-width="1.5"/><path d="M32 41H42M32 41V49M98 41H88M98 41V49M32 66H42M32 66V58M98 66H88M98 66V58" fill="none" stroke="#a6cdb1" stroke-width="1.5"/><rect x="48" y="43" width="34" height="20" rx="7" fill="#284e40" stroke="#567d66"/><circle cx="65" cy="53" r="8" fill="#102d24" stroke="#87b39a"/><circle cx="65" cy="53" r="4" fill="#3f7c62"/><circle cx="63" cy="51" r="2" fill="#c3ebd0"/><path d="M35 38H92" stroke="#ffffff" stroke-opacity=".09" stroke-width="3"/><circle class="kk-reader-led" cx="99" cy="84" r="2.5" fill="#97e5b0"/><text x="62" y="86" text-anchor="middle" font-family="sans-serif" font-size="6" font-weight="700" letter-spacing="1.6" fill="#deebe0">KITA SCAN</text><path d="M57 176H76" stroke="url(#qr71Metal)" stroke-width="2" stroke-linecap="round"/></g></svg>`;
+  }
+
   // product-migration.mjs
   var ids = { dogfood: "fishfood", treatsdog: "birdseed", petpad: "catbed", pettoy: "cattoy" };
   var names = { "Makanan anjing": "Makanan ikan", "Snek anjing": "Biji makanan burung", "Alas latihan haiwan": "Alas tidur kucing", "Syampu haiwan": "Syampu kucing", "Mainan haiwan": "Bola benang kucing" };
@@ -1211,7 +1216,10 @@
     { "id": "accessories", "name": "Aksesori digital", "cost": 16500, "art": "led", "description": "Pengecas, kabel dan aksesori peranti." },
     { "id": "clothing", "name": "Pakaian & tekstil", "cost": 9800, "art": "tissue", "description": "Pakaian ringkas, tuala dan aksesori." }
   ];
+  var CARD_READ_MS = 520;
+  var kasihReadMs = (level = 0) => CARD_READ_MS - 60 * Math.max(0, Math.min(5, Math.floor(Number(level) || 0)));
   var UPGRADES = [
+    { id: "kasihSpeed", name: "Terminal KitaKasih", icon: "card", cost: 3500, max: 5, type: "payment", desc: "Bacaan kad komuniti lebih pantas. Aktif sejak awal; 5 tahap naik taraf kelajuan." },
     { id: "card", name: "Terminal kad", icon: "card", cost: 3500, max: 5, type: "payment", desc: "Tahap 1 membuka kad; tahap lanjut mengurangkan kehausan dan risiko kerosakan." },
     { id: "qr", name: "Scanner QR", icon: "qr", cost: 2500, max: 5, type: "payment", desc: "Tahap 1 membuka QR; tahap lanjut mempercepat pengesahan bayaran." },
     { id: "rushBoost", name: "Pengganda Rush Hour", icon: "spark", cost: 1e5, max: 5, desc: "Untung Rush Hour bermula \xD72; setiap tahap +0.3 sehingga \xD73.5. Kos upgrade tinggi." },
@@ -1288,7 +1296,7 @@
     return Math.min(20, 4 + Math.max(1, Math.floor(Number(day) || 1)));
   }
   function createProgress() {
-    return { version: 1, day: 1, wallet: 0, lifetime: 0, served: 0, bestCombo: 0, upgrades: { scanner: 0, scale: 0, conveyor: 0, comfort: 0, riderPatience: 0, tips: 0, storage: 0, card: 0, qr: 0, rushBoost: 0 }, history: [], unlocked: ["essentials"], settings: { motion: true, theme: "mint", volume: 0.6, music: true, musicVolume: 0.2, musicTrack: "random" } };
+    return { version: 1, day: 1, wallet: 0, lifetime: 0, served: 0, bestCombo: 0, upgrades: { scanner: 0, scale: 0, conveyor: 0, comfort: 0, riderPatience: 0, tips: 0, storage: 0, card: 0, qr: 0, kasihSpeed: 0, rushBoost: 0 }, history: [], unlocked: ["essentials"], settings: { motion: true, theme: "mint", volume: 0.6, music: true, musicVolume: 0.2, musicTrack: "random" } };
   }
   function restoreProgress(raw) {
     try {
@@ -3304,7 +3312,7 @@
   var calculatorResult = "";
   var advancePending = false;
   var STORAGE = "kedai-kita-v1";
-  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v70-kasih-visit";
+  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v71-kasih-reader";
   var UPDATE_CHECK_URL = "./version.json";
   var storageOK = true;
   var progress = createProgress();
@@ -5646,7 +5654,7 @@
       return;
     }
     const stage = customer.cardStage || "ready", working = stage === "processing";
-    $("paymentArea").innerHTML = `<div id="payDevice" class="payment-scene qr-scene kk-qr-stage stage-${stage}"><div class="kk-qr-phone"><div class="kk-phone-island" aria-hidden="true"></div><div class="kk-phone-status"><span>9:41</span><span>\u25B0 \u25B0</span></div><div class="kk-wallet-brand"><span>K</span><div><small>KITA PAY</small><b>${customer.person.name}</b></div></div><small class="kk-amount-label">JUMLAH BAYARAN</small><strong class="kk-amount">${money(amountDue(customer))}</strong><button class="kk-qr-code" id="qrTarget" aria-label="Imbas kod QR pada telefon" ${working ? "disabled" : ""}>${qrArt()}<i></i></button><span class="kk-wallet-status">${working ? "Mengesahkan bayaran\u2026" : "Imbas kod untuk bayar"}</span><div class="kk-home-indicator"></div></div>${working ? "" : `<button type="button" class="kk-qr-reader" id="qrScanner" aria-label="Seret scanner ke kod QR atau tekan untuk mengambilnya"><svg viewBox="0 0 132 192" aria-hidden="true"><defs><linearGradient id="kkShell" x2=".8" y2="1"><stop stop-color="#718b83"/><stop offset=".4" stop-color="#31564c"/><stop offset="1" stop-color="#142f2b"/></linearGradient><linearGradient id="kkGrip" x2="1"><stop stop-color="#193b33"/><stop offset=".5" stop-color="#496b5d"/><stop offset="1" stop-color="#203e35"/></linearGradient><radialGradient id="kkGlass"><stop stop-color="#326965"/><stop offset="1" stop-color="#102c30"/></radialGradient></defs><g transform="rotate(-13 66 96)"><path d="M46 83h39l4 80q0 11-10 12H57q-9-1-10-12Z" fill="url(#kkGrip)" stroke="#153b32" stroke-width="3"/><path d="M49 106h37m-36 11h37m-36 11h37m-36 11h37m-36 11h37m-36 11h36" stroke="#142f29" stroke-width="5"/><rect x="14" y="13" width="105" height="86" rx="18" fill="url(#kkShell)" stroke="#183b34" stroke-width="3"/><path d="M26 20h78q8 0 8 8v53" fill="none" stroke="#9dbba8" stroke-opacity=".55" stroke-width="3"/><rect x="24" y="25" width="84" height="51" rx="12" fill="url(#kkGlass)" stroke="#83a395" stroke-width="2"/><path d="M35 35h10m-10 0v10m61-10H86m10 0v10M35 65h10m-10 0V55m61 10H86m10 0V55" fill="none" stroke="#9cdcc1" stroke-width="2"/><path d="M53 39h9v9h-9Zm16 0h9v9h-9ZM53 55h9v9h-9Zm16-2h4v4h5v7h-9Z" fill="none" stroke="#b6eed9" stroke-width="2"/><circle class="kk-reader-led" cx="105" cy="20" r="4" fill="#83f3b6"/><text x="67" y="89" text-anchor="middle" font-size="8" font-weight="700" letter-spacing="1" fill="#e1f1e5">IMBAS QR</text></g></svg><span>AMBIL & IMBAS</span></button>`}</div><p class="payment-hint kk-qr-hint">${working ? "Kod dibaca. Scanner disimpan secara automatik." : "Seret scanner ke kod QR, atau tekan scanner kemudian tekan kod QR."}</p>`;
+    $("paymentArea").innerHTML = `<div id="payDevice" class="payment-scene qr-scene kk-qr-stage stage-${stage}"><div class="kk-qr-phone"><div class="kk-phone-island" aria-hidden="true"></div><div class="kk-phone-status"><span>9:41</span><span>\u25B0 \u25B0</span></div><div class="kk-wallet-brand"><span>K</span><div><small>KITA PAY</small><b>${customer.person.name}</b></div></div><small class="kk-amount-label">JUMLAH BAYARAN</small><strong class="kk-amount">${money(amountDue(customer))}</strong><button class="kk-qr-code" id="qrTarget" aria-label="Imbas kod QR pada telefon" ${working ? "disabled" : ""}>${qrArt()}<i></i></button><span class="kk-wallet-status">${working ? "Mengesahkan bayaran\u2026" : "Imbas kod untuk bayar"}</span><div class="kk-home-indicator"></div></div>${working ? "" : `<button type="button" class="kk-qr-reader" id="qrScanner" aria-label="Seret scanner ke kod QR atau tekan untuk mengambilnya">${qrScannerArt()}<span>AMBIL & IMBAS</span></button>`}</div><p class="payment-hint kk-qr-hint">${working ? "Kod dibaca. Scanner disimpan secara automatik." : "Seret scanner ke kod QR, atau tekan scanner kemudian tekan kod QR."}</p>`;
     if (!working) bindQrScanner();
   }
   var CARD_DECLINE_MESSAGES = {
@@ -5714,7 +5722,7 @@
     renderPayment();
     save();
     const qrLevel = Math.max(1, Math.min(5, Number(progress.upgrades.qr) || 1));
-    if (!await delayActive(card ? 520 : Math.max(580, 1400 - (qrLevel - 1) * 205), token)) return;
+    if (!await delayActive(card ? CARD_READ_MS : Math.max(580, 1400 - (qrLevel - 1) * 205), token)) return;
     busy = false;
     beep("scan");
     if (card && customer.requiresPin) {
@@ -5905,9 +5913,9 @@
     });
   }
   function paymentUpgradeCards() {
-    return `<h3 class="shop-section-title">Terminal pembayaran</h3><p class="muted">Tahap 1 membuka kaedah bayaran. Empat tahap seterusnya meningkatkan ketahanan terminal atau kelajuan QR.</p><div class="payment-upgrade-grid">${UPGRADES.filter((u) => u.type === "payment").map((u) => {
-      const level = progress.upgrades[u.id] || 0, owned = level >= 1, maxed = level >= u.max, cost = u.cost * (level + 1);
-      return `<div class="payment-upgrade-card ${owned ? "owned" : ""}"><span class="payment-upgrade-art">${icon(u.icon)}<i>${icon(owned ? "check" : "lock")}</i></span><h3>${u.name}</h3><span class="payment-level">Tahap ${level} / ${u.max}</span><p>${u.desc}</p><button class="primary-btn" data-upgrade="${u.id}" ${maxed || progress.wallet < cost ? "disabled" : ""}>${maxed ? "\u2713 Maksimum" : owned ? "Upgrade \xB7 " + money(cost) : "Buka \xB7 " + money(cost)}</button><small>${maxed ? "Semua 5 tahap lengkap" : owned ? "Pembayaran aktif \xB7 upgrade pilihan" : progress.wallet < cost ? "Perlu lagi " + money(cost - progress.wallet) : "Sedia dibuka"}</small></div>`;
+    return `<h3 class="shop-section-title">Terminal pembayaran</h3><p class="muted">Naik taraf ketahanan kad dan kelajuan bacaan QR atau KitaKasih. KitaKasih tersedia sejak awal.</p><div class="payment-upgrade-grid">${UPGRADES.filter((u) => u.type === "payment").map((u) => {
+      const level = progress.upgrades[u.id] || 0, owned = u.id === "kasihSpeed" || level >= 1, maxed = level >= u.max, cost = u.cost * (level + 1);
+      return `<div class="payment-upgrade-card ${owned ? "owned" : ""}"><span class="payment-upgrade-art">${icon(u.icon)}<i>${icon(owned ? "check" : "lock")}</i></span><h3>${u.name}</h3><span class="payment-level">Tahap ${level} / ${u.max}</span><p>${u.desc}${u.id === "kasihSpeed" ? `<span class="machine-speed">${(kasihReadMs(level) / 1e3).toFixed(2)}s${maxed ? " \xB7 Maksimum" : " \u2192 " + (kasihReadMs(level + 1) / 1e3).toFixed(2) + "s"}</span>` : ""}</p><button class="primary-btn" data-upgrade="${u.id}" ${maxed || progress.wallet < cost ? "disabled" : ""}>${maxed ? "\u2713 Maksimum" : owned ? "Upgrade \xB7 " + money(cost) : "Buka \xB7 " + money(cost)}</button><small>${maxed ? "Semua 5 tahap lengkap" : owned ? "Pembayaran aktif \xB7 upgrade pilihan" : progress.wallet < cost ? "Perlu lagi " + money(cost - progress.wallet) : "Sedia dibuka"}</small></div>`;
     }).join("")}</div>`;
   }
   function audioVolume() {
@@ -7289,19 +7297,36 @@
     customer.cardDeclineReason = null;
     customer.patience += 15;
   }
+  var kasihReading = null;
   function renderKasih() {
     const c = customer, k = c.kasih, q = kasihQuote(c), area = $("paymentArea");
     k.card = kasihAccount(operatingStore(), c.person).card;
+    const reading = busy && kasihReading === c;
     const active = () => customer === c && !paused && !busy && phase === "offer" && c.method === "kasih" && !c.paid;
-    area.innerHTML = `<section class="kasih-panel kasih-pro"><header><div><span class="kasih-pill">KitaKasih</span><small>Pembayaran bantuan</small></div><span class="kasih-connection"><i></i> ${k.verified ? "Kad disahkan" : "Sedia"}</span></header><div class="kasih-pro-grid"><div class="kasih-pro-hardware"><button class="kasih-reader pro-reader" id="kasihReader" aria-label="Baca kad KitaKasih"><span class="pro-reader-brand"><span>KITA PAY</span><i class="reader-led" aria-hidden="true"></i></span><span class="pro-reader-screen ${k.verified ? "" : "awaiting-card"}"><small>${k.verified ? "BAKI TERSEDIA" : "KITAKASIH"}</small>${k.verified ? `<b>${money(k.balanceBefore)}</b><span>${c.person.name}</span>` : '<b class="pro-reader-instruction">Tekan atau seret kad</b>'}<i>${icon(k.verified ? "check" : "card")} ${k.verified ? "Disahkan" : "Sedia menerima kad"}</i></span><span class="pro-reader-slot"><i></i></span><span class="pro-reader-contact">${icon("scan")} TERMINAL BANTUAN</span></button><button class="kasih-card pro-aid-card ${k.verified ? "verified" : ""}" id="kasihCard" aria-label="Semak kad KitaKasih pelanggan"><span class="aid-id-heading">KAD KOMUNITI<span>KEDAI KITA \xB7 KitaKasih</span></span><span class="aid-id-pattern" aria-hidden="true"></span><span class="aid-id-photo">${avatar(c.person)}</span><span class="aid-id-data"><small>NAMA PEMEGANG</small><strong>${c.person.name}</strong><small>ID PELANGGAN</small><b>${k.card}</b><em>AHLI KOMUNITI \xB7 AKTIF</em></span><span class="aid-id-footer">KAD REKAAN \xB7 UNTUK PERMAINAN SAHAJA</span></button>${k.verified ? '<span class="kasih-device-caption">Identiti disahkan</span>' : ""}</div><div class="kasih-pro-receipt"><div class="kasih-review-title"><span>JUMLAH BELIAN</span><b>${money(netTotal(c))}</b></div>${c.hasCoupon ? `<div class="kasih-coupon ${c.couponApplied ? "applied" : ""}"><span>${icon("receipt")}<b>${c.couponApplied ? "Kupon 10% digunakan" : "Pelanggan minta kupon 10%"}</b></span>${c.couponApplied ? `<strong>\u2212${money(c.discount)}</strong>` : '<button id="kasihCoupon" class="secondary-btn">Gunakan kupon</button>'}</div>` : ""}<div class="kasih-breakdown"><div><span>Barang layak${c.couponApplied ? " selepas kupon" : ""}</span><b>${money(q.eligible)}</b></div><div><span>Barang tidak layak</span><b>${money(q.ineligible)}</b></div><div class="kasih-funded"><span>Dana KitaKasih</span><b>${k.verified ? money(q.aid) : "\u2014"}</b></div><div><span>Baki transaksi</span><b>${k.verified ? money(q.balanceAfter) : "\u2014"}</b></div><div class="kasih-extra"><span>Pelanggan bayar</span><b>${k.verified ? money(q.remaining) : "\u2014"}</b></div></div><p class="kasih-note" role="status">${!k.verified ? "Baca kad untuk semak bantuan." : q.remaining ? "Pilih kaedah bayaran tambahan." : "Belian ditanggung sepenuhnya."}</p>${k.verified ? q.remaining ? `<div class="kasih-actions">${availablePaymentMethods(progress.upgrades, mode === "practice").map((m) => `<button class="secondary-btn" data-kasih-method="${m}">${icon(m)} ${{ cash: "Tunai", card: "Kad debit", qr: "QR" }[m]}</button>`).join("")}</div><small class="kasih-rounding-note">Tambahan tunai dibundarkan kepada 5 sen.</small>` : '<button id="kasihConfirm" class="primary-btn">Sahkan bayaran</button>' : '<div class="kasih-awaiting">' + icon("lock") + " Menunggu kad</div>"}<button id="kasihCancel" class="text-btn">Bayar tanpa bantuan</button></div></div><footer class="kasih-pro-footer"><span>${icon("lock")} Kad rekaan \xB7 Simulasi dalam permainan</span><b>KITA PAY</b></footer></section>`;
-    const verify = () => {
-      if (!active()) return;
+    area.innerHTML = `<section class="kasih-panel kasih-pro ${reading ? "is-reading" : ""}" aria-busy="${reading}"><header><div><span class="kasih-pill">KitaKasih</span><small>Pembayaran bantuan</small></div><span class="kasih-connection"><i></i> ${reading ? "Membaca kad" : k.verified ? "Kad disahkan" : "Sedia"}</span></header><div class="kasih-pro-grid"><div class="kasih-pro-hardware"><button class="kasih-reader pro-reader" id="kasihReader" aria-label="Baca kad KitaKasih"><span class="pro-reader-brand"><span>KITA PAY</span><i class="reader-led" aria-hidden="true"></i></span><span class="pro-reader-screen ${k.verified ? "" : "awaiting-card"}"><small>${k.verified ? "BAKI TERSEDIA" : "KITAKASIH"}</small>${k.verified ? `<b>${money(k.balanceBefore)}</b><span>${c.person.name}</span>` : `<b class="pro-reader-instruction">${reading ? "MEMBACA KAD\u2026" : "TEKAN ATAU SERET KAD"}</b>${reading ? '<span class="kasih-read-track"><i id="kasihReadProgress"></i></span>' : ""}`}<i>${icon(k.verified ? "check" : "card")} ${reading ? "Sila tunggu" : k.verified ? "Disahkan" : "Sedia menerima kad"}</i></span><span class="pro-reader-slot"><i></i></span><span class="pro-reader-contact">${icon("scan")} TERMINAL BANTUAN</span></button><button class="kasih-card pro-aid-card ${k.verified ? "verified" : ""}" id="kasihCard" aria-label="Semak kad KitaKasih pelanggan"><span class="aid-id-heading">KAD KOMUNITI<span>KEDAI KITA \xB7 KitaKasih</span></span><span class="aid-id-pattern" aria-hidden="true"></span><span class="aid-id-photo">${avatar(c.person)}</span><span class="aid-id-data"><small>NAMA PEMEGANG</small><strong>${c.person.name}</strong><small>ID PELANGGAN</small><b>${k.card}</b><em>AHLI KOMUNITI \xB7 AKTIF</em></span><span class="aid-id-footer">KAD REKAAN \xB7 UNTUK PERMAINAN SAHAJA</span></button>${k.verified ? '<span class="kasih-device-caption">Identiti disahkan</span>' : ""}</div><div class="kasih-pro-receipt"><div class="kasih-review-title"><span>JUMLAH BELIAN</span><b>${money(netTotal(c))}</b></div>${c.hasCoupon ? `<div class="kasih-coupon ${c.couponApplied ? "applied" : ""}"><span>${icon("receipt")}<b>${c.couponApplied ? "Kupon 10% digunakan" : "Pelanggan minta kupon 10%"}</b></span>${c.couponApplied ? `<strong>\u2212${money(c.discount)}</strong>` : '<button id="kasihCoupon" class="secondary-btn">Gunakan kupon</button>'}</div>` : ""}<div class="kasih-breakdown"><div><span>Barang layak${c.couponApplied ? " selepas kupon" : ""}</span><b>${money(q.eligible)}</b></div><div><span>Barang tidak layak</span><b>${money(q.ineligible)}</b></div><div class="kasih-funded"><span>Dana KitaKasih</span><b>${k.verified ? money(q.aid) : "\u2014"}</b></div><div><span>Baki transaksi</span><b>${k.verified ? money(q.balanceAfter) : "\u2014"}</b></div><div class="kasih-extra"><span>Pelanggan bayar</span><b>${k.verified ? money(q.remaining) : "\u2014"}</b></div></div><p class="kasih-note" role="status">${!k.verified ? "Baca kad untuk semak bantuan." : q.remaining ? "Pilih kaedah bayaran tambahan." : "Belian ditanggung sepenuhnya."}</p>${k.verified ? q.remaining ? `<div class="kasih-actions">${availablePaymentMethods(progress.upgrades, mode === "practice").map((m) => `<button class="secondary-btn" data-kasih-method="${m}">${icon(m)} ${{ cash: "Tunai", card: "Kad debit", qr: "QR" }[m]}</button>`).join("")}</div><small class="kasih-rounding-note">Tambahan tunai dibundarkan kepada 5 sen.</small>` : '<button id="kasihConfirm" class="primary-btn">Sahkan bayaran</button>' : '<div class="kasih-awaiting">' + icon("lock") + " Menunggu kad</div>"}<button id="kasihCancel" class="text-btn">Bayar tanpa bantuan</button></div></div><footer class="kasih-pro-footer"><span>${icon("lock")} Kad rekaan \xB7 Simulasi dalam permainan</span><b>KITA PAY</b></footer></section>`;
+    const verify = async () => {
+      if (!active() || k.verified) return;
+      const token = scanToken;
+      busy = true;
+      kasihReading = c;
+      renderKasih();
+      save();
+      const valid = await delayActive(kasihReadMs(operatingStore().upgrades?.kasihSpeed), token, (f) => {
+        const bar = $("kasihReadProgress");
+        if (bar) bar.style.width = f * 100 + "%";
+      });
+      if (!valid || customer !== c || c.kasih !== k || phase !== "offer" || c.method !== "kasih") return;
+      busy = false;
+      kasihReading = null;
       k.verified = true;
       beep("coin");
       renderKasih();
       renderReceipt();
       save();
     };
+    area.querySelectorAll("button").forEach((b) => {
+      b.disabled = reading;
+    });
     $("kasihReader").onclick = verify;
     const card = $("kasihCard");
     let start = null, suppressClick = false;
