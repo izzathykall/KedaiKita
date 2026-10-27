@@ -1,9 +1,9 @@
 {
-  "version": "2026-10-28-v73-device-responsive",
-  "title": "Penyesuaian paparan semua peranti",
+  "version": "2026-10-28-v74-clean-ui-responsive",
+  "title": "Responsive + teks ringkas",
   "notes": [
-    "Rupa dan fungsi asal dikekalkan: pembetulan lebar, susunan portrait, landscape, resit, dan dialog.",
-    "Maklumat pelanggan kekal di tengah; popup, menu dan kaunter boleh dicapai di skrin kecil.",
-    "Fail responsive.css turut dicache untuk permainan offline."
+    "Buang nota status bawah resit tetapi kekalkan mekanisme simpanan offline.",
+    "Ringkaskan ayat KitaFood, conveyor dan KitaKasih tanpa membuang fungsi.",
+    "Kekalkan UI responsif V73, kaunter pelanggan berpusat, resit dan popup boleh skrol."
   ]
 }

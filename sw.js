@@ -1,5 +1,5 @@
 /* Only public game files and immutable Firebase SDK code are cached. */
-const RELEASE='2026-10-28-v73-device-responsive';
+const RELEASE='2026-10-28-v74-clean-ui-responsive';
 const PREFIX='kedai-kita-shell-';
 const CACHE=PREFIX+RELEASE;
 const SDK_CACHE='kedai-kita-public-sdk-v1';

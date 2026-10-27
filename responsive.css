@@ -1,135 +1,90 @@
-/* KedaiKita V73 | Cross-device fit layer.
-   Intent: no artwork changes, no changed game rules or payments.
-   Loaded AFTER design.css to resolve conflicting earlier breakpoints.
-   Portrait: full-width scrollable cashier above the original receipt.
-   Landscape: original counter/payment composition, scaled only if necessary.
-*/
-:root { --kk-safe-bottom: env(safe-area-inset-bottom, 0px); }
-html, body { width:100%; max-width:100%; min-width:0; }
-html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
-.app, .game-grid, .work-area, .belt-section, .stations,
-.pos-panel, .receipt-list, .conveyor, .products { min-width:0; }
-.game-grid, .work-area, .pos-panel { max-width:100%; }
-.conveyor { max-width:100%; }
-.product { min-width:0; max-width:100%; }
-.product .product-name { overflow:hidden; text-overflow:ellipsis; max-width:100%; }
-.receipt-row, .receipt-row > div, .receipt-title > div { min-width:0; }
-.receipt-row b, .receipt-row small { overflow-wrap:anywhere; }
-.customer-info > div:nth-child(2) { min-width:0; flex:1 1 auto; }
-.customer-info strong, .customer-info .customer-occupation { overflow-wrap:anywhere; }
-.customer-info .patience-wrap { flex:0 0 auto; }
-.store-scene .speech { box-sizing:border-box; overflow-wrap:break-word; overflow-y:auto; scrollbar-width:none; }
-.store-scene .speech::-webkit-scrollbar { display:none; }
-.wall-note { max-width:31%; }
-.belt-section .section-heading { min-width:0; }
-.belt-section .section-heading > div { min-width:0; flex:0 1 auto; }
-.belt-section #beltHint { min-width:0; text-align:right; overflow-wrap:anywhere; }
-.station-label { max-width:100%; }
-.payment-sheet, .payment-sheet #paymentArea, .payment-sheet #paymentMount,
-#modal, #modalContent, .account-form-inner { min-width:0; }
-#modal[open]:not([data-kind="style-preview"]) {
-  max-width:calc(100vw - 16px); max-height:calc(100dvh - 16px);
-  overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain;
+/* KedaiKita V74 – responsive-fit and text-cleanup layer.  Original palette and artwork unchanged. */
+:root{--kk-safe-bottom:env(safe-area-inset-bottom,0px)}
+html,body{width:100%;max-width:100%;min-width:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.app,.game-grid,.work-area,.belt-section,.stations,.pos-panel,.receipt-list,.conveyor,.products{min-width:0}
+.game-grid,.work-area,.pos-panel,.conveyor{max-width:100%}
+.product{min-width:0;max-width:100%}
+.product .product-name{overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.receipt-row,.receipt-row>div,.receipt-title>div{min-width:0}
+.receipt-row b,.receipt-row small{overflow-wrap:anywhere}
+.customer-info>div:nth-child(2){min-width:0;flex:1 1 auto}
+.customer-info strong,.customer-info .customer-occupation{overflow-wrap:anywhere}
+.customer-info .patience-wrap{flex:0 0 auto}
+.store-scene .speech{box-sizing:border-box;overflow-wrap:break-word;overflow-y:auto;scrollbar-width:none}
+.store-scene .speech::-webkit-scrollbar{display:none}
+.wall-note{max-width:31%}
+.belt-section .section-heading{min-width:0}
+.belt-section .section-heading>div{min-width:0;flex:0 1 auto}
+.belt-section #beltHint{min-width:0;text-align:right;overflow-wrap:anywhere}
+.station-label{max-width:100%}
+/* Hide visual-only saving and offline status, retain DOM nodes for cloud sync. */
+.pos-foot{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:0!important;border:0!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important}
+/* Retain clickable KitaKasih history with a discreet icon instead of text. */
+.kasih-history-button{display:inline-flex!important;align-items:center;justify-content:center;vertical-align:middle;width:26px!important;height:26px!important;min-height:26px!important;padding:4px!important;margin-top:3px!important;color:inherit}
+.kasih-history-button svg{height:14px;width:14px}
+.payment-sheet,.payment-sheet #paymentArea,.payment-sheet #paymentMount,#modal,#modalContent,.account-form-inner{min-width:0}
+#modal[open]:not([data-kind="style-preview"]){max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
+#modalContent,.modal-pad{max-width:100%}
+#accountOverlay:not(.account-compact){max-width:100vw;max-height:100dvh}
+#accountOverlay.account-compact{max-height:calc(100dvh - 20px)!important}
+#accountOverlay.account-compact .account-panel{max-height:none!important;overflow-x:hidden!important}
+.payment-overlay{padding:max(6px,env(safe-area-inset-top,0px)) max(6px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+.payment-overlay .payment-sheet{min-width:0;max-width:100%;max-height:calc(100dvh - 12px)}
+.payment-overlay .payment-sheet #paymentArea{min-width:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.payment-overlay[data-method="qr"] .payment-sheet #paymentArea{overflow-y:auto!important}
+.floating-calculator{max-width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}
+@media (orientation:portrait){
+ html,body{overflow-x:clip!important;overflow-y:auto!important;height:auto!important;min-height:100%}
+ body{overscroll-behavior-x:none}
+ .app.game-viewport-fit{width:100%!important;max-width:1800px!important;height:auto!important;min-height:100dvh!important;overflow:visible!important;zoom:1!important;transform:none!important;padding-bottom:max(18px,env(safe-area-inset-bottom,0px))!important}
+ .app.game-viewport-fit .game-grid{display:flex!important;flex-direction:column!important;flex:none!important;width:100%!important;height:auto!important;min-height:0!important;gap:clamp(10px,1.8vw,16px)!important}
+ .app.game-viewport-fit .game-grid>.work-area,body.view-payment .app.game-viewport-fit .work-area{order:0;display:flex!important;flex:none!important;height:auto!important;min-height:0!important;width:100%!important}
+ .app.game-viewport-fit .game-grid>.pos-panel,body.view-payment .app.game-viewport-fit .pos-panel{order:1;display:flex!important;width:100%!important;height:auto!important;flex:none!important;min-height:0!important;max-height:none!important;overflow:hidden!important}
+ .app.game-viewport-fit .store-scene{height:clamp(235px,29svh,370px)!important;min-height:235px!important;flex:none!important}
+ .app.game-viewport-fit .receipt-list{flex:0 1 auto!important;height:clamp(120px,22svh,260px)!important;min-height:120px!important;max-height:260px!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+ .app.game-viewport-fit .mobile-tabs{display:none!important}
+ .app.game-viewport-fit .stations,.app.game-viewport-fit .shift-footer{flex:none!important}
+ .app.game-viewport-fit .pos-foot{flex-wrap:wrap;overflow-wrap:anywhere}
 }
-#modalContent, .modal-pad { max-width:100%; }
-#accountOverlay:not(.account-compact) { max-width:100vw; max-height:100dvh; }
-#accountOverlay.account-compact { max-height:calc(100dvh - 20px)!important; }
-#accountOverlay.account-compact .account-panel {
-  max-height:none!important; overflow-x:hidden!important;
+@media (orientation:portrait) and (max-width:760px){
+ .app.game-viewport-fit{padding-left:max(9px,env(safe-area-inset-left,0px))!important;padding-right:max(9px,env(safe-area-inset-right,0px))!important}
+ .app.game-viewport-fit .store-scene{height:clamp(214px,30svh,295px)!important;min-height:214px!important}
+ .app.game-viewport-fit .store-scene .customer{left:50%!important;width:clamp(112px,37vw,174px);max-width:48%}
+ .app.game-viewport-fit .store-scene .speech{font-size:clamp(9px,2.5vw,11px);padding:clamp(7px,2vw,12px)}
+ .app.game-viewport-fit .wall-note{right:3%;top:8%;max-width:29%;font-size:clamp(5px,1.55vw,8px);letter-spacing:clamp(.1px,.2vw,1px);padding:clamp(4px,1.4vw,8px)}
+ .app.game-viewport-fit .wall-note b{font-size:clamp(6px,1.8vw,10px)}
+ .app.game-viewport-fit .stations{grid-template-columns:minmax(0,1.16fr) minmax(0,.94fr) minmax(62px,.48fr)!important;gap:clamp(5px,1.9vw,9px)!important}
+ .app.game-viewport-fit .station,.app.game-viewport-fit .bag-zone{min-width:0}
+ .app.game-viewport-fit .station{height:clamp(124px,18svh,155px)}
+ .app.game-viewport-fit .bag-zone{overflow:hidden}
+ .app.game-viewport-fit .conveyor{height:clamp(108px,16svh,137px)!important}
+ .app.game-viewport-fit .conveyor:has(.many){height:max(155px,24svh)!important}
+ .app.game-viewport-fit .belt-section .section-heading{flex-wrap:wrap}
+ .app.game-viewport-fit .belt-section #beltHint{flex:1 1 110px}
+ .app.game-viewport-fit .receipt-list{height:clamp(120px,24svh,235px)!important}
+ .app.game-viewport-fit .pos-panel{border-radius:16px}
 }
-/* Keep payment sheets usable when device or browser chrome reduces height. */
-.payment-overlay { padding:max(6px,env(safe-area-inset-top,0px)) max(6px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px)); }
-.payment-overlay .payment-sheet { min-width:0; max-width:100%; max-height:calc(100dvh - 12px); }
-.payment-overlay .payment-sheet #paymentArea { min-width:0; overflow-x:hidden; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-.payment-overlay[data-method="qr"] .payment-sheet #paymentArea { overflow-y:auto!important; }
-.floating-calculator { max-width:calc(100vw - 12px); max-height:calc(100dvh - 12px); }
-
-/* Compact portrait phones: preserve the original cashier -> terminal order.
-   The document scrolls instead of silently hiding sections below the fold. */
-@media (orientation:portrait) {
-  html,body { overflow-x:clip!important; overflow-y:auto!important; height:auto!important; min-height:100%; }
-  body { overscroll-behavior-x:none; }
-  .app.game-viewport-fit {
-    width:100%!important; max-width:1800px!important;
-    height:auto!important; min-height:100dvh!important;
-    overflow:visible!important; zoom:1!important; transform:none!important;
-    padding-bottom:max(18px,env(safe-area-inset-bottom,0px))!important;
-  }
-  .app.game-viewport-fit .game-grid { display:flex!important; flex-direction:column!important; flex:none!important;
-    width:100%!important; height:auto!important; min-height:0!important; gap:clamp(10px,1.8vw,16px)!important; }
-  .app.game-viewport-fit .game-grid>.work-area,
-  body.view-payment .app.game-viewport-fit .work-area {
-    order:0; display:flex!important; flex:none!important; height:auto!important; min-height:0!important; width:100%!important; }
-  .app.game-viewport-fit .game-grid>.pos-panel,
-  body.view-payment .app.game-viewport-fit .pos-panel {
-    order:1; display:flex!important; width:100%!important; height:auto!important;
-    flex:none!important; min-height:0!important; max-height:none!important; overflow:hidden!important; }
-  .app.game-viewport-fit .store-scene {
-    height:clamp(235px,29svh,370px)!important; min-height:235px!important;
-    flex:none!important; }
-  .app.game-viewport-fit .receipt-list {
-    flex:0 1 auto!important; height:clamp(120px,22svh,260px)!important;
-    min-height:120px!important; max-height:260px!important; overflow-y:auto!important;
-    -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
-  }
-  .app.game-viewport-fit .mobile-tabs { display:none!important; }
-  .app.game-viewport-fit .stations,.app.game-viewport-fit .shift-footer { flex:none!important; }
-  .app.game-viewport-fit .pos-foot { flex-wrap:wrap; overflow-wrap:anywhere; }
+@media (orientation:portrait) and (max-width:380px){
+ .app.game-viewport-fit .customer-info{left:7px!important;right:7px!important}
+ .app.game-viewport-fit .customer-info .mini-avatar{width:23px;height:23px;flex:none}
+ .app.game-viewport-fit .customer-info .patience-wrap{gap:3px!important}
+ .app.game-viewport-fit .customer-info .patience-track{width:clamp(34px,11vw,49px)!important}
+ .app.game-viewport-fit .customer-info .patience-wrap small{width:auto;min-width:28px;font-size:8px!important}
+ .app.game-viewport-fit #storeMenu>button{font-size:clamp(8px,2.6vw,10px)!important;gap:3px!important}
+ .app.game-viewport-fit .station-label{font-size:clamp(5px,1.7vw,7px)}
+ .app.game-viewport-fit .scale-screen{width:54%;right:4px}
+ .app.game-viewport-fit .scale-screen>span{font-size:clamp(12px,4vw,17px)}
+ .app.game-viewport-fit .bag-zone b{font-size:clamp(6px,2vw,8px)}
 }
-@media (orientation:portrait) and (max-width:760px) {
-  .app.game-viewport-fit { padding-left:max(9px,env(safe-area-inset-left,0px))!important;
-    padding-right:max(9px,env(safe-area-inset-right,0px))!important; }
-  .app.game-viewport-fit .store-scene {
-    height:clamp(214px,30svh,295px)!important; min-height:214px!important; }
-  .app.game-viewport-fit .store-scene .customer {
-    left:50%!important; width:clamp(112px,37vw,174px); max-width:48%; }
-  .app.game-viewport-fit .store-scene .speech { font-size:clamp(9px,2.5vw,11px); padding:clamp(7px,2vw,12px); }
-  .app.game-viewport-fit .wall-note { right:3%; top:8%; max-width:29%;
-    font-size:clamp(5px,1.55vw,8px); letter-spacing:clamp(.1px,.2vw,1px);
-    padding:clamp(4px,1.4vw,8px); }
-  .app.game-viewport-fit .wall-note b { font-size:clamp(6px,1.8vw,10px); }
-  .app.game-viewport-fit .stations {
-    grid-template-columns:minmax(0,1.16fr) minmax(0,.94fr) minmax(62px,.48fr)!important;
-    gap:clamp(5px,1.9vw,9px)!important;
-  }
-  .app.game-viewport-fit .station, .app.game-viewport-fit .bag-zone { min-width:0; }
-  .app.game-viewport-fit .station { height:clamp(124px,18svh,155px); }
-  .app.game-viewport-fit .bag-zone { overflow:hidden; }
-  .app.game-viewport-fit .conveyor { height:clamp(108px,16svh,137px)!important; }
-  .app.game-viewport-fit .conveyor:has(.many) { height:max(155px,24svh)!important; }
-  .app.game-viewport-fit .belt-section .section-heading { flex-wrap:wrap; }
-  .app.game-viewport-fit .belt-section #beltHint { flex:1 1 110px; }
-  .app.game-viewport-fit .receipt-list { height:clamp(120px,24svh,235px)!important; }
-  .app.game-viewport-fit .pos-panel { border-radius:16px; }
+@media (orientation:landscape) and (max-height:540px){
+ .app.game-viewport-fit{overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+ .app.game-viewport-fit .pos-panel{overflow-y:auto}
 }
-@media (orientation:portrait) and (max-width:380px) {
-  .app.game-viewport-fit .customer-info { left:7px!important; right:7px!important; }
-  .app.game-viewport-fit .customer-info .mini-avatar { width:23px;height:23px;flex:none; }
-  .app.game-viewport-fit .customer-info .patience-wrap { gap:3px!important; }
-  .app.game-viewport-fit .customer-info .patience-track { width:clamp(34px,11vw,49px)!important; }
-  .app.game-viewport-fit .customer-info .patience-wrap small { width:auto;min-width:28px;font-size:8px!important; }
-  .app.game-viewport-fit #storeMenu>button { font-size:clamp(8px,2.6vw,10px)!important; gap:3px!important; }
-  .app.game-viewport-fit .station-label { font-size:clamp(5px,1.7vw,7px); }
-  .app.game-viewport-fit .scale-screen { width:54%;right:4px; }
-  .app.game-viewport-fit .scale-screen>span { font-size:clamp(12px,4vw,17px); }
-  .app.game-viewport-fit .bag-zone b { font-size:clamp(6px,2vw,8px); }
+@media (orientation:landscape) and (max-width:760px){.app.game-viewport-fit .store-scene .customer{left:50%!important}}
+@media (max-width:600px){
+ #modal[open]:not([data-kind="style-preview"]){max-width:calc(100vw - 10px);max-height:calc(100dvh - 10px)}
+ .payment-sheet .payment-sheet-header,.payment-sheet .payment-sheet-header>div{min-width:0}
+ #accountOverlay:not(.account-compact) .account-panel{max-width:100%}
 }
-/* Landscape phones / short split-screen windows: do not clip a large cashier
-   behind browser chrome. Normal-size landscape retains the original columns. */
-@media (orientation:landscape) and (max-height:540px) {
-  .app.game-viewport-fit { overflow-y:auto!important; overflow-x:hidden!important;
-    -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
-  .app.game-viewport-fit .pos-panel { overflow-y:auto; }
-}
-@media (orientation:landscape) and (max-width:760px) {
-  .app.game-viewport-fit .store-scene .customer { left:50%!important; }
-}
-@media (max-width:600px) {
-  #modal[open]:not([data-kind="style-preview"]) { max-width:calc(100vw - 10px); max-height:calc(100dvh - 10px); }
-  .payment-sheet .payment-sheet-header { min-width:0; }
-  .payment-sheet .payment-sheet-header > div { min-width:0; }
-  #accountOverlay:not(.account-compact) .account-panel { max-width:100%; }
-}
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior:auto!important; }
-}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
