@@ -2326,3 +2326,20 @@ body[data-theme="dark"] .kasih-pro-hardware{background:radial-gradient(ellipse,#
 .aid-id-chip {
   display: none !important;
 }
+
+/* V70: compact professional aid terminal. */
+.kasih-pro .pro-reader{position:relative;border-color:#7c9188;background:linear-gradient(145deg,#415d54 0%,#233e35 46%,#172f28 100%);box-shadow:inset 0 1px 0 #d7e8dc70,0 4px 0 #11291f,0 12px 18px #173f3726;border-radius:20px 20px 26px 26px;padding:14px;gap:10px}
+.pro-reader-brand{display:flex;justify-content:space-between;align-items:center;align-self:stretch;font-size:9px;font-weight:800;letter-spacing:1.8px;padding:0 4px}
+.reader-led{width:5px;height:5px;border-radius:50%;background:#9ee7b1;box-shadow:0 0 7px #9ee7b177}
+.pro-reader-screen{background:linear-gradient(150deg,#f0f7e9,#d9ebdc);border-color:#102c23;border-radius:11px;box-shadow:inset 0 1px 4px #143a2720;min-height:128px;justify-content:center;align-items:center;text-align:center}
+.kasih-pro .pro-reader-screen small{font-weight:700;letter-spacing:1.4px;opacity:.7}
+.kasih-pro .pro-reader-screen>b:not(.pro-reader-instruction){font-size:26px;font-variant-numeric:tabular-nums;letter-spacing:-.8px}
+.pro-reader-screen>i{justify-content:center;font-size:8px;border-top:1px solid #91b19a55;padding-top:7px;width:100%;color:#426b50}
+.pro-reader-slot{align-self:center;height:6px;background:#10241c;border:1px solid #708b7b;box-shadow:none}
+.pro-reader-contact{width:100%;font-size:6px;letter-spacing:1.1px;opacity:.8}
+.kasih-pro .kasih-funded{padding:10px;background:#e8f1e3;border:1px solid #cbdcc7;border-radius:8px;color:#315b3b}
+.aid-id-data{right:6%}
+@media(max-width:600px){.kasih-pro .pro-reader{padding:9px;gap:7px;border-radius:16px 16px 20px 20px}.pro-reader-brand{font-size:7px;letter-spacing:.8px}.pro-reader-screen{min-height:105px}.kasih-pro .pro-reader-screen>b:not(.pro-reader-instruction){font-size:20px}.pro-reader-screen>i{font-size:7px;padding-top:5px}.kasih-pro .kasih-funded{padding:7px}.pro-reader-contact{font-size:5px;letter-spacing:.6px}}
+@media(max-width:350px){.kasih-pro .pro-reader{padding:6px}.pro-reader-brand{font-size:6px}.kasih-pro .pro-reader-screen>b:not(.pro-reader-instruction){font-size:16px}.pro-reader-screen>i{font-size:6px}.pro-reader-contact{font-size:4.5px;letter-spacing:0}}
+@media(max-height:600px) and (min-width:601px){.kasih-pro .pro-reader{padding:8px;gap:5px}.pro-reader-screen{min-height:95px}}
+@media(max-width:350px){.kasih-pro .pro-reader-screen>b:not(.pro-reader-instruction){font-size:13px;white-space:nowrap;letter-spacing:-.5px}}

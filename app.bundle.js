@@ -250,12 +250,14 @@
   // kitakasih.mjs
   var KASIH_PRODUCTS = /* @__PURE__ */ new Set(["milk", "bread", "eggs", "rice", "noodles", "cookies", "soap", "coffee", "water", "curry", "detergent", "oil", "sugar", "flour", "soy", "sardine", "tea", "malt", "salt", "condensed", "tissue", "toothpaste", "shampoo", "dishsoap"]);
   var kasihEligible = (item) => KASIH_PRODUCTS.has(item.id);
+  var kasihOpeningBalance = (rng = Math.random) => 1e3 + Math.min(18, Math.max(0, Math.floor(rng() * 19))) * 500;
   function kasihAccount(store, person, rng = Math.random) {
     store.kitaKasih ??= { accounts: {}, receipts: [] };
     store.kitaKasih.accounts ??= {};
     store.kitaKasih.receipts ??= [];
     const key = person.id;
-    const account = store.kitaKasih.accounts[key] ??= { balance: 1e3 + Math.min(18, Math.max(0, Math.floor(rng() * 19))) * 500 };
+    for (const a of Object.values(store.kitaKasih.accounts)) delete a.balance;
+    const account = store.kitaKasih.accounts[key] ??= {};
     if (!/^KK-\d{6}$/.test(account.card || "")) {
       const used = new Set(Object.values(store.kitaKasih.accounts).map((a) => a.card));
       let n = 1e5 + Math.min(899999, Math.max(0, Math.floor(rng() * 9e5)));
@@ -282,8 +284,7 @@
     const k = c.kasih;
     if (k.committed) return false;
     const account = kasihAccount(store, c.person), q = kasihQuote(c);
-    if (!k.verified || !k.reserved || account.balance !== k.balanceBefore) return false;
-    account.balance = q.balanceAfter;
+    if (!k.verified || !k.reserved || store.kitaKasih.receipts.some((r) => r.id === k.id)) return false;
     k.committed = true;
     k.balanceAfter = q.balanceAfter;
     k.aid = q.aid;
@@ -3303,7 +3304,7 @@
   var calculatorResult = "";
   var advancePending = false;
   var STORAGE = "kedai-kita-v1";
-  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v69-kasih-card";
+  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v70-kasih-visit";
   var UPDATE_CHECK_URL = "./version.json";
   var storageOK = true;
   var progress = createProgress();
@@ -7282,7 +7283,7 @@
     if (rush || customer.kind === "return" || customer.kind === "kitafood") return;
     if (mode === "practice" ? session.index % 3 !== 0 : session.index % 4 !== 1) return;
     const account = kasihAccount(operatingStore(), customer.person);
-    customer.kasih = { id: progress.day + "-" + session.index + "-" + customer.person.id, card: account.card, balanceBefore: account.balance, verified: false, reserved: false, committed: false };
+    customer.kasih = { id: progress.day + "-" + session.index + "-" + customer.person.id, card: account.card, balanceBefore: kasihOpeningBalance(), verified: false, reserved: false, committed: false };
     customer.method = "kasih";
     customer.requiresPin = false;
     customer.cardDeclineReason = null;
@@ -7292,11 +7293,9 @@
     const c = customer, k = c.kasih, q = kasihQuote(c), area = $("paymentArea");
     k.card = kasihAccount(operatingStore(), c.person).card;
     const active = () => customer === c && !paused && !busy && phase === "offer" && c.method === "kasih" && !c.paid;
-    area.innerHTML = `<section class="kasih-panel kasih-pro"><header><div><span class="kasih-pill">KitaKasih</span><small>Terminal bantuan kedai</small></div><span class="kasih-connection"><i></i> ${k.verified ? "Kad disahkan" : "Sedia"}</span></header><div class="kasih-pro-grid"><div class="kasih-pro-hardware"><button class="kasih-reader pro-reader" id="kasihReader" aria-label="Baca kad KitaKasih"><span class="pro-reader-brand">KITA \xB7 SMART TERMINAL</span><span class="pro-reader-screen ${k.verified ? "" : "awaiting-card"}"><small>${k.verified ? "BAKI BANTUAN" : "PENGESAHAN KAD"}</small>${k.verified ? `<b>${money(k.balanceBefore)}</b><span>${c.person.name}</span>` : '<b class="pro-reader-instruction">Tekan kad atau seret kad ke pembaca</b>'}<i>${icon(k.verified ? "check" : "card")} ${k.verified ? "Kad aktif" : "Menunggu kad"}</i></span><span class="pro-reader-slot"><i></i></span><span class="pro-reader-contact">${icon("scan")} PEMBACA KAD</span></button><button class="kasih-card pro-aid-card ${k.verified ? "verified" : ""}" id="kasihCard" aria-label="Semak kad KitaKasih pelanggan"><span class="aid-id-heading">KAD KOMUNITI<span>KEDAI KITA \xB7 KitaKasih</span></span><span class="aid-id-pattern" aria-hidden="true"></span><span class="aid-id-photo">${avatar(c.person)}</span><span class="aid-id-chip" aria-hidden="true"></span><span class="aid-id-data"><small>NAMA PEMEGANG</small><strong>${c.person.name}</strong><small>ID PELANGGAN</small><b>${k.card}</b><em>AHLI KOMUNITI \xB7 AKTIF</em></span><span class="aid-id-footer">KAD REKAAN \xB7 UNTUK PERMAINAN SAHAJA</span></button>${k.verified ? '<span class="kasih-device-caption">Kad pelanggan telah disahkan</span>' : ""}</div><div class="kasih-pro-receipt"><div class="kasih-review-title"><span>SEMAKAN BELIAN</span><b>${money(netTotal(c))}</b></div>${c.hasCoupon ? `<div class="kasih-coupon ${c.couponApplied ? "applied" : ""}"><span>${icon("receipt")}<b>${c.couponApplied ? "Kupon 10% digunakan" : "Pelanggan minta kupon 10%"}</b></span>${c.couponApplied ? `<strong>\u2212${money(c.discount)}</strong>` : '<button id="kasihCoupon" class="secondary-btn">Gunakan kupon</button>'}</div>` : ""}<div class="kasih-breakdown"><div><span>Barang layak${c.couponApplied ? " selepas kupon" : ""}</span><b>${money(q.eligible)}</b></div><div><span>Barang tidak layak</span><b>${money(q.ineligible)}</b></div><div class="kasih-funded"><span>Daripada KitaKasih</span><b>${k.verified ? money(q.aid) : "\u2014"}</b></div><div><span>Baki bantuan selepas bayaran</span><b>${k.verified ? money(q.balanceAfter) : "\u2014"}</b></div><div class="kasih-extra"><span>Bayaran tambahan</span><b>${k.verified ? money(q.remaining) : "\u2014"}</b></div></div><p class="kasih-note" role="status">${!k.verified ? "Sahkan kad untuk semak bantuan dan bayaran tambahan." : q.remaining ? "Pilih kaedah untuk baki belian. Bantuan belum dipotong." : "Bantuan mencukupi. Sahkan untuk lengkapkan pembelian."}</p>${k.verified ? q.remaining ? `<div class="kasih-actions">${availablePaymentMethods(progress.upgrades, mode === "practice").map((m) => `<button class="secondary-btn" data-kasih-method="${m}">${icon(m)} ${{ cash: "Tunai", card: "Kad debit", qr: "QR" }[m]}</button>`).join("")}</div><small class="kasih-rounding-note">Tambahan tunai dibundarkan kepada 5 sen.</small>` : '<button id="kasihConfirm" class="primary-btn">Sahkan bayaran & pulangkan kad</button>' : '<div class="kasih-awaiting">' + icon("lock") + " Menunggu pengesahan kad</div>"}<button id="kasihCancel" class="text-btn">Bayar sendiri tanpa bantuan</button></div></div><footer class="kasih-pro-footer"><span>${icon("lock")} Kad rekaan \xB7 Simulasi dalam permainan</span><b>KITA PAY</b></footer></section>`;
+    area.innerHTML = `<section class="kasih-panel kasih-pro"><header><div><span class="kasih-pill">KitaKasih</span><small>Pembayaran bantuan</small></div><span class="kasih-connection"><i></i> ${k.verified ? "Kad disahkan" : "Sedia"}</span></header><div class="kasih-pro-grid"><div class="kasih-pro-hardware"><button class="kasih-reader pro-reader" id="kasihReader" aria-label="Baca kad KitaKasih"><span class="pro-reader-brand"><span>KITA PAY</span><i class="reader-led" aria-hidden="true"></i></span><span class="pro-reader-screen ${k.verified ? "" : "awaiting-card"}"><small>${k.verified ? "BAKI TERSEDIA" : "KITAKASIH"}</small>${k.verified ? `<b>${money(k.balanceBefore)}</b><span>${c.person.name}</span>` : '<b class="pro-reader-instruction">Tekan atau seret kad</b>'}<i>${icon(k.verified ? "check" : "card")} ${k.verified ? "Disahkan" : "Sedia menerima kad"}</i></span><span class="pro-reader-slot"><i></i></span><span class="pro-reader-contact">${icon("scan")} TERMINAL BANTUAN</span></button><button class="kasih-card pro-aid-card ${k.verified ? "verified" : ""}" id="kasihCard" aria-label="Semak kad KitaKasih pelanggan"><span class="aid-id-heading">KAD KOMUNITI<span>KEDAI KITA \xB7 KitaKasih</span></span><span class="aid-id-pattern" aria-hidden="true"></span><span class="aid-id-photo">${avatar(c.person)}</span><span class="aid-id-data"><small>NAMA PEMEGANG</small><strong>${c.person.name}</strong><small>ID PELANGGAN</small><b>${k.card}</b><em>AHLI KOMUNITI \xB7 AKTIF</em></span><span class="aid-id-footer">KAD REKAAN \xB7 UNTUK PERMAINAN SAHAJA</span></button>${k.verified ? '<span class="kasih-device-caption">Identiti disahkan</span>' : ""}</div><div class="kasih-pro-receipt"><div class="kasih-review-title"><span>JUMLAH BELIAN</span><b>${money(netTotal(c))}</b></div>${c.hasCoupon ? `<div class="kasih-coupon ${c.couponApplied ? "applied" : ""}"><span>${icon("receipt")}<b>${c.couponApplied ? "Kupon 10% digunakan" : "Pelanggan minta kupon 10%"}</b></span>${c.couponApplied ? `<strong>\u2212${money(c.discount)}</strong>` : '<button id="kasihCoupon" class="secondary-btn">Gunakan kupon</button>'}</div>` : ""}<div class="kasih-breakdown"><div><span>Barang layak${c.couponApplied ? " selepas kupon" : ""}</span><b>${money(q.eligible)}</b></div><div><span>Barang tidak layak</span><b>${money(q.ineligible)}</b></div><div class="kasih-funded"><span>Dana KitaKasih</span><b>${k.verified ? money(q.aid) : "\u2014"}</b></div><div><span>Baki transaksi</span><b>${k.verified ? money(q.balanceAfter) : "\u2014"}</b></div><div class="kasih-extra"><span>Pelanggan bayar</span><b>${k.verified ? money(q.remaining) : "\u2014"}</b></div></div><p class="kasih-note" role="status">${!k.verified ? "Baca kad untuk semak bantuan." : q.remaining ? "Pilih kaedah bayaran tambahan." : "Belian ditanggung sepenuhnya."}</p>${k.verified ? q.remaining ? `<div class="kasih-actions">${availablePaymentMethods(progress.upgrades, mode === "practice").map((m) => `<button class="secondary-btn" data-kasih-method="${m}">${icon(m)} ${{ cash: "Tunai", card: "Kad debit", qr: "QR" }[m]}</button>`).join("")}</div><small class="kasih-rounding-note">Tambahan tunai dibundarkan kepada 5 sen.</small>` : '<button id="kasihConfirm" class="primary-btn">Sahkan bayaran</button>' : '<div class="kasih-awaiting">' + icon("lock") + " Menunggu kad</div>"}<button id="kasihCancel" class="text-btn">Bayar tanpa bantuan</button></div></div><footer class="kasih-pro-footer"><span>${icon("lock")} Kad rekaan \xB7 Simulasi dalam permainan</span><b>KITA PAY</b></footer></section>`;
     const verify = () => {
       if (!active()) return;
-      const a = kasihAccount(operatingStore(), c.person);
-      k.balanceBefore = a.balance;
       k.verified = true;
       beep("coin");
       renderKasih();
@@ -7380,7 +7379,7 @@
   }
   function showKasihHistory() {
     const store = operatingStore(), receipts = store.kitaKasih?.receipts || [];
-    openModal("kasih-history", `<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">SIMULASI BANTUAN DALAM PERMAINAN</div><h2>Resit KitaKasih</h2></div><button class="icon-btn" id="closeKasihHistory" aria-label="Tutup">${icon("close")}</button></div><p>Rekod 20 transaksi terkini. Baki kad rekaan disimpan mengikut pelanggan. Baki awal pelanggan baharu rawak RM10\u2013RM100, tanpa tambah nilai automatik. Baki sedia ada dikekalkan.</p><div class="kasih-history">${receipts.length ? receipts.map((r) => `<article><b>${r.name} \xB7 ${r.card}</b><small>Hari ${r.day} \xB7 ${r.id}</small><div><span>Jumlah belian</span><b>${money(r.total)}</b></div><div><span>KitaKasih</span><b>${money(r.aid)}</b></div><div><span>Tambahan (${{ cash: "tunai", card: "kad", qr: "QR", kasih: "tiada" }[r.method] || r.method})</span><b>${money(r.extra)}</b></div><div><span>Baki bantuan</span><b>${money(r.balance)}</b></div></article>`).join("") : "<p>Belum ada transaksi. Pelanggan KitaKasih pertama muncul sebagai pelanggan kedua syif biasa. Dalam latihan, pelanggan pertama menggunakan KitaKasih.</p>"}</div></div>`);
+    openModal("kasih-history", `<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">SIMULASI BANTUAN DALAM PERMAINAN</div><h2>Resit KitaKasih</h2></div><button class="icon-btn" id="closeKasihHistory" aria-label="Tutup">${icon("close")}</button></div><p>Rekod 20 transaksi terkini. Bantuan rawak RM10\u2013RM100 bagi setiap kunjungan. Baki transaksi tidak dibawa ke kunjungan seterusnya.</p><div class="kasih-history">${receipts.length ? receipts.map((r) => `<article><b>${r.name} \xB7 ${r.card}</b><small>Hari ${r.day} \xB7 ${r.id}</small><div><span>Jumlah belian</span><b>${money(r.total)}</b></div><div><span>KitaKasih</span><b>${money(r.aid)}</b></div><div><span>Tambahan (${{ cash: "tunai", card: "kad", qr: "QR", kasih: "tiada" }[r.method] || r.method})</span><b>${money(r.extra)}</b></div><div><span>Baki bantuan</span><b>${money(r.balance)}</b></div></article>`).join("") : "<p>Belum ada transaksi. Pelanggan KitaKasih pertama muncul sebagai pelanggan kedua syif biasa. Dalam latihan, pelanggan pertama menggunakan KitaKasih.</p>"}</div></div>`);
     $("closeKasihHistory").onclick = closeModal;
   }
   var kasihHistoryButton = document.createElement("button");

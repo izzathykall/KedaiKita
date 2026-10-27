@@ -1,9 +1,8 @@
 {
-  "version": "2026-10-27-v69-kasih-card",
-  "title": "Kad KitaKasih lebih kemas",
+  "version": "2026-10-27-v70-kasih-visit",
+  "title": "KitaKasih: bantuan setiap kunjungan",
   "notes": [
-    "Muzik kekal pada kelajuan biasa termasuk Rush Hour.",
-    "Foto kad tersenyum, cip kanan tengah dan ID rawak kekal.",
-    "Arahan pembaca kad dipusatkan dan ditebalkan."
+    "Bantuan rawak setiap kunjungan, tanpa baki akaun pelanggan.",
+    "Terminal baharu dengan arahan ringkas dan kad tanpa cip."
   ]
 }
