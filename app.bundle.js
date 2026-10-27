@@ -68,12 +68,6 @@
       if (active) return;
       if (document.activeElement?.matches('input,textarea,[contenteditable="true"]')) return;
       const viewport = screen();
-      if (viewport.height >= viewport.width) {
-        app.classList.remove("game-tight");
-        app.dataset.fitOverflow = "false";
-        apply(1, viewport.height);
-        return;
-      }
       if (visual && visual.height < viewport.layoutH * 0.64 && document.activeElement?.isContentEditable) return;
       active = true;
       const paymentView = body.classList.contains("view-payment") && viewport.width <= 760;
@@ -1823,7 +1817,7 @@
       const head = `<header class="kf-head"><div class="kf-logo">${icon2("delivery")}</div><div><small>KEDAI KITA \xB7 PENGHANTARAN TEMPATAN</small><h2>Kita<em>Food</em></h2><p>Pesanan pelanggan, disiapkan di kaunter.</p></div><button id="kfClose" class="icon-btn" aria-label="Tutup KitaFood">${icon2("close")}</button></header>`;
       const stats = `<div class="kf-stats"><div><small>DIHANTAR</small><strong>${s.completed || 0}</strong></div><div><small>JUALAN KITAFOOD</small><strong>${money2(s.revenue || 0)}</strong></div><div><small>GANJARAN PANTAS</small><strong>${money2(s.bonus || 0)}</strong></div></div>`;
       const content = !o ? `<div class="kf-welcome"><div class="kf-welcome-graphic">${icon2("delivery")}</div><h3>${unlocked() ? "Kaunter KitaFood sedia!" : "KitaFood dibuka pada Hari 3"}</h3>${unlocked() ? "" : "<p>Teruskan Mod Kerjaya sehingga Hari 3 untuk menerima pesanan penghantaran.</p>"}<div class="kf-mini-steps"><span>Rider tiba</span><span>Cari barang</span><span>Sahkan kod</span></div></div>` : `${riderHeader(o)}<nav class="kf-steps" aria-label="Proses pesanan"><span class="done">1. Semak</span><span class="${stage === "pick" || stage === "verify" ? "done" : ""}">2. Cari barang</span><span class="${stage === "verify" ? "done" : ""}">3. Serah</span></nav>
-   ${stage === "list" ? `<div class="kf-intro-stage">${ticket(o)}<aside class="kf-tip-card"><div class="kf-tip-symbol">${icon2("basket")}</div><h3>Cari sendiri barang pesanan</h3><p>Lihat senarai di sebelah. Pilih barang yang betul pada rak kedai dan masukkan ke beg sebelum menyerahkannya kepada rider.</p><div class="kf-tip-note">Bayaran pelanggan sudah diterima melalui KitaFood. Tiada perlu kutip tunai.</div><button class="primary-btn kf-big-button" id="kfStart">Mula Cari Barang ${icon2("arrow")}</button></aside></div>` : stage === "pick" ? `<div class="kf-pick-layout">${ticket(o)}<section class="kf-shop"><div class="kf-section-heading"><div><small>RAK PRODUK KEDAI KITA</small><h3>Pilih barang yang diminta</h3></div><span class="kf-scan-label">${icon2("scan")} IMBAS</span></div><div class="kf-filter"><input id="kfSearch" type="search" placeholder="Cari nama produk..." aria-label="Cari barang" autocomplete="off"><select id="kfCategory" aria-label="Kategori barang"><option value="all">Semua kategori</option>${categories.filter((c) => p.unlocked.includes(c.id) && foodCategories.has(c.id)).map((c) => `<option value="${safe(c.id)}">${safe(c.name)}</option>`).join("")}</select></div><div class="kf-shelf" id="kfShelf">${shelfHTML(o)}</div></section></div><div class="kf-bag"><div class="kf-bag-head">${icon2("basket")} <div><small>BEG PESANAN</small><strong>${picked(o)} daripada ${o.items.length} barang</strong></div><div class="kf-progress"><i style="width:${Math.round(100 * picked(o) / o.items.length)}%"></i></div></div><div class="kf-packed">${picked(o) ? o.items.filter((x) => x.packed).map((x) => `<div class="kf-packed-product">${productArt2(x.id)}<span>${safe(x.name)}</span><button data-kf-remove="${safe(x.id)}" type="button">Keluarkan</button></div>`).join("") : "<p>Beg masih kosong. Tekan barang yang betul di rak untuk mengisi beg.</p>"}</div><button class="primary-btn kf-big-button" id="kfDone" ${ready(o) ? "" : "disabled"}>${ready(o) ? "Barang Sudah Siap" : "Lengkapkan Semua Barang"} ${icon2("check")}</button></div>` : `<div class="kf-verify-stage"><div class="kf-sealed"><span class="kf-seal-art">${icon2("basket")}<i>${icon2("check")}</i></span><h3>Semua barang telah dibungkus!</h3><p>Beg pesanan <b>${safe(o.id)}</b> telah dimeterai. Pastikan kod pengambilan sepadan sebelum serahkan kepada rider.</p><div class="kf-review-list">${o.items.map((x) => `<span class="kf-review-product">${productArt2(x.id)}<b>${safe(x.name)}</b>${icon2("check")}</span>`).join("")}</div><button class="kf-back" id="kfEdit">${icon2("undo")} Semak semula beg</button></div><div class="kf-phone"><small>KOD PENGAMBILAN PADA TELEFON RIDER</small><strong>${safe(o.code)}</strong><span>KITAFOOD \xB7 ${safe(o.rider)}</span><label for="kfCode">Masukkan kod 4 digit rider</label><input id="kfCode" maxlength="4" inputmode="none" readonly placeholder="\u2212 \u2212 \u2212 \u2212" autocomplete="off" aria-describedby="kfCodeError"><div class="kf-keypad" role="group" aria-label="Pad nombor kod rider">${["1", "2", "3", "4", "5", "6", "7", "8", "9", "clear", "0", "back"].map((key) => `<button type="button" data-kf-key="${key}" aria-label="${key === "clear" ? "Kosongkan kod" : key === "back" ? "Padam digit terakhir" : key}">${key === "clear" ? "Padam semua" : key === "back" ? icon2("undo") : key}</button>`).join("")}</div><p id="kfCodeError" class="kf-code-error" role="status" aria-live="polite"></p><button class="primary-btn kf-big-button" id="kfHandoff">Sahkan & Serah Kepada Rider ${icon2("check")}</button></div></div>`}
+   ${stage === "list" ? `<div class="kf-intro-stage">${ticket(o)}<aside class="kf-tip-card"><div class="kf-tip-symbol">${icon2("basket")}</div><h3>Cari barang pesanan</h3><p>Lihat senarai di sebelah. Pilih barang yang betul pada rak kedai dan masukkan ke beg sebelum menyerahkannya kepada rider.</p><div class="kf-tip-note">Bayaran pelanggan sudah diterima melalui KitaFood. Tiada perlu kutip tunai.</div><button class="primary-btn kf-big-button" id="kfStart">Mula Cari Barang ${icon2("arrow")}</button></aside></div>` : stage === "pick" ? `<div class="kf-pick-layout">${ticket(o)}<section class="kf-shop"><div class="kf-section-heading"><div><small>RAK PRODUK KEDAI KITA</small><h3>Pilih barang yang diminta</h3></div><span class="kf-scan-label">${icon2("scan")} IMBAS</span></div><div class="kf-filter"><input id="kfSearch" type="search" placeholder="Cari nama produk..." aria-label="Cari barang" autocomplete="off"><select id="kfCategory" aria-label="Kategori barang"><option value="all">Semua kategori</option>${categories.filter((c) => p.unlocked.includes(c.id) && foodCategories.has(c.id)).map((c) => `<option value="${safe(c.id)}">${safe(c.name)}</option>`).join("")}</select></div><div class="kf-shelf" id="kfShelf">${shelfHTML(o)}</div></section></div><div class="kf-bag"><div class="kf-bag-head">${icon2("basket")} <div><small>BEG PESANAN</small><strong>${picked(o)} daripada ${o.items.length} barang</strong></div><div class="kf-progress"><i style="width:${Math.round(100 * picked(o) / o.items.length)}%"></i></div></div><div class="kf-packed">${picked(o) ? o.items.filter((x) => x.packed).map((x) => `<div class="kf-packed-product">${productArt2(x.id)}<span>${safe(x.name)}</span><button data-kf-remove="${safe(x.id)}" type="button">Keluarkan</button></div>`).join("") : "<p>Beg masih kosong. Tekan barang yang betul di rak untuk mengisi beg.</p>"}</div><button class="primary-btn kf-big-button" id="kfDone" ${ready(o) ? "" : "disabled"}>${ready(o) ? "Barang Sudah Siap" : "Lengkapkan Semua Barang"} ${icon2("check")}</button></div>` : `<div class="kf-verify-stage"><div class="kf-sealed"><span class="kf-seal-art">${icon2("basket")}<i>${icon2("check")}</i></span><h3>Semua barang telah dibungkus!</h3><p>Beg pesanan <b>${safe(o.id)}</b> telah dimeterai. Pastikan kod pengambilan sepadan sebelum serahkan kepada rider.</p><div class="kf-review-list">${o.items.map((x) => `<span class="kf-review-product">${productArt2(x.id)}<b>${safe(x.name)}</b>${icon2("check")}</span>`).join("")}</div><button class="kf-back" id="kfEdit">${icon2("undo")} Semak semula beg</button></div><div class="kf-phone"><small>KOD PENGAMBILAN PADA TELEFON RIDER</small><strong>${safe(o.code)}</strong><span>KITAFOOD \xB7 ${safe(o.rider)}</span><label for="kfCode">Masukkan kod 4 digit rider</label><input id="kfCode" maxlength="4" inputmode="none" readonly placeholder="\u2212 \u2212 \u2212 \u2212" autocomplete="off" aria-describedby="kfCodeError"><div class="kf-keypad" role="group" aria-label="Pad nombor kod rider">${["1", "2", "3", "4", "5", "6", "7", "8", "9", "clear", "0", "back"].map((key) => `<button type="button" data-kf-key="${key}" aria-label="${key === "clear" ? "Kosongkan kod" : key === "back" ? "Padam digit terakhir" : key}">${key === "clear" ? "Padam semua" : key === "back" ? icon2("undo") : key}</button>`).join("")}</div><p id="kfCodeError" class="kf-code-error" role="status" aria-live="polite"></p><button class="primary-btn kf-big-button" id="kfHandoff">Sahkan & Serah Kepada Rider ${icon2("check")}</button></div></div>`}
    <div class="kf-cancel-line"><button id="kfCancel" class="kf-cancel">Batalkan pesanan</button><div id="kfConfirmCancel" class="kf-cancel-confirm" hidden><p>Batalkan pesanan ${safe(o.id)}? Stok tidak akan ditolak.</p><button type="button" id="kfKeep">Kembali</button><button type="button" id="kfCancelYes">Ya, batalkan</button></div></div>`;
       openModal2("delivery", `<div class="modal-pad kf-ui kf-state-${o ? stage : "empty"}">${head}${stats}${content}<footer class="kf-footer">KITAFOOD \xB7 Hanya stok pesanan yang berjaya diserahkan akan ditolak.</footer></div>`);
       document.getElementById("kfClose").onclick = () => closeModal2();
@@ -3465,7 +3459,7 @@
   var calculatorResult = "";
   var advancePending = false;
   var STORAGE = "kedai-kita-v1";
-  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v72-offline-counter";
+  var APP_BUILD = window.__KEDAI_ACTIVE_VERSION__ || "2026-10-27-v73-portrait-fit";
   var UPDATE_CHECK_URL = "./version.json";
   var storageOK = true;
   var progress = createProgress();
@@ -3997,7 +3991,7 @@
       el.disabled = !!p.scanned;
       el.setAttribute("aria-label", p.name + ", " + (p.scanned ? "sudah dalam beg" : p.damaged && !p.repaired && p.barcodeFailTriggered ? "kod manual " + p.manualCode : p.weighted ? "tekan untuk timbang" : "tekan untuk scan"));
     }
-    $("beltHint").textContent = !customer && session ? "Menunggu pelanggan \xB7 tiada barang di conveyor" : scanned === items.length ? "Semua siap. Teruskan bayaran!" : slot > 5 ? slot + " barang menunggu \xB7 bergerak ke depan automatik" : "Scan barang \xB7 conveyor bergerak automatik";
+    $("beltHint").textContent = !customer && session ? "Menunggu pelanggan \xB7 tiada barang di conveyor" : scanned === items.length ? "Semua siap. Teruskan bayaran!" : "";
     $("undoScanBtn").disabled = !customer || phase !== "scan" || busy || !scanned;
   }
   function productHTML(p, i) {
@@ -7312,13 +7306,24 @@
       keyPose = move(keyPose.x + shifts[e.key][0], keyPose.y + shifts[e.key][1], base);
     };
   }
+  function fitWallSign() {
+    const scene = document.querySelector(".store-scene"), sign = scene?.querySelector(".wall-note"), shelf = scene?.querySelector(".shelf-right");
+    if (!scene || !sign || !shelf) return;
+    const available = Math.max(12, shelf.offsetTop - 22), width = Math.max(48, Math.min(150, shelf.offsetWidth * 0.82));
+    sign.style.width = width + "px";
+    sign.style.height = available + "px";
+    sign.style.fontSize = Math.max(5, Math.min(8, available / 5, width / 15)) + "px";
+    sign.style.right = Math.max(8, scene.clientWidth - shelf.offsetLeft - shelf.offsetWidth + shelf.offsetWidth * 0.09) + "px";
+  }
   function positionCustomerDialogue() {
+    fitWallSign();
     const scene = document.querySelector(".store-scene"), art = $("customerArt"), bubble = $("speech"), info = $("customerInfo");
     if (!scene || !art || !bubble || !info || !customer) return;
     const sceneBox = scene.getBoundingClientRect();
     if (!sceneBox.width || !sceneBox.height) return;
     const compact = sceneBox.width < 520, veryNarrow = sceneBox.width < 390;
-    art.style.left = compact ? "34%" : "";
+    const portrait = window.matchMedia("(orientation:portrait)").matches;
+    art.style.left = portrait ? "50%" : compact ? "34%" : "";
     const center = art.offsetLeft, half = art.offsetWidth / 2;
     const charLeft = center - half, charRight = center + half;
     const gap = compact ? 12 : 22, edge = compact ? 9 : 15;
@@ -7592,26 +7597,24 @@
   }
   function showKasihHistory() {
     const store = operatingStore(), receipts = store.kitaKasih?.receipts || [];
-    openModal("kasih-history", `<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">SIMULASI BANTUAN DALAM PERMAINAN</div><h2>Resit KitaKasih</h2></div><button class="icon-btn" id="closeKasihHistory" aria-label="Tutup">${icon("close")}</button></div><p>Rekod 20 transaksi terkini. Bantuan rawak RM10\u2013RM100 bagi setiap kunjungan. Baki transaksi tidak dibawa ke kunjungan seterusnya.</p><div class="kasih-history">${receipts.length ? receipts.map((r) => `<article><b>${r.name} \xB7 ${r.card}</b><small>Hari ${r.day} \xB7 ${r.id}</small><div><span>Jumlah belian</span><b>${money(r.total)}</b></div><div><span>KitaKasih</span><b>${money(r.aid)}</b></div><div><span>Tambahan (${{ cash: "tunai", card: "kad", qr: "QR", kasih: "tiada" }[r.method] || r.method})</span><b>${money(r.extra)}</b></div><div><span>Baki bantuan</span><b>${money(r.balance)}</b></div></article>`).join("") : "<p>Belum ada transaksi. Pelanggan KitaKasih pertama muncul sebagai pelanggan kedua syif biasa. Dalam latihan, pelanggan pertama menggunakan KitaKasih.</p>"}</div></div>`);
+    openModal("kasih-history", `<div class="modal-pad"><div class="modal-heading"><div><div class="modal-kicker">SIMULASI BANTUAN DALAM PERMAINAN</div><h2>Sejarah bantuan</h2></div><button class="icon-btn" id="closeKasihHistory" aria-label="Tutup">${icon("close")}</button></div><p>Rekod 20 transaksi terkini. Bantuan rawak RM10\u2013RM100 bagi setiap kunjungan. Baki transaksi tidak dibawa ke kunjungan seterusnya.</p><div class="kasih-history">${receipts.length ? receipts.map((r) => `<article><b>${r.name} \xB7 ${r.card}</b><small>Hari ${r.day} \xB7 ${r.id}</small><div><span>Jumlah belian</span><b>${money(r.total)}</b></div><div><span>KitaKasih</span><b>${money(r.aid)}</b></div><div><span>Tambahan (${{ cash: "tunai", card: "kad", qr: "QR", kasih: "tiada" }[r.method] || r.method})</span><b>${money(r.extra)}</b></div><div><span>Baki bantuan</span><b>${money(r.balance)}</b></div></article>`).join("") : "<p>Belum ada transaksi. Pelanggan KitaKasih pertama muncul sebagai pelanggan kedua syif biasa. Dalam latihan, pelanggan pertama menggunakan KitaKasih.</p>"}</div></div>`);
     $("closeKasihHistory").onclick = closeModal;
   }
   var kasihHistoryButton = document.createElement("button");
   kasihHistoryButton.type = "button";
   kasihHistoryButton.className = "text-btn kasih-history-button";
-  kasihHistoryButton.textContent = "Resit KitaKasih";
+  kasihHistoryButton.innerHTML = icon("receipt");
+  kasihHistoryButton.setAttribute("aria-label", "Sejarah bantuan");
+  kasihHistoryButton.title = "Sejarah bantuan";
   kasihHistoryButton.onclick = showKasihHistory;
-  $("receiptSub").parentElement.append(kasihHistoryButton);
+  document.querySelector(".receipt-title>span").replaceWith(kasihHistoryButton);
 
   // offline.mjs
   function prepareOfflineGame() {
     if (!("serviceWorker" in navigator) || !window.isSecureContext) return;
     const register = () => navigator.serviceWorker.register("./sw.js", { scope: "./", updateViaCache: "none" }).then((reg) => {
       const announce = () => {
-        const label = document.getElementById("offlineStatus");
-        if (label) {
-          label.textContent = "Sedia dimainkan offline";
-          label.title = "Fail permainan tersedia pada peranti ini. Progres akaun disegerakkan apabila internet kembali.";
-        }
+        document.documentElement.dataset.offlineReady = "true";
       };
       if (reg.active) announce();
       const track = (worker) => worker?.addEventListener("statechange", () => {
@@ -7620,8 +7623,7 @@
       track(reg.installing);
       reg.addEventListener("updatefound", () => track(reg.installing));
     }).catch(() => {
-      const label = document.getElementById("offlineStatus");
-      if (label) label.textContent = "Cache offline belum tersedia";
+      document.documentElement.dataset.offlineReady = "false";
     });
     register();
     window.addEventListener("online", register);

@@ -68,11 +68,6 @@
   if(active)return;
   if(document.activeElement?.matches('input,textarea,[contenteditable="true"]'))return;
   const viewport=screen();
-  // Portrait is a readable, vertically scrollable counter followed by receipt.
-  if(viewport.height>=viewport.width){
-   app.classList.remove('game-tight');app.dataset.fitOverflow='false';
-   apply(1,viewport.height);return;
-  }
   // A keyboard opening is not a change of the game's available layout.
   if(visual&&visual.height<viewport.layoutH*.64&&document.activeElement?.isContentEditable)return;
   active=true;
